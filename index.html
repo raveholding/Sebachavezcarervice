@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SebaChavez Car Service · Sistema VB (demo)</title>
+<meta name="theme-color" content="#2b2f36">
+<style>
+:root{--rojo:#e53935;--azul:#1e6fd0;--grafito:#3a3d43;--noche:#23262b;--bg:#f2f4f7;--card:#fff;--bd:#dfe3e8;--tx:#1d2127;--mut:#667085;--ok:#1f9d55;--warn:#d98b0a;--bad:#d32f2f;--r:10px}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--tx);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0 0 .4em;line-height:1.2}
+h2{font-size:1.25rem}h3{font-size:1.02rem}
+.hide,[hidden]{display:none!important}
+.mut{color:var(--mut)}.sm{font-size:.86rem}.r{text-align:right}.c{text-align:center}.b{font-weight:600}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sp{flex:1}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media(max-width:900px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.g2>*,.g3>*,.g4>*,.card{min-width:0}
+.btn{border:1px solid var(--bd);background:#fff;border-radius:8px;padding:8px 14px;min-height:40px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--tx)}
+.btn:hover{border-color:#b9c0ca;background:#f7f8fa}
+.btn.p{background:var(--azul);border-color:var(--azul);color:#fff}.btn.p:hover{background:#1859ab}
+.btn.d{background:var(--rojo);border-color:var(--rojo);color:#fff}.btn.d:hover{background:#c62828}
+.btn.s{min-height:32px;padding:4px 10px;font-size:.88rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+input,select,textarea{border:1px solid var(--bd);border-radius:8px;padding:8px 10px;background:#fff;width:100%;min-height:40px}
+textarea{min-height:70px;resize:vertical}
+input:focus,select:focus,textarea:focus,.btn:focus-visible{outline:2px solid var(--azul);outline-offset:1px}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--mut);margin:0 0 3px}
+.f{margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.card h3{margin-bottom:8px}
+/* login */
+#login{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#fff 0%,#eef2f8 60%,#e7edf7 100%)}
+.lbox{width:100%;max-width:560px;background:#fff;border:1px solid var(--bd);border-radius:16px;padding:22px;box-shadow:0 10px 40px rgba(20,30,50,.08)}
+.lbox .logo{display:block;margin:0 auto 6px;width:150px;height:auto}
+.ucard{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;min-height:52px}
+.ucard:hover{border-color:var(--azul);background:#f5f9ff}
+.av{width:36px;height:36px;border-radius:50%;background:var(--grafito);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.demoflag{background:#fff6e0;border:1px solid #f1d38a;color:#7a5400;border-radius:8px;padding:8px 10px;font-size:.84rem;margin:10px 0}
+/* VB banner */
+.vb{background:linear-gradient(120deg,#1b1d21,#2c2f35);color:#fff;border-radius:12px;padding:14px;margin-top:14px}
+.vb b{color:#ff8a1f}
+.vb .lema{font-style:italic;color:#d6d9de;font-size:.9rem}
+.vbb{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.vbb a{flex:1;min-width:110px;min-height:48px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;font-weight:700;text-decoration:none;color:#fff;background:#ff7a00;padding:0 14px}
+.vbb a.w{background:#25a244}.vbb a.t{background:#3c6fd6}.vbb a.m{background:#ff7a00}
+.vbl{font-size:.78rem;color:#9aa1ab;text-align:center;padding:6px}
+/* app */
+#app{display:flex;min-height:100vh}
+#side{width:236px;background:var(--noche);color:#e6e8ec;flex:none;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:auto}
+#side .brand{padding:14px 12px 8px;text-align:center;background:#fff}
+#side .brand img{width:96px;height:auto;display:block;margin:0 auto}
+#side nav{padding:8px;flex:1}
+#side nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;color:#cfd3da;padding:10px 12px;border-radius:8px;cursor:pointer;min-height:42px}
+#side nav button:hover{background:#2f333a}
+#side nav button.on{background:var(--azul);color:#fff;font-weight:700}
+#side .badge2{margin-left:auto;background:var(--rojo);color:#fff;border-radius:999px;font-size:.72rem;padding:1px 7px}
+#side .who{padding:10px 12px;border-top:1px solid #343840;font-size:.84rem}
+#side .vbs{padding:8px 12px 12px;font-size:.72rem;color:#8f96a1}
+#side .vbs a{color:#ff9a3d}
+#main{flex:1;min-width:0}
+#top{display:none;background:var(--noche);color:#fff;padding:8px 12px;align-items:center;gap:10px;position:sticky;top:0;z-index:20}
+#top button{background:none;border:1px solid #555;color:#fff;border-radius:8px;min-width:44px;min-height:40px;font-size:1.1rem}
+#view{padding:18px;max-width:1500px}
+@media(max-width:900px){#side{position:fixed;left:-250px;top:0;z-index:30;transition:left .2s}#side.open{left:0}#top{display:flex}#view{padding:12px}}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.bar h2{margin:0 12px 0 0}
+/* tables */
+.tw{overflow:auto;border:1px solid var(--bd);border-radius:var(--r);background:#fff}
+table{border-collapse:collapse;width:100%}
+th,td{padding:8px 10px;border-bottom:1px solid #edf0f3;text-align:left;vertical-align:top;font-size:.92rem}
+th{background:#f6f8fa;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;color:#5a6472;position:sticky;top:0;white-space:nowrap}
+td.n,th.n{text-align:right;white-space:nowrap}
+tr.clk{cursor:pointer}tr.clk:hover td{background:#f5f9ff}
+tr.sel td{background:#d9ecff}
+tr.low td{background:#fff3c4}
+tr.off td{opacity:.5}
+.badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.76rem;font-weight:700;background:#e9edf2;color:#44505e;white-space:nowrap}
+.b-Recibido{background:#e7eefb;color:#1d4ea0}.b-Diagnóstico{background:#efe6fb;color:#5b2ea6}.b-Presupuesto{background:#fff0d6;color:#8a5a00}
+.b-En\ reparación{background:#ffe3e0;color:#b3261e}.b-Listo{background:#dff5e7;color:#1b7a43}.b-Entregado{background:#e9edf2;color:#56606d}
+.ok{background:#dff5e7;color:#1b7a43}.warn{background:#fff0d6;color:#8a5a00}.bad{background:#ffe3e0;color:#b3261e}
+.kpi{background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:12px;cursor:pointer;text-align:left}
+.kpi:hover{border-color:var(--azul)}
+.kpi .v{font-size:1.55rem;font-weight:800;line-height:1.1}.kpi .l{font-size:.8rem;color:var(--mut);font-weight:600}
+.kpi.bad .v{color:var(--bad)}.kpi.okk .v{color:var(--ok)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--bd);background:#fff;border-radius:999px;padding:5px 12px;cursor:pointer;font-size:.86rem;font-weight:600;min-height:34px}
+.chip.on{background:var(--grafito);color:#fff;border-color:var(--grafito)}
+/* kanban */
+.kan{display:grid;grid-template-columns:repeat(6,minmax(210px,1fr));gap:10px;overflow:auto;padding-bottom:8px}
+.kcol{background:#e9edf2;border-radius:10px;padding:8px;min-height:140px}
+.kcol h4{margin:2px 4px 8px;font-size:.84rem;text-transform:uppercase;letter-spacing:.04em;color:#4a5461;display:flex;justify-content:space-between}
+.kc{background:#fff;border:1px solid var(--bd);border-left:4px solid var(--azul);border-radius:8px;padding:8px 10px;margin-bottom:8px;cursor:pointer}
+.kc:hover{box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.kc .pat{font-weight:800;letter-spacing:.06em}
+.kc.deuda{border-left-color:var(--rojo)}
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(15,20,30,.55);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow:auto}
+.mbox{background:#fff;border-radius:14px;width:100%;max-width:620px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.mbox.wide{max-width:980px}
+.mh{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0;z-index:2}
+.mh h3{margin:0;flex:1}
+.mb{padding:16px}
+.mf{padding:12px 16px;border-top:1px solid var(--bd);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;background:#fafbfc;border-radius:0 0 14px 14px}
+.err{background:#ffe3e0;color:#9b1c14;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:.9rem}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#23262b;color:#fff;padding:10px 16px;border-radius:10px;z-index:90;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+#toast.bad{background:#b3261e}
+/* turnos grid */
+.tg{display:grid;grid-template-columns:60px repeat(4,minmax(150px,1fr));min-width:760px;border:1px solid var(--bd);background:#fff;border-radius:10px;overflow:hidden}
+.tg .hd{background:#f6f8fa;font-weight:700;font-size:.8rem;padding:8px;border-bottom:1px solid var(--bd);border-left:1px solid #edf0f3}
+.tg .hr{padding:6px;font-size:.8rem;color:var(--mut);border-bottom:1px solid #edf0f3;height:56px}
+.tg .cell{border-bottom:1px solid #edf0f3;border-left:1px solid #edf0f3;height:56px;cursor:pointer;position:relative}
+.tg .cell:hover{background:#f0f6ff}
+.tb{position:absolute;left:2px;right:2px;top:2px;border-radius:6px;padding:4px 6px;font-size:.78rem;overflow:hidden;color:#fff;background:var(--azul);z-index:1;cursor:pointer}
+.tb.Confirmado{background:#1f9d55}.tb.Pendiente{background:#d98b0a}.tb.Taller{background:#6a3fc0}.tb.Cancelado{background:#8a8f98;text-decoration:line-through}
+.pbar{height:10px;background:#e3e7ec;border-radius:99px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--ok)}
+.hbar{height:16px;background:var(--azul);border-radius:4px;min-width:2px}
+.itbl input,.itbl select{min-height:34px;padding:4px 6px}
+.det{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:10px}
+.pill{display:inline-block;background:#eef1f5;border-radius:6px;padding:1px 7px;font-size:.8rem}
+#printArea{display:none}
+@media print{body>*:not(#printArea){display:none!important}#printArea{display:block!important;padding:0;color:#000;background:#fff}#printArea table th{position:static}}
+.pa h1{font-size:1.3rem}.pa .hdr{display:flex;gap:14px;align-items:center;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:10px}.pa .hdr img{width:80px}
+.pa td,.pa th{border:1px solid #999;font-size:.85rem}
+</style>
+</head>
+<body>
+<div id="login"></div>
+<div id="app" hidden>
+  <aside id="side"></aside>
+  <div id="main">
+    <div id="top"><button data-act="menu" aria-label="Menú">☰</button><b>SebaChavez Car Service</b></div>
+    <div id="view"></div>
+  </div>
+</div>
+<div id="modal" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="printArea"></div>
+<script>
+const LOGO="data:image/jpeg;base64,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";
+</script>
+<script>
+'use strict';
+/* ===== Sistema VB · taller mecánico · DEMO (datos locales en el navegador) ===== */
+const LS='sbcs_vb26_demo_v1', SS='sbcs_vb26_user';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const h=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const r2=n=>Math.round((+n||0)*100)/100;
+const fmt=n=>'$ '+r2(n).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const uid=p=>p+Math.random().toString(36).slice(2,9);
+function ymd(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+const TODAY=()=>ymd();
+function addDays(n,base){const d=base?new Date(base+'T12:00:00'):new Date();d.setDate(d.getDate()+n);return ymd(d)}
+function fdate(s){if(!s)return'—';const p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function daysTo(s){if(!s)return 9999;return Math.round((new Date(s+'T12:00:00')-new Date(TODAY()+'T12:00:00'))/864e5)}
+function ftime(t){const d=new Date(t);return fdate(ymd(d))+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+const num=v=>{const n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0};
+const VBTEL='5493874484132';
+const ESTADOS=['Recibido','Diagnóstico','Presupuesto','En reparación','Listo','Entregado'];
+const RECURSOS=['Elevador 1 (2 col.)','Elevador 2 (2 col.)','Alineación / balanceo','Servicio rápido'];
+const HORAS=[8,9,10,11,12,13,14,15,16,17];
+
+/* ---------- CUIT ---------- */
+function cuitDV(b){const w=[5,4,3,2,7,6,5,4,3,2];let s=0;for(let i=0;i<10;i++)s+=(+b[i])*w[i];let r=11-(s%11);if(r===11)r=0;return r===10?null:r}
+function cuitOk(c){const d=String(c||'').replace(/\D/g,'');return d.length===11&&cuitDV(d.slice(0,10))===+d[10]}
+function cuitFmt(c){const d=String(c).replace(/\D/g,'');return d.slice(0,2)+'-'+d.slice(2,10)+'-'+d[10]}
+function mkCuit(pre,n){for(;;n++){const b=pre+String(n).padStart(8,'0');const dv=cuitDV(b);if(dv!==null)return cuitFmt(b+dv)}}
+
+/* ---------- Datos de ejemplo ---------- */
+function seed(){
+ const d={ver:1,seq:{ot:0,tu:0,oc:0,mov:0,tc:1},
+ cfg:{nombre:'SebaChavez Car Service',dir:'Jujuy 251 - Salta',tel:'3875971922',mail:'schavezcarservice@gmail.com',fb:'sebachavezcarservice',ig:'sebachavez_carservice',vhora:18000,rubrosOblig:true,traspasoSinRubro:false},
+ users:[
+  {id:'u1',n:'Seba Chavez',rol:'dueno',esp:'Dueño · gestión',com:0},
+  {id:'u2',n:'Marcelo Torres',rol:'jefe',esp:'Jefe de taller · motor y transmisión',com:10},
+  {id:'u3',n:'Lucía Ramos',rol:'recepcion',esp:'Recepción y atención al cliente',com:0},
+  {id:'u4',n:'Darío Quispe',rol:'mecanico',esp:'Electricidad y electrónica',com:8},
+  {id:'u5',n:'Nahuel Ibarra',rol:'mecanico',esp:'Frenos, suspensión y dirección',com:8},
+  {id:'u6',n:'Ariel Vilte',rol:'mecanico',esp:'Inyección y combustible',com:8},
+  {id:'u7',n:'Rosa Guanca',rol:'limpieza',esp:'Limpieza y orden del taller',com:0}],
+ rubrosRep:['FILTRO DE ACEITE','FILTRO DE AIRE','FILTRO DE COMBUSTIBLE','FILTRO DE HABITÁCULO','ACEITE LUBRICANTE','BUJÍAS','FRENOS','CORREAS Y DISTRIBUCIÓN','BATERÍAS','SUSPENSIÓN','REFRIGERACIÓN','ILUMINACIÓN'],
+ marcas:['WEGA','FRAM','HASTING','MANN','BOSCH','NGK','ELAION','TRW','MONROE','MOURA','GATES','VOX'],
+ rubrosFin:[
+  {id:'f1',n:'Cobro de OT',t:'ing'},{id:'f2',n:'Venta de mostrador',t:'ing'},{id:'f3',n:'Otros ingresos',t:'ing'},
+  {id:'f4',n:'Pago a proveedores',t:'egr'},{id:'f5',n:'Insumos del taller',t:'egr'},{id:'f6',n:'Sueldos y comisiones',t:'egr'},
+  {id:'f7',n:'Alquiler y servicios',t:'egr'},{id:'f8',n:'Impuestos y habilitaciones',t:'egr'},{id:'f9',n:'Retiro del dueño',t:'egr'},
+  {id:'f10',n:'Gestor de residuos',t:'egr'},{id:'sys',n:'Traspaso interno',t:'int',oculto:true}],
+ servicios:[
+  {id:'s1',n:'Service: cambio de aceite y filtro',pu:14000,h:1},{id:'s2',n:'Cambio de pastillas de freno (eje)',pu:18000,h:1.5},
+  {id:'s3',n:'Rectificación de discos / campanas (torno)',pu:22000,h:2},{id:'s4',n:'Alineación y balanceo',pu:26000,h:1},
+  {id:'s5',n:'Diagnóstico con escáner multimarca',pu:16000,h:1},{id:'s6',n:'Carga de aire acondicionado',pu:30000,h:1.5},
+  {id:'s7',n:'Cambio de kit de distribución',pu:95000,h:5},{id:'s8',n:'Limpieza de inyectores por ultrasonido',pu:42000,h:2},
+  {id:'s9',n:'Reparación de alternador / burro de arranque',pu:38000,h:2.5},{id:'s10',n:'Cambio de amortiguadores (eje)',pu:30000,h:2},
+  {id:'s11',n:'Control de compresión',pu:20000,h:1},{id:'s12',n:'Mano de obra general (hora)',pu:18000,h:1}],
+ provs:[],repuestos:[],clientes:[],vehs:[],ots:[],turnos:[],ocs:[],ledger:[],
+ cajas:[{id:'C1',n:'Caja mostrador',principal:true},{id:'C2',n:'Caja taller'}],
+ turno:{abierto:true,id:'T1',fecha:TODAY(),apert:{C1:20000,C2:5000},por:'Seba Chavez'},
+ movs:[],hist:[],audit:[],
+ equip:[],extint:[],epp:[],resid:[],habil:[],entregas:[]};
+
+ /* proveedores */
+ const P=[['Distribuidora San Roque',mkCuit('3071',1234),'3874221100','ventas@sanroque.example'],['Filtros VOX',mkCuit('3069',5551),'3874330022','pedidos@vox.example'],['FRAM Argentina (mayorista)',mkCuit('3070',8870),'3874150099','mayorista@fram.example'],['Lubricantes del Norte',mkCuit('3068',4410),'3874090011','info@lubnorte.example'],['Frenos y Suspensión Salta',mkCuit('3072',3320),'3874777123','ventas@fysalta.example']];
+ P.forEach((p,i)=>d.provs.push({id:'p'+(i+1),n:p[0],cuit:p[1],tel:p[2],mail:p[3],activo:true}));
+ const pid=n=>d.provs.find(p=>p.n.startsWith(n)).id;
+
+ /* repuestos: cod, codProv, desc, marca, rubro, prov, pc, gan, qty, alarma, repos, rosca, junta, apl */
+ const R=[
+ ['7898286722777','7898286722777','WO120','VOX','FILTRO DE ACEITE','Filtros VOX',2980,50,12,2,6,'','',''],
+ ['7798186476940','7798186476940','WO121','VOX','FILTRO DE ACEITE','Filtros VOX',3050,50,8,2,6,'','',''],
+ ['7798001699226','7798001699226','WO130','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',3671,50,25,2,10,'M18X1,5','72X62','CHEVROLET Agile LS / LT / LTZ - 1,4 8v 92cv 2009\nCHEVROLET Astra 2,0i 8v 1998\nCHEVROLET Astra 2,0i 8v 1999'],
+ ['7798001694979','7798001694979','WO131','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',3720,50,14,3,8,'3/4-16 UNF','76X62','FORD Fiesta 1,6 8v · Ka 1,0 / 1,6 (2001-2008)'],
+ ['7898452283163','7898452283163','WO133','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',3890,50,3,3,8,'M20X1,5','76X64','VOLKSWAGEN Gol / Saveiro AP 1,6 · Polo 1,6'],
+ ['7799076011852','7799076011852','WO138','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',4120,50,10,2,6,'M20X1,5','72X62','FIAT Palio / Siena 1,4 8v Fire · Uno 1,3 Fire'],
+ ['7799076005769','7799076005769','WO139','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',4210,50,9,2,6,'M20X1,5','72X62','PEUGEOT 206 / 207 1,4 · 1,6 8v · CITROËN C3 1,4'],
+ ['HASTING WO140','HASTING WO140','WO140','HASTING','FILTRO DE ACEITE','Distribuidora San Roque',3500,45,6,2,6,'','',''],
+ ['7798186473444','7798186473444','WO155','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',4480,50,5,2,6,'M22X1,5','82X70','TOYOTA Hilux 2,5 / 3,0 TD (2005-2015)'],
+ ['7798001699257','7798001699257','WO160','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',4650,50,7,2,6,'','',''],
+ ['7798001699264','7798001699264','WO170','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',4900,50,1,2,6,'','',''],
+ ['7797954045586','7797954045586','WO170','FRAM','FILTRO DE ACEITE','FRAM Argentina',5100,50,4,2,6,'','',''],
+ ['7798001699295','7798001699295','WO200','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',5320,50,6,2,6,'','',''],
+ ['7798001699974','7798001699974','WO205','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',5400,50,5,2,6,'','',''],
+ ['7898286722845','7898286722845','WO205','VOX','FILTRO DE ACEITE','Filtros VOX',5150,50,8,2,6,'','',''],
+ ['7799076008500','7799076008500','WO215','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',5600,50,4,2,6,'','',''],
+ ['7798001699356','7798001699356','WO260','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',6200,50,2,2,4,'','',''],
+ ['7798001699424','7798001699424','WO330','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',6900,50,3,2,4,'','',''],
+ ['7798001697109','7798001697109','WO331','WEGA','FILTRO DE ACEITE','Distribuidora San Roque',7100,50,3,2,4,'','',''],
+ ['AF-2201','AF-2201','AF2201','FRAM','FILTRO DE AIRE','FRAM Argentina',4200,55,10,2,6,'','','VOLKSWAGEN Gol Trend 1,6 · Fox 1,6 · Suran 1,6'],
+ ['AF-3350','AF-3350','AF3350','MANN','FILTRO DE AIRE','Filtros VOX',5900,55,7,2,4,'','','FIAT Palio / Siena 1,4 · 1,6 16v · Strada'],
+ ['FC-410','FC-410','FC410','WEGA','FILTRO DE COMBUSTIBLE','Distribuidora San Roque',3300,60,9,2,4,'','','CHEVROLET Corsa 1,4 / 1,6 · Classic'],
+ ['FH-770','FH-770','FH770','MANN','FILTRO DE HABITÁCULO','Filtros VOX',4800,60,6,2,4,'','','TOYOTA Corolla 2009-2013 · Etios'],
+ ['ELA-5W30-4','ELA-5W30-4','ELAION F50 5W30 x4L','ELAION','ACEITE LUBRICANTE','Lubricantes del Norte',31500,35,18,4,12,'','','Sintético · motores nafteros modernos'],
+ ['ELA-10W40-4','ELA-10W40-4','ELAION F30 10W40 x4L','ELAION','ACEITE LUBRICANTE','Lubricantes del Norte',24800,35,22,4,12,'','','Semisintético · uso general'],
+ ['ELA-15W40D-4','ELA-15W40D-4','ELAION D10 15W40 x4L (diésel)','ELAION','ACEITE LUBRICANTE','Lubricantes del Norte',23900,35,12,4,12,'','','Mineral · motores diésel'],
+ ['NGK-BKR6E','NGK-BKR6E','BKR6E (bujía)','NGK','BUJÍAS','Distribuidora San Roque',3400,70,40,8,24,'','','VOLKSWAGEN Gol AP · FORD Escort · CHEVROLET Astra'],
+ ['TRW-GDB1330','TRW-GDB1330','GDB1330 pastillas delanteras','TRW','FRENOS','Frenos y Suspensión Salta',21500,55,5,2,4,'','','VOLKSWAGEN Gol Trend · Fox · Voyage'],
+ ['TRW-GDB1550','TRW-GDB1550','GDB1550 pastillas delanteras','TRW','FRENOS','Frenos y Suspensión Salta',24800,55,2,2,4,'','','FORD Focus · Fiesta Kinetic'],
+ ['LIQ-FR-DOT4','LIQ-FR-DOT4','Líquido de frenos DOT4 500 ml','BOSCH','FRENOS','Lubricantes del Norte',5200,60,15,3,8,'','',''],
+ ['GAT-K015569','GAT-K015569','Kit de distribución K015569','GATES','CORREAS Y DISTRIBUCIÓN','Frenos y Suspensión Salta',68500,40,2,1,2,'','','VOLKSWAGEN Gol / Saveiro 1,6 AP · Polo'],
+ ['MOU-12X65','MOU-12X65','Batería 12x65 Ah','MOURA','BATERÍAS','Distribuidora San Roque',96000,30,4,2,4,'','','Autos medianos nafta/diésel'],
+ ['MON-G8101','MON-G8101','Amortiguador delantero G8101','MONROE','SUSPENSIÓN','Frenos y Suspensión Salta',39500,50,4,2,4,'','','CHEVROLET Corsa · Classic'],
+ ['REF-ORG-5L','REF-ORG-5L','Refrigerante orgánico 50% x5L','ELAION','REFRIGERACIÓN','Lubricantes del Norte',9800,55,10,3,6,'','','Larga vida · uso general'],
+ ['H4-60-55','H4-60-55','Lámpara H4 60/55W','BOSCH','ILUMINACIÓN','Distribuidora San Roque',2400,80,30,6,12,'','','Universal']];
+ R.forEach((r,i)=>{const pv=r2(r[6]*(1+r[7]/100));d.repuestos.push({id:'r'+(i+1),cod:r[0],codProv:r[1],desc:r[2],marca:r[3],rubro:r[4],provId:pid(r[5]),pc:r[6],gan:r[7],pv:pv,qty:r[8],alarma:r[9],repos:r[10],venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:r[11],junta:r[12],apl:r[13],activo:true})});
+
+ /* clientes y vehículos */
+ const C=[['Carlos Aramayo','20-12345678-?','3874001122',true,150000],['Valeria Cruz','','3874556677',false,0],['Transportes Lerma SRL','','3874888999',true,400000],['Hugo Mamaní','','3875112233',false,0],['Julieta Ferreyra','','3874990011',false,0],['Gastón Pérez','','3875334455',false,0]];
+ C.forEach((c,i)=>d.clientes.push({id:'c'+(i+1),n:c[0],doc:'',tel:c[2],mail:'',cc:c[3],lim:c[4],saldo:i===2?85000:0}));
+ const V=[['c1','AE123CD','Volkswagen','Gol Trend 1.6',2016,68200],['c1','AA456BB','Chevrolet','Corsa Classic 1.4',2012,141000],['c2','AF789EF','Ford','Fiesta Kinetic 1.6',2018,52300],['c3','AC321GH','Toyota','Hilux 2.5 TD',2014,236000],['c3','AD654IJ','Toyota','Hilux 3.0 TD',2015,198500],['c4','AB987KL','Fiat','Palio Fire 1.4',2013,119000],['c5','AG246MN','Peugeot','207 Compact 1.4',2014,97300],['c6','AH135OP','Renault','Sandero 1.6',2019,44800]];
+ V.forEach((v,i)=>d.vehs.push({id:'v'+(i+1),cliId:v[0],pat:v[1],marca:v[2],mod:v[3],anio:v[4],km:v[5],proxKm:Math.ceil((v[5]+1)/10000)*10000,proxFecha:addDays(30+i*7)}));
+
+ /* OT de ejemplo */
+ const rp=n=>d.repuestos.find(r=>r.cod===n||r.desc===n);
+ function mk(cli,veh,mot,est,mec,dias,items,extra){
+  d.seq.ot++;const v=d.vehs.find(x=>x.id===veh);
+  const o={id:'ot'+d.seq.ot,num:d.seq.ot,fecha:addDays(-dias),cliId:cli,vehId:veh,km:v.km,motivo:mot,estado:est,mecId:mec,recurso:'',presAprob:est!=='Recibido'&&est!=='Diagnóstico'&&est!=='Presupuesto',
+   items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2'},obs:'',pagos:[],entregada:'',ccTomado:0,...extra};
+  items.forEach(it=>{if(it[0]==='r'){const r=rp(it[1]);o.items.push({k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:it[2],pu:r.pv,iva:r.iva,costo:r.pc})}
+   else{const s=d.servicios.find(x=>x.id===it[1]);o.items.push({k:'mo',desc:s.n,qty:it[2],pu:s.pu,iva:21,costo:0})}});
+  d.ots.push(o);return o};
+ mk('c1','v1','Service 70.000 km y ruido en tren delantero','En reparación','u2',0,[['r','WO130',1],['r','ELAION F30 10W40 x4L',1],['m','s1',1],['m','s5',1]]);
+ mk('c2','v3','Frena largo y vibra el volante','Presupuesto','u5',0,[['r','GDB1550 pastillas delanteras',1],['m','s2',1],['m','s4',1]]);
+ mk('c3','v4','Pierde potencia y humea','Diagnóstico','u6',1,[['m','s5',1],['m','s8',1]]);
+ mk('c4','v6','Cambio de batería, no arranca por la mañana','Listo','u4',1,[['r','Batería 12x65 Ah',1],['m','s12',0.5]]);
+ mk('c5','v7','Service completo + distribución','En reparación','u2',2,[['r','Kit de distribución K015569',1],['r','WO139',1],['r','ELAION F50 5W30 x4L',1],['m','s7',1],['m','s1',1]]);
+ mk('c6','v8','Control de 40.000 km','Recibido','',0,[]);
+ const e1=mk('c1','v2','Cambio de amortiguadores','Entregado','u5',6,[['r','Amortiguador delantero G8101',2],['m','s10',1]],{entregada:addDays(-5)});
+ const e2=mk('c3','v5','Service + alineación','Entregado','u2',3,[['r','WO155',1],['r','ELAION D10 15W40 x4L (diésel)',2],['m','s1',1],['m','s4',1]],{entregada:addDays(-2)});
+ const e3=mk('c2','v3','Cambio de aceite y filtro','Entregado','u4',1,[['r','WO131',1],['r','ELAION F30 10W40 x4L',1],['m','s1',1]],{entregada:addDays(-1)});
+ [e1,e2,e3].forEach((o,i)=>{const t=otTotal(o).total;o.pagos.push({id:uid('pg'),fecha:o.entregada,medio:i===0?'Transferencia':'Efectivo',monto:t,cajaId:i===0?'':'C1'})});
+ d.ots[1].items.forEach(()=>{});
+ /* turnos */
+ const tu=(dias,hr,dur,rec,cli,veh,srv,est)=>{d.seq.tu++;d.turnos.push({id:'t'+d.seq.tu,fecha:addDays(dias),hora:hr,dur,rec,cliId:cli,vehId:veh,srv,estado:est,otId:''})};
+ tu(0,9,2,0,'c1','v1','Service 70.000 km','En taller');tu(0,10,1,2,'c3','v4','Alineación y balanceo','Confirmado');tu(0,14,2,1,'c5','v7','Cambio de distribución','Confirmado');tu(0,15,1,3,'c4','v6','Cambio de aceite','Pendiente');
+ tu(1,8,1,0,'c2','v3','Diagnóstico escáner','Confirmado');tu(1,11,3,1,'c6','v8','Frenos delanteros','Pendiente');tu(2,9,1,3,'c1','v2','Service rápido','Pendiente');
+ d.turnos[0].otId=d.ots[0].id;
+ /* proveedores: libro */
+ const L=(p,dias,t,m,ref)=>d.ledger.push({id:uid('lg'),provId:pid(p),fecha:addDays(-dias),tipo:t,monto:m,ref:ref,asig:[]});
+ L('Distribuidora San Roque',20,'Compra',380000,'Remito R-0001-00045821');L('Distribuidora San Roque',9,'Pago',200000,'Transferencia');
+ L('Filtros VOX',15,'Compra',96000,'Remito 0003-00007712');L('Lubricantes del Norte',12,'Compra',310000,'Factura A 0004-00012233');L('Lubricantes del Norte',5,'Pago',310000,'Transferencia');
+ L('Frenos y Suspensión',8,'Compra',184000,'Remito 0002-00003345');
+ /* movimientos de caja del turno */
+ const mv=(c,t,con,m,ref)=>{d.seq.mov++;d.movs.push({id:'m'+d.seq.mov,turnoId:'T1',cajaId:c,tipo:t,conc:con,monto:m,ref:ref,u:'Lucía Ramos',t:Date.now()-36e5})};
+ mv('C1','ingreso','f1',e3.pagos?otTotal(e3).total:0,'OT-'+String(e3.num).padStart(4,'0'));mv('C2','egreso','f5',4500,'Trapos y desengrasante');
+ d.ots.filter(o=>o.estado==='Entregado').forEach(o=>{});
+ /* equipamiento */
+ const E=[
+ ['Infraestructura y taller físico','Área de recepción y oficina de atención al cliente','ok',1],['Infraestructura y taller físico','Zona de taller con piso de hormigón resistente a químicos','ok',1],
+ ['Infraestructura y taller físico','Elevador hidráulico de dos columnas (mecánica general)','ok',2],['Infraestructura y taller físico','Elevador de cuatro columnas o tijera (alineación)','falta',1],
+ ['Infraestructura y taller físico','Instalación de aire comprimido en todo el taller','ok',1],['Infraestructura y taller físico','Sistema de ventilación y extracción de gases de escape','falta',1],
+ ['Infraestructura y taller físico','Depósito seguro para repuestos e insumos (aceites, lubricantes)','ok',1],
+ ['Herramientas y equipamiento mayor','Carro de herramientas manuales completo por mecánico','ok',3],['Herramientas y equipamiento mayor','Herramientas neumáticas e inalámbricas de impacto','ok',3],
+ ['Herramientas y equipamiento mayor','Prensa hidráulica','ok',1],['Herramientas y equipamiento mayor','Gatos de fosa o transmisión','ok',2],
+ ['Herramientas y equipamiento mayor','Bomba de extracción / drenaje de aceite y carga de fluidos','ok',1],['Herramientas y equipamiento mayor','Cargadores y arrancadores de baterías','mant',2],
+ ['Diagnóstico y especialidad','Escáner automotriz multimarca de última generación','ok',1],['Diagnóstico y especialidad','Máquina para desmontar y equilibrar neumáticos','falta',1],
+ ['Diagnóstico y especialidad','Banco de alineación de dirección computarizada','falta',1],['Diagnóstico y especialidad','Equipo de mantenimiento y carga de aire acondicionado / gases refrigerantes','ok',1],
+ ['Especialidad: motor y transmisión','Torquímetros','ok',3],['Especialidad: motor y transmisión','Elevador de motores (pluma) y soportes','ok',1],['Especialidad: motor y transmisión','Compresor de resortes de válvulas','falta',1],
+ ['Especialidad: motor y transmisión','Herramientas de distribución','ok',2],['Especialidad: motor y transmisión','Medidor de compresión','ok',1],
+ ['Especialidad: electricidad y electrónica','Multímetro digital','ok',3],['Especialidad: electricidad y electrónica','Osciloscopio','falta',1],
+ ['Especialidad: electricidad y electrónica','Banco de prueba para alternadores y motores de arranque','falta',1],['Especialidad: electricidad y electrónica','Estación de soldadura','ok',1],
+ ['Especialidad: frenos, suspensión y dirección','Torno para rectificación de discos y campanas','ok',1],['Especialidad: frenos, suspensión y dirección','Herramientas de purgado','ok',2],['Especialidad: frenos, suspensión y dirección','Caballetes de alta resistencia','ok',6],
+ ['Especialidad: inyección y combustible','Equipo de ultrasonido para limpieza de inyectores','ok',1],['Especialidad: inyección y combustible','Manómetros de presión de combustible','ok',2],
+ ['Gestión, sistemas y personal','Software integral de gestión (OT, inventario, facturación, turnos)','ok',1],['Gestión, sistemas y personal','Computadoras e impresoras','ok',2],
+ ['Gestión, sistemas y personal','Personal: recepcionista','ok',1],['Gestión, sistemas y personal','Personal: jefe de taller','ok',1],['Gestión, sistemas y personal','Personal: mecánicos especializados','ok',3],['Gestión, sistemas y personal','Personal: limpieza','ok',1]];
+ E.forEach((e,i)=>d.equip.push({id:'e'+(i+1),cat:e[0],n:e[1],est:e[2],cant:e[3],prox:(e[2]==='ok'&&/Elevador|Escáner|Torno|Torquímetros|Multímetro|Manómetros|Medidor/.test(e[1]))?addDays(20+i*9):'',nota:''}));
+ d.extint=[{id:'x1',ubic:'Recepción',tipo:'ABC 5 kg',venc:addDays(120)},{id:'x2',ubic:'Taller · sector elevadores',tipo:'ABC 10 kg',venc:addDays(18)},{id:'x3',ubic:'Depósito de lubricantes',tipo:'CO2 5 kg',venc:addDays(200)}];
+ d.epp=[{id:'g1',n:'Cascos / gorras de protección',stock:4,min:3},{id:'g2',n:'Guantes de seguridad',stock:10,min:6},{id:'g3',n:'Antiparras',stock:2,min:4},{id:'g4',n:'Calzado de seguridad (pares)',stock:3,min:3},{id:'g5',n:'Tapones / protección auditiva',stock:8,min:4}];
+ d.resid=[{id:'z1',fecha:addDays(-20),tipo:'Aceite usado',cant:60,unidad:'L',ref:'Generado en services'},{id:'z2',fecha:addDays(-6),tipo:'Aceite usado',cant:-40,unidad:'L',ref:'Retiro gestor · cert. 0001-2231'},{id:'z3',fecha:addDays(-12),tipo:'Baterías',cant:3,unidad:'u',ref:'Cambios de batería'},{id:'z4',fecha:addDays(-10),tipo:'Filtros usados',cant:22,unidad:'u',ref:'Services'}];
+ d.habil=[{id:'h1',n:'Habilitación municipal del local',ent:'Municipalidad de Salta',venc:addDays(240)},{id:'h2',n:'Seguro de responsabilidad civil del taller',ent:'Aseguradora (ejemplo)',venc:addDays(24)},{id:'h3',n:'ART (cobertura del personal)',ent:'ART (ejemplo)',venc:addDays(75)},{id:'h4',n:'Inscripción como generador de residuos peligrosos',ent:'Autoridad ambiental provincial',venc:addDays(-5)},{id:'h5',n:'Seguro del local / incendio',ent:'Aseguradora (ejemplo)',venc:addDays(160)}];
+ return d}
+
+/* ---------- estado ---------- */
+let DB=loadDB();
+function loadDB(){try{const j=localStorage.getItem(LS);if(j){const o=JSON.parse(j);if(o&&o.ver===1)return o}}catch(e){}return seed()}
+function save(){try{localStorage.setItem(LS,JSON.stringify(DB))}catch(e){}}
+function resetDemo(){try{localStorage.removeItem(LS)}catch(e){}DB=seed();save()}
+let ME=null,VIEW='dash',UI={otMode:'tablero',otEst:'',otQ:'',otMec:'',repQ:'',repRub:'',repSel:'',cliQ:'',turFecha:TODAY(),cajaTab:'mov',compTab:'prov',repTab:'',eqCat:'',segTab:'epp',repoPer:'mes'};
+function audit(a,d){DB.audit.unshift({t:Date.now(),u:ME?ME.n:'sistema',a,d:d||''});if(DB.audit.length>400)DB.audit.length=400}
+const userOf=id=>DB.users.find(u=>u.id===id);
+const cliOf=id=>DB.clientes.find(c=>c.id===id);
+const vehOf=id=>DB.vehs.find(v=>v.id===id);
+const repOf=id=>DB.repuestos.find(r=>r.id===id);
+const provOf=id=>DB.provs.find(p=>p.id===id);
+const otOf=id=>DB.ots.find(o=>o.id===id);
+const otNum=o=>'OT-'+String(o.num).padStart(4,'0');
+const rubFin=id=>DB.rubrosFin.find(r=>r.id===id);
+function otTotal(o){let neto=0,iva=0,costo=0,rep=0,mo=0;(o.items||[]).forEach(i=>{const s=i.qty*i.pu;neto+=s;iva+=s*i.iva/100;costo+=(i.costo||0)*i.qty;if(i.k==='rep')rep+=s;else mo+=s});
+ neto=r2(neto);iva=r2(iva);const total=r2(neto+iva);const pagado=r2((o.pagos||[]).reduce((a,p)=>a+p.monto,0))+r2(o.ccTomado||0);return{neto,iva,total,pagado:r2(pagado),saldo:r2(total-pagado),costo:r2(costo),rep:r2(rep),mo:r2(mo)}}
+const isBoss=()=>ME&&(ME.rol==='dueno'||ME.rol==='jefe');
+const canCost=()=>isBoss();
+const PERM={dueno:'*',jefe:['dash','ot','turnos','clientes','repuestos','compras','caja','equipo','seguridad','personal','reportes'],recepcion:['dash','ot','turnos','clientes','repuestos','caja'],mecanico:['dash','ot','turnos','repuestos','equipo','seguridad'],limpieza:['dash','seguridad']};
+const can=v=>{const p=PERM[ME.rol];return p==='*'||(p&&p.indexOf(v)>=0)};
+const ROL={dueno:'Dueño',jefe:'Jefe de taller',recepcion:'Recepción',mecanico:'Mecánico',limpieza:'Limpieza'};
+const NAV=[['dash','🏠','Panel'],['ot','🔧','Órdenes de trabajo'],['turnos','📅','Turnos'],['clientes','👤','Clientes y vehículos'],['repuestos','📦','Repuestos'],['compras','🚚','Proveedores y compras'],['caja','💵','Caja'],['equipo','🛠️','Equipamiento'],['seguridad','🦺','Seguridad y ambiente'],['personal','👷','Personal'],['reportes','📊','Reportes'],['config','⚙️','Configuración']];
+
+/* ---------- UI helpers ---------- */
+function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='on'+(bad?' bad':'');clearTimeout(toast.k);toast.k=setTimeout(()=>t.className='',2600)}
+let MODAL=null;
+function modal(o){ // {title,body,ok,onOk,wide,cancel,hideOk,calc}
+ MODAL=o;const m=$('#modal');m.hidden=false;
+ m.innerHTML='<div class="mbox'+(o.wide?' wide':'')+'" role="dialog" aria-modal="true" aria-label="'+h(o.title)+'"><div class="mh"><h3>'+h(o.title)+'</h3><button class="btn s" data-act="mclose" aria-label="Cerrar">✕</button></div><div class="mb"><div id="merr"></div><div id="mbody">'+o.body+'</div></div>'+
+ (o.hideOk&&!o.foot?'':'<div class="mf">'+(o.foot||'')+(o.cancel===false?'':'<button class="btn" data-act="mclose">'+(o.cancel||'Cancelar')+'</button>')+(o.hideOk?'':'<button class="btn p" data-act="mok">'+(o.ok||'Guardar')+'</button>')+'</div>')+'</div>';
+ if(o.calc)o.calc();
+ const f=$('#mbody input,#mbody select,#mbody textarea');if(f&&!o.noFocus)f.focus()}
+function closeModal(){const f=MODAL&&MODAL.onClose;$('#modal').hidden=true;$('#modal').innerHTML='';MODAL=null;if(f)f()}
+function merr(msg){const e=$('#merr');if(e){e.innerHTML=msg?'<div class="err" role="alert">'+h(msg)+'</div>':'';if(msg){const b=$('.mb');b&&b.scrollIntoView&&e.scrollIntoView({block:'nearest'})}}}
+function rerenderModalBody(html){const b=$('#mbody');if(b)b.innerHTML=html}
+function confirmBox(msg,onYes,yes){modal({title:'Confirmar',body:'<p>'+h(msg)+'</p>',ok:yes||'Sí, confirmar',onOk:()=>{onYes();return true}})}
+const val=id=>{const e=document.getElementById(id);return e?e.value:''};
+const chk=id=>{const e=document.getElementById(id);return !!(e&&e.checked)};
+function opts(list,sel,fn,blank){return (blank!==undefined?'<option value="">'+h(blank)+'</option>':'')+list.map(x=>{const v=fn?fn(x)[0]:x,t=fn?fn(x)[1]:x;return '<option value="'+h(v)+'"'+(String(v)===String(sel)?' selected':'')+'>'+h(t)+'</option>'}).join('')}
+function csvDown(name,rows){const t=rows.map(r=>r.map(c=>{c=String(c==null?'':c);return /[;"\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c}).join(';')).join('\r\n');const b=new Blob(['﻿'+t],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function printHTML(html){const p=$('#printArea');p.innerHTML='<div class="pa">'+html+'</div>';setTimeout(()=>{window.print();},50)}
+function wa(tel,msg){const d=String(tel||'').replace(/\D/g,'');return 'https://wa.me/'+(d.startsWith('54')?d:'549'+d.replace(/^0/,'').replace(/^15/,''))+'?text='+encodeURIComponent(msg||'')}
+
+/* ---------- créditos VINCULAR BUSINESS (datos oficiales) ---------- */
+const VBMSG='Hola, vi el sistema de '+'SebaChavez Car Service (Sistema VB) y quiero más información.';
+function vbLine(){return 'Desarrollado por <b>VINCULAR BUSINESS</b> · (387) 4484132 · vincularbusiness@gmail.com · “Tu idea, en buenas manos.”'}
+function vbBlock(){return '<div class="vb" role="contentinfo" aria-label="Créditos del desarrollador"><div><b>VINCULAR BUSINESS</b> · Desarrollo de sistemas</div><div class="lema">“Tu idea, en buenas manos.”</div>'+
+ '<div class="vbb"><a class="w" href="https://wa.me/'+VBTEL+'?text='+encodeURIComponent(VBMSG)+'" target="_blank" rel="noopener">WhatsApp</a><a class="t" href="tel:+'+VBTEL+'">Llamar</a><a class="m" href="mailto:vincularbusiness@gmail.com?subject='+encodeURIComponent('Sistema VB · SebaChavez Car Service')+'">Correo</a></div>'+
+ '<div class="vbl">(387) 4484132 · vincularbusiness@gmail.com</div></div>'}
+</script>
+<script>
+/* ===== Registros ===== */
+const V={},ACT={},CHG={};
+const provDeuda=id=>r2(DB.ledger.filter(l=>l.provId===id).reduce((a,l)=>a+(l.tipo==='Compra'?l.monto:-l.monto),0));
+const cajaEfectivo=cid=>{if(!DB.turno.abierto)return 0;let s=DB.turno.apert[cid]||0;DB.movs.filter(m=>m.turnoId===DB.turno.id&&m.cajaId===cid).forEach(m=>{s+=m.tipo==='ingreso'?m.monto:-m.monto});return r2(s)};
+
+function alertas(){const A=[];
+ DB.extint.forEach(x=>{const d=daysTo(x.venc);if(d<=30)A.push({t:d<0?'bad':'warn',x:'Extintor “'+x.ubic+'” '+(d<0?'vencido':'vence en '+d+' días'),go:'seguridad'})});
+ DB.habil.forEach(x=>{const d=daysTo(x.venc);if(d<=30)A.push({t:d<0?'bad':'warn',x:x.n+': '+(d<0?'vencido':'vence en '+d+' días'),go:'seguridad'})});
+ DB.equip.forEach(x=>{if(x.prox){const d=daysTo(x.prox);if(d<=30)A.push({t:d<0?'bad':'warn',x:'Calibración/service de “'+x.n+'” '+(d<0?'vencido':'en '+d+' días'),go:'equipo'})}});
+ DB.epp.forEach(x=>{if(x.stock<x.min)A.push({t:'warn',x:'EPP bajo mínimo: '+x.n+' ('+x.stock+' de '+x.min+')',go:'seguridad'})});
+ const rb=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).length;if(rb)A.push({t:'warn',x:rb+' repuestos en o bajo la cantidad de alarma',go:'repuestos'});
+ const ac=resStock('Aceite usado');if(ac>=80)A.push({t:'warn',x:'Aceite usado acumulado: '+ac+' L (coordinar retiro con el gestor)',go:'seguridad'});
+ DB.ots.filter(o=>o.estado==='Listo'&&daysTo(o.fecha)<=-2).forEach(o=>A.push({t:'warn',x:otNum(o)+' lista hace días sin entregar',go:'ot'}));
+ DB.vehs.forEach(v=>{const d=daysTo(v.proxFecha);if(d<=14&&d>=-30)A.push({t:'ok',x:'Próximo service '+v.pat+' ('+(cliOf(v.cliId)||{}).n+'): '+fdate(v.proxFecha),go:'clientes'})});
+ return A}
+function resStock(tipo){return DB.resid.filter(r=>r.tipo===tipo).reduce((a,r)=>a+r.cant,0)}
+
+/* ===== Ingreso ===== */
+function renderLogin(){
+ $('#login').hidden=false;$('#app').hidden=true;
+ $('#login').innerHTML='<div class="lbox"><img class="logo" src="'+LOGO+'" alt="Logo SebaChavez Car Service"><h2 class="c">Sistema de gestión del taller</h2>'+
+ '<p class="c mut sm" style="margin-top:-4px">'+h(DB.cfg.dir)+' · '+h(DB.cfg.tel)+'</p>'+
+ '<div class="demoflag"><b>DEMO.</b> Los datos (clientes, precios, stock) son <b>de ejemplo</b> y se guardan sólo en este navegador. Sin clave de acceso en la demo: elegí un perfil para ver los permisos de cada rol.</div>'+
+ DB.users.filter(u=>u.rol!=='limpieza').map(u=>'<button class="ucard" data-act="login" data-id="'+u.id+'"><span class="av">'+h(u.n.split(' ').map(x=>x[0]).slice(0,2).join(''))+'</span><span><b>'+h(u.n)+'</b><br><span class="mut sm">'+h(ROL[u.rol])+' · '+h(u.esp)+'</span></span></button>').join('')+
+ vbBlock()+'</div>'}
+ACT.login=d=>{ME=userOf(d.id);try{sessionStorage.setItem(SS,ME.id)}catch(e){}audit('Ingreso','Perfil '+ROL[ME.rol]);save();renderShell()};
+ACT.logout=()=>{audit('Salida');try{sessionStorage.removeItem(SS)}catch(e){}ME=null;save();renderLogin()};
+ACT.menu=()=>$('#side').classList.toggle('open');
+
+function renderShell(){
+ $('#login').hidden=true;$('#app').hidden=false;
+ const na=DB.ots.filter(o=>o.estado!=='Entregado').length,al=alertas().filter(a=>a.t!=='ok').length;
+ $('#side').innerHTML='<div class="brand"><img src="'+LOGO+'" alt="SebaChavez Car Service"></div><nav aria-label="Principal">'+
+ NAV.filter(n=>n[0]==='config'?(ME.rol==='dueno'):can(n[0])).map(n=>'<button data-act="go" data-v="'+n[0]+'" id="nav_'+n[0]+'"><span aria-hidden="true">'+n[1]+'</span>'+h(n[2])+(n[0]==='ot'&&na?'<span class="badge2">'+na+'</span>':'')+(n[0]==='seguridad'&&al?'<span class="badge2">'+al+'</span>':'')+'</button>').join('')+'</nav>'+
+ '<div class="who"><b>'+h(ME.n)+'</b><br><span class="mut">'+h(ROL[ME.rol])+'</span><br><button class="btn s" style="margin-top:6px;background:#2f333a;color:#fff;border-color:#444" data-act="logout">Salir</button></div>'+
+ '<div class="vbs">'+vbLine()+'<br><a href="https://wa.me/'+VBTEL+'?text='+encodeURIComponent(VBMSG)+'" target="_blank" rel="noopener">WhatsApp</a> · <a href="tel:+'+VBTEL+'">Llamar</a> · <a href="mailto:vincularbusiness@gmail.com">Correo</a></div>';
+ go(VIEW)}
+function go(v){if(!ME)return;if(!can(v)||(v==='config'&&ME.rol!=='dueno'))v='dash';VIEW=v;$$('#side nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+ $('#side').classList.remove('open');renderView();window.scrollTo(0,0)}
+function renderView(){$('#view').innerHTML=V[VIEW]()+'<div style="margin-top:20px">'+vbBlock()+'</div>';
+ const na=DB.ots.filter(o=>o.estado!=='Entregado').length;const b=$('#nav_ot .badge2');if(b)b.textContent=na}
+ACT.go=d=>go(d.v);
+
+/* ===== Panel ===== */
+V.dash=()=>{
+ const act=DB.ots.filter(o=>o.estado!=='Entregado'),tu=DB.turnos.filter(t=>t.fecha===TODAY()&&t.estado!=='Cancelado').sort((a,b)=>a.hora-b.hora);
+ let cobHoy=0;DB.ots.forEach(o=>o.pagos.forEach(p=>{if(p.fecha===TODAY()&&p.medio!=='Cuenta corriente')cobHoy+=p.monto}));
+ const dcli=DB.clientes.reduce((a,c)=>a+c.saldo,0),dprov=DB.provs.reduce((a,p)=>a+provDeuda(p.id),0),bajo=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).length;
+ const al=alertas();
+ const k=(v,l,go,cls)=>'<button class="kpi '+(cls||'')+'" data-act="go" data-v="'+go+'"><div class="v">'+v+'</div><div class="l">'+l+'</div></button>';
+ return '<div class="bar"><h2>Panel · '+h(DB.cfg.nombre)+'</h2><span class="mut sm">'+h(new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}))+'</span></div>'+
+ '<div class="g4" style="margin-bottom:14px">'+k(act.length,'Vehículos en taller','ot')+k(act.filter(o=>o.estado==='Listo').length,'Listos para entregar','ot','okk')+k(tu.length,'Turnos de hoy','turnos')+k(fmt(cobHoy),'Cobrado hoy (sin cta. cte.)','caja','okk')+
+ (can('clientes')?k(fmt(dcli),'Deuda de clientes','clientes',dcli?'bad':''):'')+(can('compras')?k(fmt(dprov),'Deuda con proveedores','compras',dprov?'bad':''):'')+k(bajo,'Repuestos en alarma','repuestos',bajo?'bad':'')+k(al.filter(a=>a.t!=='ok').length,'Alertas de seguridad y vencimientos','seguridad',al.some(a=>a.t==='bad')?'bad':'')+'</div>'+
+ '<div class="g2"><div class="card"><h3>En el taller ahora</h3>'+(act.length?'<div class="tw"><table><thead><tr><th>OT</th><th>Vehículo</th><th>Estado</th><th>Mecánico</th></tr></thead><tbody>'+act.map(o=>{const v=vehOf(o.vehId)||{};return '<tr class="clk" data-act="otopen" data-id="'+o.id+'"><td>'+otNum(o)+'</td><td><b>'+h(v.pat)+'</b> <span class="mut sm">'+h(v.marca+' '+v.mod)+'</span></td><td><span class="badge b-'+o.estado+'">'+o.estado+'</span></td><td>'+h((userOf(o.mecId)||{n:'— sin asignar'}).n)+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="mut">No hay vehículos en el taller.</p>')+'</div>'+
+ '<div class="card"><h3>Turnos de hoy</h3>'+(tu.length?tu.map(t=>{const v=vehOf(t.vehId)||{};return '<div class="row" style="padding:6px 0;border-bottom:1px solid #eef1f4"><b style="width:56px">'+String(t.hora).padStart(2,'0')+':00</b><span class="sp"><b>'+h(v.pat)+'</b> · '+h(t.srv)+'<br><span class="mut sm">'+h((cliOf(t.cliId)||{}).n)+' · '+h(RECURSOS[t.rec])+'</span></span><span class="badge '+(t.estado==='Confirmado'?'ok':t.estado==='Pendiente'?'warn':'')+'">'+t.estado+'</span></div>'}).join(''):'<p class="mut">Sin turnos para hoy.</p>')+'<button class="btn s" style="margin-top:8px" data-act="go" data-v="turnos">Ver agenda</button></div></div>'+
+ '<div class="card"><h3>Alertas y recordatorios</h3>'+(al.length?al.slice(0,14).map(a=>'<div class="row" style="padding:5px 0"><span class="badge '+a.t+'">'+(a.t==='bad'?'Urgente':a.t==='warn'?'Atención':'Aviso')+'</span><span class="sp">'+h(a.x)+'</span><button class="btn s" data-act="go" data-v="'+a.go+'">Ir</button></div>').join(''):'<p class="mut">Todo en orden.</p>')+'</div>'};
+
+/* ===== Selector de cliente + vehículo ===== */
+function pickerHTML(cid,vid){return '<div class="g2"><div class="f"><label for="pk_cli">Cliente</label><select id="pk_cli" data-chg="pkcli">'+opts(DB.clientes,cid,c=>[c.id,c.n],'— elegir —')+'<option value="__new">➕ Nuevo cliente…</option></select></div>'+
+ '<div class="f"><label for="pk_veh">Vehículo</label><select id="pk_veh" data-chg="pkveh"></select></div></div>'+
+ '<div id="pk_newc" class="g2" hidden><div class="f"><label for="pk_cn">Nombre y apellido / razón social</label><input id="pk_cn"></div><div class="f"><label for="pk_ct">Teléfono (WhatsApp)</label><input id="pk_ct" inputmode="tel" placeholder="3875123456"></div></div>'+
+ '<div id="pk_newv" class="g4" hidden><div class="f"><label for="pk_vp">Patente</label><input id="pk_vp" placeholder="AB123CD" maxlength="8"></div><div class="f"><label for="pk_vm">Marca</label><input id="pk_vm"></div><div class="f"><label for="pk_vo">Modelo / motor</label><input id="pk_vo"></div><div class="f"><label for="pk_va">Año</label><input id="pk_va" inputmode="numeric" maxlength="4"></div></div>'}
+function pkFill(vid){const c=val('pk_cli'),sel=$('#pk_veh');if(!sel)return;const vs=DB.vehs.filter(v=>v.cliId===c);
+ sel.innerHTML=(c&&c!=='__new'?'<option value="">— elegir —</option>'+vs.map(v=>'<option value="'+v.id+'"'+(v.id===vid?' selected':'')+'>'+h(v.pat+' · '+v.marca+' '+v.mod)+'</option>').join(''):'')+'<option value="__new">➕ Nuevo vehículo…</option>';
+ if(c==='__new'||!c)sel.value='__new';
+ $('#pk_newc').hidden=c!=='__new';$('#pk_newv').hidden=sel.value!=='__new'||!c}
+CHG.pkcli=()=>pkFill();
+CHG.pkveh=()=>{$('#pk_newv').hidden=val('pk_veh')!=='__new'||!val('pk_cli')};
+function readPicker(){
+ let cid=val('pk_cli'),vid=val('pk_veh');
+ if(!cid)throw new Error('Elegí un cliente o creá uno nuevo.');
+ if(cid==='__new'){const n=val('pk_cn').trim();if(n.length<3)throw new Error('Cargá el nombre del cliente nuevo.');const t=val('pk_ct').replace(/\D/g,'');if(t&&t.length<8)throw new Error('El teléfono parece incompleto.');
+  cid=uid('c');DB.clientes.push({id:cid,n:n,doc:'',tel:t,mail:'',cc:false,lim:0,saldo:0});audit('Cliente nuevo',n);vid='__new'}
+ if(!vid)throw new Error('Elegí un vehículo o creá uno nuevo.');
+ if(vid==='__new'){const p=val('pk_vp').toUpperCase().replace(/[\s-]/g,'');if(!/^([A-Z]{2}\d{3}[A-Z]{2}|[A-Z]{3}\d{3})$/.test(p))throw new Error('Patente inválida (formatos AB123CD o ABC123).');
+  const ex=DB.vehs.find(v=>v.pat===p);if(ex)vid=ex.id;else{if(!val('pk_vm').trim()||!val('pk_vo').trim())throw new Error('Cargá marca y modelo del vehículo.');const a=parseInt(val('pk_va'))||0;if(a&&(a<1960||a>new Date().getFullYear()+1))throw new Error('Año inválido.');
+   vid=uid('v');DB.vehs.push({id:vid,cliId:cid,pat:p,marca:val('pk_vm').trim(),mod:val('pk_vo').trim(),anio:a,km:0,proxKm:0,proxFecha:''});audit('Vehículo nuevo',p)}}
+ return{cid,vid}}
+
+/* ===== Órdenes de trabajo ===== */
+function otFiltered(){const q=norm(UI.otQ);return DB.ots.filter(o=>{if(UI.otEst&&o.estado!==UI.otEst)return false;if(UI.otMec&&o.mecId!==UI.otMec)return false;
+  if(ME.rol==='mecanico'&&o.mecId&&o.mecId!==ME.id&&false)return false;
+  if(q){const v=vehOf(o.vehId)||{},c=cliOf(o.cliId)||{};if(!norm([otNum(o),v.pat,v.marca,v.mod,c.n,o.motivo].join(' ')).includes(q))return false}return true}).sort((a,b)=>b.num-a.num)}
+V.ot=()=>{
+ const l=otFiltered();
+ let body;
+ if(UI.otMode==='tablero'){
+  body='<div class="kan">'+ESTADOS.map(e=>{const xs=l.filter(o=>o.estado===e);return '<div class="kcol"><h4>'+e+'<span>'+xs.length+'</span></h4>'+xs.map(o=>{const v=vehOf(o.vehId)||{},t=otTotal(o);
+    return '<div class="kc'+(e==='Listo'&&t.saldo>0?' deuda':'')+'" tabindex="0" data-act="otopen" data-id="'+o.id+'"><div class="row"><span class="pat">'+h(v.pat)+'</span><span class="sp"></span><span class="mut sm">'+otNum(o)+'</span></div><div class="sm">'+h(v.marca+' '+v.mod)+'</div><div class="sm mut" style="margin:3px 0">'+h(o.motivo.length>60?o.motivo.slice(0,58)+'…':o.motivo)+'</div><div class="row sm"><span>'+h((userOf(o.mecId)||{n:'Sin asignar'}).n.split(' ')[0])+'</span><span class="sp"></span><b>'+fmt(t.total)+'</b></div>'+(e!=='Entregado'&&t.saldo>0.005&&t.pagado>0?'<div class="sm" style="color:var(--bad)">Saldo '+fmt(t.saldo)+'</div>':'')+'</div>'}).join('')+'</div>'}).join('')+'</div>'}
+ else body='<div class="tw"><table><thead><tr><th>OT</th><th>Fecha</th><th>Patente</th><th>Vehículo</th><th>Cliente</th><th>Estado</th><th>Mecánico</th><th class="n">Total</th><th class="n">Saldo</th></tr></thead><tbody>'+l.map(o=>{const v=vehOf(o.vehId)||{},t=otTotal(o);return '<tr class="clk" data-act="otopen" data-id="'+o.id+'"><td>'+otNum(o)+'</td><td>'+fdate(o.fecha)+'</td><td><b>'+h(v.pat)+'</b></td><td>'+h(v.marca+' '+v.mod)+'</td><td>'+h((cliOf(o.cliId)||{}).n)+'</td><td><span class="badge b-'+o.estado+'">'+o.estado+'</span></td><td>'+h((userOf(o.mecId)||{n:'—'}).n)+'</td><td class="n">'+fmt(t.total)+'</td><td class="n">'+(t.saldo>0.005?'<b style="color:var(--bad)">'+fmt(t.saldo)+'</b>':'—')+'</td></tr>'}).join('')+(l.length?'':'<tr><td colspan="9" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>';
+ return '<div class="bar"><h2>Órdenes de trabajo</h2><input id="otq" style="max-width:240px" placeholder="Buscar patente, cliente, N° OT…" value="'+h(UI.otQ)+'" data-chg="otq" aria-label="Buscar OT">'+
+ '<select id="otm" style="max-width:190px" data-chg="otm" aria-label="Filtrar por mecánico">'+opts(DB.users.filter(u=>u.rol==='mecanico'||u.rol==='jefe'),UI.otMec,u=>[u.id,u.n],'Todos los mecánicos')+'</select><span class="sp"></span>'+
+ '<div class="chips"><button class="chip'+(UI.otMode==='tablero'?' on':'')+'" data-act="otmode" data-m="tablero">Tablero</button><button class="chip'+(UI.otMode==='lista'?' on':'')+'" data-act="otmode" data-m="lista">Lista</button></div>'+
+ '<button class="btn p" data-act="otnew">➕ Nueva OT</button></div>'+
+ '<div class="chips" style="margin-bottom:10px"><button class="chip'+(!UI.otEst?' on':'')+'" data-act="otest" data-e="">Todas</button>'+ESTADOS.map(e=>'<button class="chip'+(UI.otEst===e?' on':'')+'" data-act="otest" data-e="'+e+'">'+e+'</button>').join('')+'</div>'+body};
+CHG.otq=t=>{UI.otQ=t.value;const p=t.selectionStart;renderView();const n=$('#otq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(e){}}};
+CHG.otm=t=>{UI.otMec=t.value;renderView()};
+ACT.otmode=d=>{UI.otMode=d.m;renderView()};
+ACT.otest=d=>{UI.otEst=d.e;renderView()};
+ACT.otnew=d=>{
+ modal({title:'Nueva orden de trabajo (recepción del vehículo)',wide:true,ok:'Crear OT',body:pickerHTML(d.cli||'',d.veh||'')+
+ '<div class="g3"><div class="f"><label for="n_km">Kilometraje actual</label><input id="n_km" inputmode="numeric" placeholder="68200"></div><div class="f"><label for="n_mec">Mecánico</label><select id="n_mec">'+opts(DB.users.filter(u=>u.rol==='mecanico'||u.rol==='jefe'),'',u=>[u.id,u.n+' · '+u.esp.split(' · ')[0]],'— asignar luego —')+'</select></div><div class="f"><label for="n_rec">Puesto de trabajo</label><select id="n_rec">'+opts(RECURSOS.map((r,i)=>[i,r]),'',x=>x,'— sin asignar —')+'</select></div></div>'+
+ '<div class="f"><label for="n_mot">Motivo de ingreso / lo que pide el cliente</label><textarea id="n_mot" placeholder="Ej.: service de 70.000 km, ruido en tren delantero"></textarea></div>'+
+ '<div class="card" style="background:#f8fafc"><h3>Checklist de recepción</h3><div class="g3">'+[['aceite','Nivel de aceite OK'],['luces','Luces funcionando'],['neum','Neumáticos en condiciones'],['auxilio','Rueda de auxilio / criquet'],['docs','Documentación a la vista'],['rayones','Rayones / golpes previos (anotar)']].map(c=>'<label style="font-weight:500;color:var(--tx)"><input type="checkbox" id="n_ck_'+c[0]+'" style="width:auto;min-height:0" '+(c[0]!=='rayones'?'checked':'')+'> '+c[1]+'</label>').join('')+'</div><div class="f" style="margin-top:8px;max-width:200px"><label for="n_comb">Combustible</label><select id="n_comb">'+opts(['Reserva','1/4','1/2','3/4','Lleno'],'1/2')+'</select></div></div>',
+ calc:()=>pkFill(d.veh||''),
+ onOk:()=>{try{const{cid,vid}=readPicker();const mot=val('n_mot').trim();if(mot.length<4)throw new Error('Describí el motivo de ingreso.');const km=parseInt(val('n_km'))||0;const v=vehOf(vid);if(km&&v.km&&km<v.km-1&&!confirm('El kilometraje ('+km+') es menor al último registrado ('+v.km+'). ¿Continuar?'))return false;
+   DB.seq.ot++;const o={id:'ot'+DB.seq.ot,num:DB.seq.ot,fecha:TODAY(),cliId:cid,vehId:vid,km:km||v.km,motivo:mot,estado:'Recibido',mecId:val('n_mec'),recurso:val('n_rec'),presAprob:false,items:[],
+   check:{aceite:chk('n_ck_aceite'),luces:chk('n_ck_luces'),neum:chk('n_ck_neum'),rayones:chk('n_ck_rayones'),auxilio:chk('n_ck_auxilio'),docs:chk('n_ck_docs'),comb:val('n_comb')},obs:'',pagos:[],entregada:''};
+   if(km)v.km=km;DB.ots.unshift(o);audit('OT creada',otNum(o)+' · '+v.pat);save();closeModal();renderView();toast(otNum(o)+' creada');setTimeout(()=>ACT.otopen({id:o.id}),50);return false}catch(e){merr(e.message);return false}}})};
+
+ACT.otopen=d=>{const o=otOf(d.id);if(!o)return;modal({title:otNum(o)+' · '+(vehOf(o.vehId)||{}).pat,wide:true,hideOk:true,cancel:'Cerrar',body:otBody(o),noFocus:true,onClose:()=>renderView()})};
+function otRefresh(o){rerenderModalBody(otBody(o));save()}
+function otBody(o){
+ const v=vehOf(o.vehId)||{},c=cliOf(o.cliId)||{},t=otTotal(o),lock=o.estado==='Entregado',cost=canCost();
+ const rep=DB.repuestos.filter(r=>r.activo&&r.qty>0).slice(0,40);
+ return '<div class="row" style="margin-bottom:8px"><div class="sp"><b style="font-size:1.1rem">'+h(v.marca+' '+v.mod)+(v.anio?' ('+v.anio+')':'')+'</b> · <span class="pill">'+h(v.pat)+'</span><br><span class="mut">'+h(c.n)+(c.tel?' · '+h(c.tel):'')+' · '+h(o.km)+' km · ingresó '+fdate(o.fecha)+'</span></div><span class="badge b-'+o.estado+'" style="font-size:.9rem">'+o.estado+'</span></div>'+
+ '<div class="card"><h3>Estado</h3><div class="chips">'+ESTADOS.slice(0,5).map(e=>'<button class="chip'+(o.estado===e?' on':'')+'" data-act="otestado" data-id="'+o.id+'" data-to="'+e+'"'+(lock?' disabled':'')+'>'+e+'</button>').join('')+'</div>'+
+ '<div class="row" style="margin-top:8px"><span class="badge '+(o.presAprob?'ok':'warn')+'">'+(o.presAprob?'Presupuesto aprobado por el cliente':'Presupuesto sin aprobar')+'</span>'+(!lock?'<button class="btn s" data-act="otaprob" data-id="'+o.id+'">'+(o.presAprob?'Quitar aprobación':'Marcar como aprobado')+'</button>':'')+'</div></div>'+
+ '<div class="g3"><div class="f"><label for="o_mec">Mecánico</label><select id="o_mec" data-chg="otfield" data-id="'+o.id+'" data-f="mecId"'+(lock?' disabled':'')+'>'+opts(DB.users.filter(u=>u.rol==='mecanico'||u.rol==='jefe'),o.mecId,u=>[u.id,u.n],'— sin asignar —')+'</select></div>'+
+ '<div class="f"><label for="o_rec">Puesto</label><select id="o_rec" data-chg="otfield" data-id="'+o.id+'" data-f="recurso"'+(lock?' disabled':'')+'>'+opts(RECURSOS.map((r,i)=>[String(i),r]),String(o.recurso),x=>x,'— sin asignar —')+'</select></div>'+
+ '<div class="f"><label for="o_km">Kilometraje</label><input id="o_km" inputmode="numeric" value="'+h(o.km)+'" data-chg="otfield" data-id="'+o.id+'" data-f="km"'+(lock?' disabled':'')+'></div></div>'+
+ '<div class="f"><label>Motivo de ingreso</label><div>'+h(o.motivo)+'</div></div>'+
+ '<div class="f"><label for="o_obs">Diagnóstico / observaciones del mecánico</label><textarea id="o_obs" data-chg="otfield" data-id="'+o.id+'" data-f="obs"'+(lock?' disabled':'')+'>'+h(o.obs)+'</textarea></div>'+
+ '<div class="card"><h3>Repuestos y mano de obra</h3><div class="tw"><table class="itbl"><thead><tr><th>Detalle</th><th class="n">Cant.</th><th class="n">P. unit. (neto)</th><th class="n">IVA</th><th class="n">Importe</th><th></th></tr></thead><tbody>'+
+ (o.items.length?o.items.map((i,ix)=>'<tr><td>'+(i.k==='rep'?'📦 ':'🔧 ')+h(i.desc)+'</td><td class="n">'+i.qty+'</td><td class="n">'+fmt(i.pu)+'</td><td class="n">'+i.iva+'%</td><td class="n">'+fmt(r2(i.qty*i.pu))+'</td><td class="n">'+(lock?'':'<button class="btn s" data-act="otdel" data-id="'+o.id+'" data-i="'+ix+'" aria-label="Quitar">✕</button>')+'</td></tr>').join(''):'<tr><td colspan="6" class="mut c">Sin ítems cargados.</td></tr>')+
+ '</tbody></table></div>'+
+ (lock?'':'<div class="g2" style="margin-top:10px"><div class="det"><b>Agregar repuesto</b><input id="o_rq" placeholder="Buscar código, descripción, marca, rosca o aplicación (ej.: astra)" data-chg="otrq" style="margin:6px 0"><select id="o_rep" size="1">'+repOptions('')+'</select><div class="row" style="margin-top:6px"><input id="o_rqty" type="number" min="1" value="1" style="max-width:90px" aria-label="Cantidad"><button class="btn p s" data-act="otaddrep" data-id="'+o.id+'">Agregar</button></div></div>'+
+ '<div class="det"><b>Agregar mano de obra</b><select id="o_mo" style="margin:6px 0">'+opts(DB.servicios,'',s=>[s.id,s.n+' · '+fmt(s.pu)],'— elegir servicio —')+'</select><div class="row"><input id="o_mqty" type="number" min="0.25" step="0.25" value="1" style="max-width:90px" aria-label="Cantidad / horas"><button class="btn p s" data-act="otaddmo" data-id="'+o.id+'">Agregar</button></div></div></div>')+
+ '<div class="r" style="margin-top:10px">Neto '+fmt(t.neto)+' · IVA '+fmt(t.iva)+'<br><b style="font-size:1.2rem">Total '+fmt(t.total)+'</b>'+(cost?'<br><span class="mut sm">Costo repuestos '+fmt(t.costo)+' · margen bruto '+fmt(t.neto-t.costo)+'</span>':'')+'</div></div>'+
+ '<div class="card"><h3>Cobros</h3>'+(o.pagos.length?'<div class="tw"><table><thead><tr><th>Fecha</th><th>Medio</th><th class="n">Monto</th></tr></thead><tbody>'+o.pagos.map(p=>'<tr><td>'+fdate(p.fecha)+'</td><td>'+h(p.medio)+(p.cajaId?' · '+h((DB.cajas.find(x=>x.id===p.cajaId)||{}).n||''):'')+'</td><td class="n">'+fmt(p.monto)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Sin cobros registrados.</p>')+
+ '<div class="row" style="margin-top:8px"><b>Saldo: <span style="color:'+(t.saldo>0.005?'var(--bad)':'var(--ok)')+'">'+fmt(Math.max(0,t.saldo))+'</span></b><span class="sp"></span>'+(!lock&&t.saldo>0.005&&o.items.length?'<button class="btn p" data-act="otcobrar" data-id="'+o.id+'">💵 Cobrar</button>':'')+'</div></div>'+
+ '<div class="row"><button class="btn" data-act="otprint" data-id="'+o.id+'" data-p="pres">🖨 Presupuesto</button><button class="btn" data-act="otprint" data-id="'+o.id+'" data-p="ot">🖨 Orden de trabajo</button>'+(c.tel?'<a class="btn" target="_blank" rel="noopener" href="'+h(wa(c.tel,'Hola '+c.n+', te escribimos de '+DB.cfg.nombre+'. Tu '+v.marca+' '+v.mod+' ('+v.pat+') está en estado: '+o.estado+'.'+(o.estado==='Listo'?' Ya podés retirarlo. Saldo: '+fmt(Math.max(0,t.saldo)):'')))+'">💬 Avisar por WhatsApp</a>':'')+'<span class="sp"></span>'+
+ (!lock&&o.estado==='Listo'?'<button class="btn d" data-act="otentregar" data-id="'+o.id+'">✔ Entregar vehículo</button>':'')+(lock?'<span class="badge">Entregada el '+fdate(o.entregada)+'</span>':'')+'</div>'}
+function repOptions(q){const nq=norm(q);const l=DB.repuestos.filter(r=>r.activo&&(!nq||norm([r.cod,r.desc,r.marca,r.rubro,r.rosca,r.apl].join(' ')).includes(nq))).slice(0,60);
+ return l.length?l.map(r=>'<option value="'+r.id+'"'+(r.qty<=0?' disabled':'')+'>'+h(r.desc+' · '+r.marca+' · stock '+r.qty+' · '+fmt(r.pv))+'</option>').join(''):'<option value="">Sin coincidencias</option>'}
+CHG.otrq=t=>{const s=$('#o_rep');if(s)s.innerHTML=repOptions(t.value)};
+CHG.otfield=t=>{const o=otOf(t.dataset.id);if(!o||o.estado==='Entregado')return;const f=t.dataset.f;let v=t.value;if(f==='km')v=parseInt(v)||0;o[f]=v;if(f==='km'&&v){const x=vehOf(o.vehId);if(x)x.km=Math.max(x.km,v)}save()};
+ACT.otaprob=d=>{const o=otOf(d.id);o.presAprob=!o.presAprob;audit('Presupuesto '+(o.presAprob?'aprobado':'sin aprobar'),otNum(o));otRefresh(o)};
+ACT.otestado=d=>{const o=otOf(d.id);const to=d.to;if(o.estado===to)return;
+ if(to==='En reparación'&&!o.presAprob){toast('Para pasar a “En reparación” el presupuesto debe estar aprobado por el cliente.',1);return}
+ if((to==='En reparación'||to==='Listo')&&!o.mecId){toast('Asigná un mecánico antes de continuar.',1);return}
+ if(to==='Listo'&&!o.items.length){toast('La OT no tiene ítems cargados.',1);return}
+ o.estado=to;audit('OT '+otNum(o),'Estado → '+to);otRefresh(o);renderView()};
+ACT.otaddrep=d=>{const o=otOf(d.id),r=repOf(val('o_rep'));const q=parseInt(val('o_rqty'));if(!r){toast('Elegí un repuesto.',1);return}if(!(q>0)){toast('Cantidad inválida.',1);return}
+ if(q>r.qty){toast('Stock insuficiente: disponibles '+r.qty+' de '+r.desc+'.',1);return}
+ r.qty-=q;const ex=o.items.find(i=>i.k==='rep'&&i.repId===r.id);if(ex)ex.qty+=q;else o.items.push({k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:q,pu:r.pv,iva:r.iva,costo:r.pc});
+ audit('OT '+otNum(o),'+ '+q+' × '+r.desc);otRefresh(o)};
+ACT.otaddmo=d=>{const o=otOf(d.id),s=DB.servicios.find(x=>x.id===val('o_mo'));const q=num(val('o_mqty'));if(!s){toast('Elegí un servicio.',1);return}if(!(q>0)){toast('Cantidad inválida.',1);return}
+ o.items.push({k:'mo',desc:s.n,qty:q,pu:s.pu,iva:21,costo:0});audit('OT '+otNum(o),'+ MO '+s.n);otRefresh(o)};
+ACT.otdel=d=>{const o=otOf(d.id),i=o.items[+d.i];if(!i)return;if(i.k==='rep'){const r=repOf(i.repId);if(r)r.qty+=i.qty}o.items.splice(+d.i,1);audit('OT '+otNum(o),'− '+i.desc);otRefresh(o)};
+
+ACT.otcobrar=d=>{UI.cobroOt=d.id;const o=otOf(d.id),c=cliOf(o.cliId),t=otTotal(o);
+ const abiertas=DB.turno.abierto?DB.cajas:[];
+ modal({title:'Cobrar '+otNum(o),ok:'Registrar cobro',body:'<p>Saldo a cobrar: <b style="font-size:1.2rem">'+fmt(t.saldo)+'</b></p>'+
+ '<div class="g2"><div class="f"><label for="pg_ef">Efectivo recibido</label><input id="pg_ef" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div><div class="f"><label for="pg_caja">Ingresa a la caja</label><select id="pg_caja">'+(abiertas.length?opts(abiertas,'C1',x=>[x.id,x.n]):'<option value="">⚠ No hay turno de caja abierto</option>')+'</select></div>'+
+ '<div class="f"><label for="pg_tr">Transferencia</label><input id="pg_tr" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div><div class="f"><label for="pg_tj">Tarjeta (débito/crédito)</label><input id="pg_tj" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div>'+
+ (c&&c.cc?'<div class="f"><label for="pg_cc">A cuenta corriente (límite '+fmt(c.lim)+' · deuda actual '+fmt(c.saldo)+')</label><input id="pg_cc" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div>':'')+'</div><div id="pg_res" class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f"></div>',
+ calc:()=>CHG.pgcalc(),
+ onOk:()=>{try{const r=pgCalc(o);if(r.err)throw new Error(r.err);if(r.total<=0)throw new Error('Ingresá algún importe.');
+  if(r.ef>0){if(!DB.turno.abierto)throw new Error('Abrí el turno de caja para cobrar en efectivo.');if(!val('pg_caja'))throw new Error('Elegí la caja.')}
+  const f=TODAY();
+  if(r.ef>0){o.pagos.push({id:uid('pg'),fecha:f,medio:'Efectivo',monto:r.ef,cajaId:val('pg_caja')});cajaMov(val('pg_caja'),'ingreso','f1',r.ef,otNum(o))}
+  if(r.tr>0)o.pagos.push({id:uid('pg'),fecha:f,medio:'Transferencia',monto:r.tr,cajaId:''});
+  if(r.tj>0)o.pagos.push({id:uid('pg'),fecha:f,medio:'Tarjeta',monto:r.tj,cajaId:''});
+  if(r.cc>0){o.pagos.push({id:uid('pg'),fecha:f,medio:'Cuenta corriente',monto:r.cc,cajaId:''});c.saldo=r2(c.saldo+r.cc)}
+  audit('Cobro '+otNum(o),fmt(r.total)+(r.vuelto>0?' (vuelto '+fmt(r.vuelto)+')':''));save();closeModal();
+  setTimeout(()=>ACT.otopen({id:o.id}),30);toast('Cobro registrado'+(r.vuelto>0?' · vuelto '+fmt(r.vuelto):''));return false}catch(e){merr(e.message);return false}}})};
+function pgCalc(o){const t=otTotal(o),c=cliOf(o.cliId);const ef=r2(num(val('pg_ef'))),tr=r2(num(val('pg_tr'))),tj=r2(num(val('pg_tj'))),cc=r2(num(val('pg_cc')));
+ if([ef,tr,tj,cc].some(x=>x<0))return{err:'No se admiten importes negativos.'};
+ const non=r2(tr+tj+cc);if(non>t.saldo+0.004)return{err:'Transferencia + tarjeta + cuenta corriente superan el saldo ('+fmt(t.saldo)+').'};
+ if(cc>0&&(!c||!c.cc))return{err:'El cliente no tiene cuenta corriente habilitada.'};
+ if(cc>0&&c.saldo+cc>c.lim+0.004)return{err:'Supera el límite de cuenta corriente del cliente ('+fmt(c.lim)+').'};
+ const needCash=r2(Math.max(0,t.saldo-non)),efA=r2(Math.min(ef,needCash)),vuelto=r2(ef-efA);
+ return{ef:efA,tr,tj,cc,vuelto,total:r2(efA+non),resta:r2(t.saldo-efA-non)}}
+CHG.pgcalc=()=>{const o=otOf(UI.cobroOt);if(!o||!$('#pg_res'))return;const r=pgCalc(o);$('#pg_res').innerHTML=r.err?'⚠ '+h(r.err):'Se cobra: <b>'+fmt(r.total)+'</b>'+(r.vuelto>0?' · <b>Vuelto a entregar: '+fmt(r.vuelto)+'</b>':'')+' · Queda pendiente: <b>'+fmt(r.resta)+'</b>'};
+</script>
+<script>
+/* ===== Caja: movimiento base (rubro financiero obligatorio) ===== */
+function cajaMov(cajaId,tipo,concId,monto,ref,extra){
+ if(!rubFin(concId))throw new Error('Falta el rubro financiero del movimiento.');
+ DB.seq.mov++;const m=Object.assign({id:'m'+DB.seq.mov,turnoId:DB.turno.id,cajaId,tipo,conc:concId,monto:r2(monto),ref:ref||'',u:ME?ME.n:'sistema',t:Date.now()},extra||{});DB.movs.push(m);return m}
+
+/* ===== Entregar OT / imprimir ===== */
+ACT.otentregar=d=>{const o=otOf(d.id),t=otTotal(o),c=cliOf(o.cliId);
+ const fin=ccMonto=>{
+  if(ccMonto>0){o.pagos.push({id:uid('pg'),fecha:TODAY(),medio:'Cuenta corriente',monto:ccMonto,cajaId:''});c.saldo=r2(c.saldo+ccMonto)}
+  o.estado='Entregado';o.entregada=TODAY();const v=vehOf(o.vehId);if(v){v.km=Math.max(v.km||0,o.km||0);if(v.km){v.proxKm=Math.ceil((v.km+1000)/10000)*10000;v.proxFecha=addDays(180)}}
+  o.items.forEach(i=>{if(i.k!=='rep')return;const r=repOf(i.repId);if(!r)return;let tipo='',cant=0,u='u';
+   if(r.rubro==='ACEITE LUBRICANTE'){tipo='Aceite usado';cant=i.qty*(/x\s*(\d+)\s*L/i.test(r.desc)?+RegExp.$1:4);u='L'}
+   else if(r.rubro==='FILTRO DE ACEITE'){tipo='Filtros usados';cant=i.qty}else if(r.rubro==='BATERÍAS'){tipo='Baterías';cant=i.qty}
+   if(tipo)DB.resid.push({id:uid('z'),fecha:TODAY(),tipo,cant,unidad:u,ref:'Generado en '+otNum(o)})});
+  const tu=DB.turnos.find(x=>x.otId===o.id);if(tu)tu.estado='Confirmado';
+  audit('OT entregada',otNum(o)+(ccMonto>0?' · a cta. cte. '+fmt(ccMonto):''));save();closeModal();renderView();setTimeout(()=>ACT.otopen({id:o.id}),30);toast(otNum(o)+' entregada')};
+ if(t.saldo>0.005){
+  if(c&&c.cc){if(c.saldo+t.saldo>c.lim+0.004){toast('El saldo supera el límite de cuenta corriente. Cobrá antes de entregar.',1);return}
+   confirmBox('Quedan '+fmt(t.saldo)+' sin cobrar. Se pasan a la cuenta corriente de '+c.n+'. ¿Entregar el vehículo?',()=>fin(t.saldo),'Entregar y pasar a cuenta corriente');return}
+  toast('Hay un saldo de '+fmt(t.saldo)+' sin cobrar. Cobralo antes de entregar.',1);return}
+ confirmBox('¿Confirmás la entrega del vehículo? La OT queda cerrada y no se puede editar.',()=>fin(0),'Entregar')};
+
+ACT.otprint=d=>{const o=otOf(d.id),v=vehOf(o.vehId)||{},c=cliOf(o.cliId)||{},t=otTotal(o),pres=d.p==='pres';
+ const ck=o.check||{};
+ printHTML('<div class="hdr"><img src="'+LOGO+'" alt=""><div><h1 style="margin:0">'+h(DB.cfg.nombre)+'</h1>'+h(DB.cfg.dir)+' · Tel./WhatsApp '+h(DB.cfg.tel)+'<br>'+h(DB.cfg.mail)+' · Facebook: '+h(DB.cfg.fb)+' · Instagram: @'+h(DB.cfg.ig)+'</div></div>'+
+ '<h2>'+(pres?'PRESUPUESTO':'ORDEN DE TRABAJO')+' · '+otNum(o)+'</h2><p>Fecha: '+fdate(o.fecha)+' · Cliente: <b>'+h(c.n)+'</b> '+h(c.tel)+'<br>Vehículo: <b>'+h(v.marca+' '+v.mod)+'</b> · Patente <b>'+h(v.pat)+'</b> · '+h(o.km)+' km · Mecánico: '+h((userOf(o.mecId)||{n:'—'}).n)+'</p><p>Motivo: '+h(o.motivo)+'</p>'+
+ '<table><thead><tr><th>Detalle</th><th>Cant.</th><th>P. unit.</th><th>IVA</th><th>Importe</th></tr></thead><tbody>'+o.items.map(i=>'<tr><td>'+h(i.desc)+'</td><td>'+i.qty+'</td><td>'+fmt(i.pu)+'</td><td>'+i.iva+'%</td><td>'+fmt(i.qty*i.pu)+'</td></tr>').join('')+'</tbody></table>'+
+ '<p style="text-align:right">Neto '+fmt(t.neto)+' · IVA '+fmt(t.iva)+' · <b>Total '+fmt(t.total)+'</b>'+(t.pagado?' · Pagado '+fmt(t.pagado)+' · Saldo '+fmt(Math.max(0,t.saldo)):'')+'</p>'+
+ (pres?'<p class="sm">Presupuesto sujeto a revisión si el diagnóstico en desarmado difiere. Validez y condiciones: [VERIFICAR / completar por el taller].</p><p>Conformidad del cliente: ______________________</p>':
+  '<p class="sm">Recepción: aceite '+(ck.aceite?'OK':'revisar')+' · luces '+(ck.luces?'OK':'revisar')+' · neumáticos '+(ck.neum?'OK':'revisar')+' · auxilio '+(ck.auxilio?'sí':'no')+' · docs '+(ck.docs?'sí':'no')+' · combustible '+h(ck.comb)+' · golpes previos: '+(ck.rayones?'SÍ (ver observaciones)':'no')+'</p><p>Observaciones: '+h(o.obs||'')+'</p><p>Firma del cliente: ______________________ &nbsp;&nbsp; Firma del taller: ______________________</p>')+
+ '<p class="sm" style="border-top:1px solid #999;padding-top:6px">Comprobante interno sin validez fiscal. '+vbLine()+'</p>')};
+
+/* ===== Turnos ===== */
+function tuConflict(f,hora,dur,rec,ex){if(hora+dur>18)return 'El turno termina después de las 18:00.';return DB.turnos.some(t=>t.id!==ex&&t.fecha===f&&t.estado!=='Cancelado'&&+t.rec===+rec&&hora<t.hora+t.dur&&t.hora<hora+dur)?'Ese puesto ya está ocupado en ese horario.':''}
+V.turnos=()=>{
+ const f=UI.turFecha,ts=DB.turnos.filter(t=>t.fecha===f);let g='<div class="tg"><div class="hd"></div>'+RECURSOS.map(r=>'<div class="hd">'+h(r)+'</div>').join('');
+ HORAS.forEach(hr=>{g+='<div class="hr">'+String(hr).padStart(2,'0')+':00</div>';RECURSOS.forEach((r,ri)=>{const t=ts.find(x=>+x.rec===ri&&x.hora===hr&&x.estado!=='Cancelado');const v=t?vehOf(t.vehId)||{}:null;
+  g+='<div class="cell" data-act="tunew" data-h="'+hr+'" data-r="'+ri+'" role="button" tabindex="0" aria-label="Nuevo turno '+hr+':00 '+h(r)+'">'+(t?'<div class="tb '+(t.estado==='En taller'?'Taller':t.estado)+'" style="height:'+(t.dur*56-4)+'px" data-act="tuopen" data-id="'+t.id+'"><b>'+h(v.pat)+'</b> '+h(t.srv)+'<br>'+h((cliOf(t.cliId)||{}).n)+'</div>':'')+'</div>'})});
+ g+='</div>';
+ const canc=ts.filter(t=>t.estado==='Cancelado').length;
+ return '<div class="bar"><h2>Turnos</h2><button class="btn" data-act="tuday" data-n="-1">◀</button><input type="date" id="tuf" style="max-width:170px" value="'+f+'" data-chg="tufecha" aria-label="Fecha"><button class="btn" data-act="tuday" data-n="1">▶</button><button class="btn" data-act="tuday" data-n="0">Hoy</button><span class="sp"></span><span class="mut sm">'+ts.filter(t=>t.estado!=='Cancelado').length+' turnos'+(canc?' · '+canc+' cancelados':'')+'</span><button class="btn p" data-act="tunew">➕ Nuevo turno</button></div>'+
+ '<div class="chips" style="margin-bottom:8px"><span class="badge warn">Pendiente</span><span class="badge ok">Confirmado</span><span class="badge b-Diagnóstico">En taller</span></div><div class="tw" style="padding:0">'+g+'</div>'};
+ACT.tuday=d=>{UI.turFecha=+d.n===0?TODAY():addDays(+d.n,UI.turFecha);renderView()};
+CHG.tufecha=t=>{if(t.value){UI.turFecha=t.value;renderView()}};
+ACT.tunew=d=>{const hr=+d.h||9,rc=+d.r||0;
+ modal({title:'Nuevo turno · '+fdate(UI.turFecha),ok:'Agendar',wide:true,body:pickerHTML('','')+
+ '<div class="g4"><div class="f"><label for="tu_f">Fecha</label><input type="date" id="tu_f" value="'+UI.turFecha+'"></div><div class="f"><label for="tu_h">Hora</label><select id="tu_h">'+opts(HORAS,hr,x=>[x,String(x).padStart(2,'0')+':00'])+'</select></div><div class="f"><label for="tu_d">Duración (h)</label><select id="tu_d">'+opts([1,2,3,4,5,6],1)+'</select></div><div class="f"><label for="tu_r">Puesto</label><select id="tu_r">'+opts(RECURSOS.map((r,i)=>[i,r]),rc,x=>x)+'</select></div></div>'+
+ '<div class="f"><label for="tu_s">Servicio solicitado</label><input id="tu_s" placeholder="Ej.: service, alineación, frenos…"></div>',calc:()=>pkFill(''),
+ onOk:()=>{try{const f=val('tu_f');if(!f)throw new Error('Elegí la fecha.');if(f<TODAY()&&!confirm('La fecha es anterior a hoy. ¿Continuar?'))return false;const hr2=+val('tu_h'),du=+val('tu_d'),rc2=+val('tu_r');const s=val('tu_s').trim();if(s.length<3)throw new Error('Indicá el servicio solicitado.');
+  const cf=tuConflict(f,hr2,du,rc2);if(cf)throw new Error(cf);const{cid,vid}=readPicker();DB.seq.tu++;DB.turnos.push({id:'t'+DB.seq.tu,fecha:f,hora:hr2,dur:du,rec:rc2,cliId:cid,vehId:vid,srv:s,estado:'Pendiente',otId:''});audit('Turno nuevo',fdate(f)+' '+hr2+':00 · '+s);save();UI.turFecha=f;closeModal();renderView();toast('Turno agendado');return false}catch(e){merr(e.message);return false}}})};
+ACT.tuopen=d=>{const t=DB.turnos.find(x=>x.id===d.id),v=vehOf(t.vehId)||{},c=cliOf(t.cliId)||{};
+ modal({title:'Turno · '+fdate(t.fecha)+' '+String(t.hora).padStart(2,'0')+':00',hideOk:true,cancel:'Cerrar',body:'<p><b>'+h(v.pat)+'</b> · '+h(v.marca+' '+v.mod)+'<br>'+h(c.n)+' · '+h(c.tel)+'<br>Servicio: '+h(t.srv)+'<br>Puesto: '+h(RECURSOS[t.rec])+' · '+t.dur+' h · Estado: <b>'+t.estado+'</b></p>'+
+ '<div class="row">'+(t.estado==='Pendiente'?'<button class="btn" data-act="tuest" data-id="'+t.id+'" data-e="Confirmado">✔ Confirmar</button>':'')+(!t.otId&&t.estado!=='Cancelado'?'<button class="btn p" data-act="tuot" data-id="'+t.id+'">🔧 Recibir y abrir OT</button>':'')+(t.otId?'<button class="btn p" data-act="otopen" data-id="'+t.otId+'">Ver '+h(otNum(otOf(t.otId)||{num:0}))+'</button>':'')+
+ (t.estado!=='Cancelado'&&!t.otId?'<button class="btn" data-act="tuedit" data-id="'+t.id+'">Reprogramar</button><button class="btn d" data-act="tuest" data-id="'+t.id+'" data-e="Cancelado">Cancelar turno</button>':'')+
+ (c.tel?'<a class="btn" target="_blank" rel="noopener" href="'+h(wa(c.tel,'Hola '+c.n+', te recordamos tu turno en '+DB.cfg.nombre+' el '+fdate(t.fecha)+' a las '+String(t.hora).padStart(2,'0')+':00 ('+t.srv+'). Dirección: '+DB.cfg.dir+'. ¡Te esperamos!'))+'">💬 Recordar por WhatsApp</a>':'')+'</div>'})};
+ACT.tuest=d=>{const t=DB.turnos.find(x=>x.id===d.id);t.estado=d.e;audit('Turno '+d.e,t.id);save();closeModal();renderView();toast('Turno '+d.e.toLowerCase())};
+ACT.tuot=d=>{const t=DB.turnos.find(x=>x.id===d.id),v=vehOf(t.vehId);DB.seq.ot++;const o={id:'ot'+DB.seq.ot,num:DB.seq.ot,fecha:TODAY(),cliId:t.cliId,vehId:t.vehId,km:v.km,motivo:t.srv,estado:'Recibido',mecId:'',recurso:String(t.rec),presAprob:false,items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2'},obs:'',pagos:[],entregada:''};
+ DB.ots.unshift(o);t.otId=o.id;t.estado='En taller';audit('OT desde turno',otNum(o));save();closeModal();renderView();setTimeout(()=>ACT.otopen({id:o.id}),30)};
+ACT.tuedit=d=>{const t=DB.turnos.find(x=>x.id===d.id);
+ modal({title:'Reprogramar turno',ok:'Guardar',body:'<div class="g4"><div class="f"><label for="te_f">Fecha</label><input type="date" id="te_f" value="'+t.fecha+'"></div><div class="f"><label for="te_h">Hora</label><select id="te_h">'+opts(HORAS,t.hora,x=>[x,String(x).padStart(2,'0')+':00'])+'</select></div><div class="f"><label for="te_d">Duración</label><select id="te_d">'+opts([1,2,3,4,5,6],t.dur)+'</select></div><div class="f"><label for="te_r">Puesto</label><select id="te_r">'+opts(RECURSOS.map((r,i)=>[i,r]),t.rec,x=>x)+'</select></div></div>',
+ onOk:()=>{const cf=tuConflict(val('te_f'),+val('te_h'),+val('te_d'),+val('te_r'),t.id);if(cf){merr(cf);return false}t.fecha=val('te_f');t.hora=+val('te_h');t.dur=+val('te_d');t.rec=+val('te_r');audit('Turno reprogramado',t.id);save();UI.turFecha=t.fecha;renderView();return true}})};
+
+/* ===== Clientes y vehículos ===== */
+V.clientes=()=>{const q=norm(UI.cliQ);const l=DB.clientes.filter(c=>!q||norm(c.n+' '+c.tel+' '+DB.vehs.filter(v=>v.cliId===c.id).map(v=>v.pat+' '+v.marca+' '+v.mod).join(' ')).includes(q));
+ return '<div class="bar"><h2>Clientes y vehículos</h2><input id="cq" style="max-width:280px" placeholder="Buscar nombre, teléfono, patente…" value="'+h(UI.cliQ)+'" data-chg="cliq" aria-label="Buscar cliente"><span class="sp"></span><button class="btn p" data-act="clinew">➕ Nuevo cliente</button></div>'+
+ '<div class="tw"><table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Vehículos</th><th>OT</th><th class="n">Saldo cta. cte.</th></tr></thead><tbody>'+l.map(c=>{const vs=DB.vehs.filter(v=>v.cliId===c.id);return '<tr class="clk" data-act="cliopen" data-id="'+c.id+'"><td><b>'+h(c.n)+'</b>'+(c.cc?' <span class="badge ok">Cta. cte.</span>':'')+'</td><td>'+h(c.tel)+'</td><td>'+vs.map(v=>'<span class="pill">'+h(v.pat)+'</span> '+h(v.marca+' '+v.mod)).join('<br>')+'</td><td>'+DB.ots.filter(o=>o.cliId===c.id).length+'</td><td class="n">'+(c.saldo>0?'<b style="color:var(--bad)">'+fmt(c.saldo)+'</b>':'—')+'</td></tr>'}).join('')+(l.length?'':'<tr><td colspan="5" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>'};
+CHG.cliq=t=>{UI.cliQ=t.value;const p=t.selectionStart;renderView();const n=$('#cq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(e){}}};
+ACT.clinew=()=>ACT.cliopen({id:''});
+ACT.cliopen=d=>{const c=d.id?cliOf(d.id):{id:'',n:'',tel:'',mail:'',doc:'',cc:false,lim:0,saldo:0};const vs=c.id?DB.vehs.filter(v=>v.cliId===c.id):[];const ots=c.id?DB.ots.filter(o=>o.cliId===c.id).sort((a,b)=>b.num-a.num):[];
+ modal({title:c.id?c.n:'Nuevo cliente',wide:true,ok:'Guardar cliente',body:'<div class="g3"><div class="f"><label for="cl_n">Nombre y apellido / razón social</label><input id="cl_n" value="'+h(c.n)+'"></div><div class="f"><label for="cl_t">Teléfono (WhatsApp)</label><input id="cl_t" inputmode="tel" value="'+h(c.tel)+'"></div><div class="f"><label for="cl_m">Correo</label><input id="cl_m" type="email" value="'+h(c.mail)+'"></div>'+
+ '<div class="f"><label for="cl_cc">Cuenta corriente</label><select id="cl_cc"><option value="0"'+(c.cc?'':' selected')+'>No habilitada</option><option value="1"'+(c.cc?' selected':'')+'>Habilitada</option></select></div><div class="f"><label for="cl_l">Límite de cuenta corriente ($)</label><input id="cl_l" inputmode="decimal" value="'+(c.lim||0)+'"></div><div class="f"><label>Saldo actual</label><div class="b" style="padding:8px 0;color:'+(c.saldo>0?'var(--bad)':'inherit')+'">'+fmt(c.saldo)+'</div></div></div>'+
+ (c.id?'<div class="row" style="margin-bottom:10px">'+(c.saldo>0?'<button class="btn p s" data-act="clicobro" data-id="'+c.id+'">💵 Cobrar deuda</button>':'')+'<button class="btn s" data-act="vehnew" data-id="'+c.id+'">➕ Agregar vehículo</button>'+(c.tel?'<a class="btn s" target="_blank" rel="noopener" href="'+h(wa(c.tel,'Hola '+c.n+', te escribimos de '+DB.cfg.nombre+'.'))+'">💬 WhatsApp</a>':'')+'</div>'+
+ '<h3>Vehículos y próximo service</h3>'+(vs.length?'<div class="tw"><table class="itbl"><thead><tr><th>Patente</th><th>Vehículo</th><th class="n">Km actual</th><th>Próx. service (km)</th><th>Próx. service (fecha)</th></tr></thead><tbody>'+vs.map(v=>'<tr><td><b>'+h(v.pat)+'</b></td><td>'+h(v.marca+' '+v.mod+(v.anio?' '+v.anio:''))+'</td><td class="n">'+h(v.km)+'</td><td><input data-vk="'+v.id+'" inputmode="numeric" value="'+h(v.proxKm||'')+'"></td><td><input type="date" data-vf="'+v.id+'" value="'+h(v.proxFecha||'')+'"></td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Sin vehículos cargados.</p>')+
+ '<h3 style="margin-top:12px">Historial de órdenes</h3>'+(ots.length?'<div class="tw"><table><thead><tr><th>OT</th><th>Fecha</th><th>Vehículo</th><th>Motivo</th><th>Estado</th><th class="n">Total</th></tr></thead><tbody>'+ots.map(o=>'<tr class="clk" data-act="otopen" data-id="'+o.id+'"><td>'+otNum(o)+'</td><td>'+fdate(o.fecha)+'</td><td>'+h((vehOf(o.vehId)||{}).pat)+'</td><td>'+h(o.motivo)+'</td><td><span class="badge b-'+o.estado+'">'+o.estado+'</span></td><td class="n">'+fmt(otTotal(o).total)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Sin órdenes.</p>'):''),
+ onOk:()=>{const n=val('cl_n').trim();if(n.length<3){merr('Cargá el nombre del cliente.');return false}const t=val('cl_t').replace(/\D/g,'');if(t&&t.length<8){merr('El teléfono parece incompleto.');return false}const lim=num(val('cl_l'));if(lim<0){merr('El límite no puede ser negativo.');return false}
+  const cc=val('cl_cc')==='1';if(!cc&&c.saldo>0){merr('No se puede deshabilitar la cuenta corriente con deuda pendiente.');return false}
+  const x=c.id?c:{id:uid('c'),doc:'',saldo:0};Object.assign(x,{n,tel:t,mail:val('cl_m').trim(),cc,lim});if(!c.id)DB.clientes.push(x);
+  $$('[data-vk]').forEach(i=>{const v=vehOf(i.dataset.vk);if(v)v.proxKm=parseInt(i.value)||0});$$('[data-vf]').forEach(i=>{const v=vehOf(i.dataset.vf);if(v)v.proxFecha=i.value||''});
+  audit(c.id?'Cliente editado':'Cliente nuevo',n);save();renderView();return true}})};
+ACT.vehnew=d=>{modal({title:'Nuevo vehículo',ok:'Agregar',body:'<div class="g2"><div class="f"><label for="nv_p">Patente</label><input id="nv_p" placeholder="AB123CD" maxlength="8"></div><div class="f"><label for="nv_a">Año</label><input id="nv_a" inputmode="numeric" maxlength="4"></div><div class="f"><label for="nv_m">Marca</label><input id="nv_m"></div><div class="f"><label for="nv_o">Modelo / motor</label><input id="nv_o"></div><div class="f"><label for="nv_k">Km actual</label><input id="nv_k" inputmode="numeric"></div></div>',
+ onOk:()=>{const p=val('nv_p').toUpperCase().replace(/[\s-]/g,'');if(!/^([A-Z]{2}\d{3}[A-Z]{2}|[A-Z]{3}\d{3})$/.test(p)){merr('Patente inválida (AB123CD o ABC123).');return false}if(DB.vehs.some(v=>v.pat===p)){merr('Ya existe un vehículo con esa patente.');return false}if(!val('nv_m').trim()||!val('nv_o').trim()){merr('Cargá marca y modelo.');return false}
+  DB.vehs.push({id:uid('v'),cliId:d.id,pat:p,marca:val('nv_m').trim(),mod:val('nv_o').trim(),anio:parseInt(val('nv_a'))||0,km:parseInt(val('nv_k'))||0,proxKm:0,proxFecha:''});audit('Vehículo nuevo',p);save();closeModal();renderView();setTimeout(()=>ACT.cliopen({id:d.id}),30);return false}})};
+ACT.clicobro=d=>{const c=cliOf(d.id);
+ modal({title:'Cobrar deuda de '+c.n,ok:'Registrar cobro',body:'<p>Deuda: <b>'+fmt(c.saldo)+'</b></p><div class="g3"><div class="f"><label for="cd_m">Monto</label><input id="cd_m" inputmode="decimal" value="'+c.saldo+'"></div><div class="f"><label for="cd_k">Medio</label><select id="cd_k"><option>Efectivo</option><option>Transferencia</option></select></div><div class="f"><label for="cd_c">Caja (efectivo)</label><select id="cd_c">'+opts(DB.cajas,'C1',x=>[x.id,x.n])+'</select></div></div>',
+ onOk:()=>{const m=r2(num(val('cd_m')));if(!(m>0)){merr('Monto inválido.');return false}if(m>c.saldo+0.004){merr('El monto supera la deuda.');return false}
+  if(val('cd_k')==='Efectivo'){if(!DB.turno.abierto){merr('Abrí el turno de caja para cobrar en efectivo.');return false}cajaMov(val('cd_c'),'ingreso','f1',m,'Cta. cte. '+c.n)}
+  c.saldo=r2(c.saldo-m);audit('Cobro de cuenta corriente',c.n+' '+fmt(m));save();closeModal();renderView();setTimeout(()=>ACT.cliopen({id:c.id}),30);toast('Cobro registrado');return false}})};
+
+/* ===== Repuestos ===== */
+function repFiltered(){const q=norm(UI.repQ);return DB.repuestos.filter(r=>(UI.repInact||r.activo)&&(!UI.repRub||r.rubro===UI.repRub)&&(!UI.repProv||r.provId===UI.repProv)&&(!q||norm([r.cod,r.codProv,r.desc,r.marca,r.rubro,r.rosca,r.junta,r.apl].join(' ')).includes(q)))}
+V.repuestos=()=>{const l=repFiltered(),cost=canCost(),sel=repOf(UI.repSel),bajo=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).length;
+ const stockVal=DB.repuestos.filter(r=>r.activo).reduce((a,r)=>a+r.qty*r.pc,0);
+ return '<div class="bar"><h2>Repuestos e inventario</h2>'+(isBoss()?'<button class="btn p" data-act="repedit" data-id="">Nuevo (F1)</button><button class="btn" data-act="repedit" data-id="'+h(UI.repSel)+'"'+(sel?'':' disabled')+'>Modificar (F2)</button><button class="btn" data-act="repdel"'+(sel?'':' disabled')+'>Borrar (F3)</button>':'')+'<span class="sp"></span><span class="mut sm">'+l.length+' artículos · '+bajo+' en alarma'+(cost?' · stock a costo '+fmt(stockVal):'')+'</span></div>'+
+ '<div class="bar"><input id="rq" style="max-width:300px" placeholder="Código, descripción, marca, rosca, aplicación (ej.: astra)" value="'+h(UI.repQ)+'" data-chg="repq" aria-label="Buscar repuesto"><select id="rrub" data-chg="reprub" style="max-width:220px" aria-label="Rubro">'+opts(DB.rubrosRep,UI.repRub,x=>[x,x],'Todos los rubros')+'</select><select id="rprov" data-chg="repprov" style="max-width:240px" aria-label="Proveedor">'+opts(DB.provs,UI.repProv,p=>[p.id,p.n],'Todos los proveedores')+'</select>'+(isBoss()?'<label style="margin:0;font-weight:500"><input type="checkbox" style="width:auto;min-height:0" '+(UI.repInact?'checked':'')+' data-chg="repinact"> ver dados de baja</label>':'')+'</div>'+
+ '<div class="tw" style="max-height:52vh"><table><thead><tr><th>Código</th><th>Descripción</th><th>Rubro</th><th>Marca</th><th>Proveedor</th>'+(cost?'<th class="n">P. compra</th><th class="n">% gan.</th>':'')+'<th class="n">P. venta</th><th class="n">Stock</th><th class="n">Alarma</th></tr></thead><tbody>'+
+ l.map(r=>'<tr class="clk'+(r.id===UI.repSel?' sel':'')+(r.activo&&r.qty<=r.alarma?' low':'')+(r.activo?'':' off')+'" data-act="repsel" data-id="'+r.id+'"><td>'+h(r.cod)+'</td><td><b>'+h(r.desc)+'</b></td><td>'+h(r.rubro)+'</td><td>'+h(r.marca)+'</td><td>'+h((provOf(r.provId)||{}).n)+'</td>'+(cost?'<td class="n">'+fmt(r.pc)+'</td><td class="n">'+r2(r.gan)+'%</td>':'')+'<td class="n"><b>'+fmt(r.pv)+'</b></td><td class="n">'+r.qty+'</td><td class="n">'+r.alarma+'</td></tr>').join('')+(l.length?'':'<tr><td colspan="10" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>'+
+ '<div class="det"><div class="g3"><div><label>Rosca</label><b>'+h(sel?sel.rosca||'—':'—')+'</b></div><div><label>Junta</label><b>'+h(sel?sel.junta||'—':'—')+'</b></div><div><label>Reposición / alarma</label><b>'+(sel?sel.repos+' / '+sel.alarma:'—')+'</b>'+(sel&&sel.venc?' · vence '+fdate(sel.fvenc):'')+'</div></div><label style="margin-top:8px">Aplicación (vehículos compatibles)</label><div style="white-space:pre-line">'+h(sel?sel.apl||'—':'Seleccioná un artículo de la lista.')+'</div>'+(sel&&isBoss()?'<div class="row" style="margin-top:8px"><button class="btn s" data-act="repajuste">Ajustar stock</button></div>':'')+'</div>'+
+ (isBoss()?'<div class="row" style="margin-top:10px"><button class="btn s" data-act="repmasivo">M. Precios %</button><button class="btn s" data-act="reprevert"'+(DB.undoPrecios?'':' disabled')+'>Revertir precios</button><button class="btn s" data-act="repingpre">Ingresar precios</button><button class="btn s" data-act="replist">Listado Art.</button><button class="btn s" data-act="repcsv">Sacar Excel</button><button class="btn s" data-act="repfalt">Excel faltantes</button></div>':'<div class="row" style="margin-top:10px"><button class="btn s" data-act="replist">Listado Art.</button></div>');
+};
+CHG.repq=t=>{UI.repQ=t.value;const p=t.selectionStart;renderView();const n=$('#rq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(e){}}};
+CHG.reprub=t=>{UI.repRub=t.value;renderView()};CHG.repprov=t=>{UI.repProv=t.value;renderView()};CHG.repinact=t=>{UI.repInact=t.checked;renderView()};
+ACT.repsel=d=>{UI.repSel=d.id;renderView()};
+function repForm(r){return '<div class="g2"><div class="f"><label for="rp_cod">Código (EAN / interno)</label><input id="rp_cod" value="'+h(r.cod)+'"></div><div class="f"><label for="rp_cp">Código del proveedor</label><input id="rp_cp" value="'+h(r.codProv)+'"></div></div>'+
+ '<div class="f"><label for="rp_d">Descripción</label><input id="rp_d" value="'+h(r.desc)+'"></div><div class="g3"><div class="f"><label for="rp_m">Marca</label><input id="rp_m" list="dl_m" value="'+h(r.marca)+'"><datalist id="dl_m">'+DB.marcas.map(m=>'<option value="'+h(m)+'">').join('')+'</datalist></div><div class="f"><label for="rp_r">Rubro</label><select id="rp_r">'+opts(DB.rubrosRep,r.rubro,x=>[x,x],'— elegir —')+'</select></div><div class="f"><label for="rp_p">Proveedor</label><select id="rp_p">'+opts(DB.provs.filter(p=>p.activo),r.provId,p=>[p.id,p.n],'— elegir —')+'</select></div></div>'+
+ '<div class="g3"><div class="f"><label for="rp_pc">Precio compra (neto)</label><input id="rp_pc" inputmode="decimal" value="'+r.pc+'" data-chg="rpcalc"></div><div class="f"><label for="rp_g">% ganancia</label><input id="rp_g" inputmode="decimal" value="'+r2(r.gan)+'" data-chg="rpcalc"></div><div class="f"><label for="rp_pv">Precio venta (neto)</label><input id="rp_pv" inputmode="decimal" value="'+r.pv+'" data-chg="rpcalc"></div></div>'+
+ '<div class="g4"><div class="f"><label for="rp_q">Cantidad</label><input id="rp_q" inputmode="numeric" value="'+r.qty+'"></div><div class="f"><label for="rp_a">Cant. alarma</label><input id="rp_a" inputmode="numeric" value="'+r.alarma+'"></div><div class="f"><label for="rp_rp">Cant. reposición</label><input id="rp_rp" inputmode="numeric" value="'+r.repos+'"></div><div class="f"><label for="rp_iva">I.V.A.</label><select id="rp_iva"><option value="10.5"'+(r.iva==10.5?' selected':'')+'>10,5 %</option><option value="21"'+(r.iva==10.5?'':' selected')+'>21 %</option></select></div></div>'+
+ '<div class="row"><label style="margin:0;font-weight:500"><input type="checkbox" id="rp_v" style="width:auto;min-height:0" '+(r.venc?'checked':'')+' data-chg="rpvenc"> Con vencimiento</label><input type="date" id="rp_fv" style="max-width:170px" value="'+h(r.fvenc)+'" '+(r.venc?'':'hidden')+' aria-label="Fecha de vencimiento"><span class="mut sm">Precio anterior: '+(r.pAnt?fmt(r.pAnt):'—')+' · Actualizado: '+fdate(r.fAct)+'</span></div>'+
+ '<div class="g2" style="margin-top:8px"><div class="f"><label for="rp_ro">Rosca</label><input id="rp_ro" value="'+h(r.rosca)+'"></div><div class="f"><label for="rp_j">Junta</label><input id="rp_j" value="'+h(r.junta)+'"></div></div><div class="f"><label for="rp_ap">Aplicación (un vehículo por línea)</label><textarea id="rp_ap" style="min-height:90px">'+h(r.apl)+'</textarea></div>'}
+CHG.rpvenc=t=>{$('#rp_fv').hidden=!t.checked};
+CHG.rpcalc=t=>{const pc=num(val('rp_pc')),g=num(val('rp_g')),pv=num(val('rp_pv'));if(t.id==='rp_pv'){if(pc>0)$('#rp_g').value=r2((pv/pc-1)*100)}else $('#rp_pv').value=r2(pc*(1+g/100))};
+ACT.repedit=d=>{if(!isBoss())return;const nuevo=!d.id;const r=nuevo?{cod:'',codProv:'',desc:'',marca:'',rubro:UI.repRub||'',provId:UI.repProv||'',pc:0,gan:50,pv:0,qty:0,alarma:2,repos:0,venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:'',junta:'',apl:''}:repOf(d.id);if(!r)return;
+ modal({title:nuevo?'Nuevo artículo':'Modificar artículo',wide:true,body:repForm(r),
+ onOk:()=>{try{const cod=val('rp_cod').trim();if(!cod)throw new Error('El código es obligatorio.');if(DB.repuestos.some(x=>x.cod===cod&&x!==r))throw new Error('Ya existe un artículo con ese código.');if(!val('rp_d').trim())throw new Error('La descripción es obligatoria.');if(!val('rp_r'))throw new Error('Elegí el rubro.');if(!val('rp_p'))throw new Error('Elegí el proveedor.');
+  const pc=num(val('rp_pc')),g=num(val('rp_g')),pv=num(val('rp_pv'));if(pc<0||g<0||pv<0)throw new Error('Los precios y el porcentaje no pueden ser negativos.');if(pv<pc&&!confirm('El precio de venta es menor al de compra. ¿Continuar?'))return false;
+  const q=parseInt(val('rp_q')),a=parseInt(val('rp_a')),rp=parseInt(val('rp_rp'));if([q,a,rp].some(x=>isNaN(x)||x<0))throw new Error('Cantidad, alarma y reposición deben ser números enteros ≥ 0.');
+  if(chk('rp_v')&&!val('rp_fv'))throw new Error('Indicá la fecha de vencimiento.');
+  const x=nuevo?{id:uid('r'),activo:true,pAnt:0,fAct:''}:r;if(!nuevo&&Math.abs(x.pv-pv)>0.004){x.pAnt=x.pv;x.fAct=TODAY()}
+  Object.assign(x,{cod,codProv:val('rp_cp').trim(),desc:val('rp_d').trim(),marca:val('rp_m').trim().toUpperCase(),rubro:val('rp_r'),provId:val('rp_p'),pc,gan:g,pv,qty:q,alarma:a,repos:rp,iva:+val('rp_iva'),venc:chk('rp_v'),fvenc:chk('rp_v')?val('rp_fv'):'',rosca:val('rp_ro').trim(),junta:val('rp_j').trim(),apl:val('rp_ap').trim()});
+  if(x.marca&&DB.marcas.indexOf(x.marca)<0)DB.marcas.push(x.marca);if(nuevo){DB.repuestos.push(x);x.fAct=TODAY()}UI.repSel=x.id;audit(nuevo?'Artículo nuevo':'Artículo modificado',x.cod+' '+x.desc);save();closeModal();renderView();toast('Artículo guardado');return false}catch(e){merr(e.message);return false}}})};
+ACT.repdel=()=>{const r=repOf(UI.repSel);if(!r||!isBoss())return;const usado=DB.ots.some(o=>o.items.some(i=>i.repId===r.id));
+ confirmBox(usado?'“'+r.desc+'” figura en órdenes de trabajo: se dará de baja (no se borra el historial). ¿Continuar?':'¿Borrar definitivamente “'+r.desc+'”?',()=>{if(usado){r.activo=false}else{DB.repuestos.splice(DB.repuestos.indexOf(r),1);UI.repSel=''}audit('Artículo '+(usado?'dado de baja':'borrado'),r.cod);save();renderView()},'Sí')};
+ACT.repajuste=()=>{const r=repOf(UI.repSel);if(!r)return;modal({title:'Ajustar stock · '+r.desc,ok:'Ajustar',body:'<p>Stock actual: <b>'+r.qty+'</b></p><div class="g2"><div class="f"><label for="aj_q">Nuevo stock</label><input id="aj_q" inputmode="numeric" value="'+r.qty+'"></div><div class="f"><label for="aj_m">Motivo (obligatorio)</label><input id="aj_m" placeholder="Conteo físico, rotura, devolución…"></div></div>',
+ onOk:()=>{const q=parseInt(val('aj_q'));if(isNaN(q)||q<0){merr('Cantidad inválida.');return false}if(val('aj_m').trim().length<4){merr('Indicá el motivo del ajuste.');return false}audit('Ajuste de stock',r.cod+': '+r.qty+' → '+q+' ('+val('aj_m').trim()+')');r.qty=q;save();renderView();return true}})};
+function snapPrecios(){DB.undoPrecios=DB.repuestos.map(r=>({id:r.id,pc:r.pc,gan:r.gan,pv:r.pv,pAnt:r.pAnt,fAct:r.fAct}))}
+ACT.repmasivo=()=>{modal({title:'Modificación masiva de precios',ok:'Aplicar',body:'<div class="g2"><div class="f"><label for="mp_a">Alcance</label><select id="mp_a" data-chg="mpcalc"><option value="all">Todos los artículos activos</option><option value="rub">Un rubro</option><option value="prov">Un proveedor</option><option value="marca">Una marca</option></select></div><div class="f"><label for="mp_v">Valor del alcance</label><select id="mp_v" data-chg="mpcalc"></select></div><div class="f"><label for="mp_p">Porcentaje (+ aumenta, − baja)</label><input id="mp_p" inputmode="decimal" placeholder="Ej.: 12,5" data-chg="mpcalc"></div><div class="f"><label for="mp_b">Se aplica sobre</label><select id="mp_b"><option value="compra">Precio de compra (recalcula venta con el % de ganancia)</option><option value="venta">Precio de venta directo</option></select></div></div><div id="mp_r" class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f"></div>',calc:()=>CHG.mpcalc({id:'mp_a'}),
+ onOk:()=>{const p=num(val('mp_p'));if(!val('mp_p').trim()||p===0){merr('Ingresá un porcentaje distinto de cero.');return false}if(p<=-90||p>500){merr('Porcentaje fuera de rango (−90 % a 500 %).');return false}const l=mpSet();if(!l.length){merr('El alcance no tiene artículos.');return false}
+  snapPrecios();l.forEach(r=>{r.pAnt=r.pv;r.fAct=TODAY();if(val('mp_b')==='compra'){r.pc=r2(r.pc*(1+p/100));r.pv=r2(r.pc*(1+r.gan/100))}else{r.pv=r2(r.pv*(1+p/100));r.gan=r.pc>0?r2((r.pv/r.pc-1)*100):r.gan}});
+  audit('Precios masivos',l.length+' artículos '+p+'%');save();closeModal();renderView();toast(l.length+' precios actualizados · podés revertir');return false}})};
+function mpSet(){const a=val('mp_a'),v=val('mp_v');return DB.repuestos.filter(r=>r.activo&&(a==='all'||(a==='rub'&&r.rubro===v)||(a==='prov'&&r.provId===v)||(a==='marca'&&r.marca===v)))}
+CHG.mpcalc=t=>{if(t.id==='mp_a'){const a=val('mp_a'),s=$('#mp_v');s.disabled=a==='all';s.innerHTML=a==='rub'?opts(DB.rubrosRep,'',x=>[x,x]):a==='prov'?opts(DB.provs,'',p=>[p.id,p.n]):a==='marca'?opts(DB.marcas,'',x=>[x,x]):'<option value="">—</option>'}
+ const p=num(val('mp_p'));$('#mp_r').innerHTML='Alcanza a <b>'+mpSet().length+'</b> artículos'+(p?' · variación '+(p>0?'+':'')+p+' %':'')};
+ACT.reprevert=()=>{if(!DB.undoPrecios)return;confirmBox('Se restauran los precios previos a la última modificación masiva. ¿Confirmás?',()=>{DB.undoPrecios.forEach(s=>{const r=repOf(s.id);if(r)Object.assign(r,{pc:s.pc,gan:s.gan,pv:s.pv,pAnt:s.pAnt,fAct:s.fAct})});DB.undoPrecios=null;audit('Precios revertidos');save();renderView();toast('Precios restaurados')},'Revertir')};
+ACT.repingpre=()=>{modal({title:'Ingresar precios de compra (lista del proveedor)',ok:'Aplicar',body:'<p class="sm mut">Una línea por artículo: <code>código;precio de compra</code>. Se recalcula el precio de venta con el % de ganancia de cada artículo.</p><textarea id="ip_t" style="min-height:140px" placeholder="7798001699226;3900&#10;7798001694979;3950"></textarea>',
+ onOk:()=>{const L=val('ip_t').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!L.length){merr('Pegá al menos una línea.');return false}const bad=[],ok=[];
+  L.forEach(x=>{const p=x.split(/[;\t]/);const r=DB.repuestos.find(y=>y.cod===(p[0]||'').trim());const pr=num(p[1]);if(!r||!(pr>0))bad.push(x);else ok.push([r,pr])});
+  if(!ok.length){merr('Ninguna línea coincide con un código existente.');return false}snapPrecios();ok.forEach(([r,pr])=>{r.pAnt=r.pv;r.fAct=TODAY();r.pc=r2(pr);r.pv=r2(pr*(1+r.gan/100))});audit('Ingreso de precios',ok.length+' artículos');save();closeModal();renderView();toast(ok.length+' precios actualizados'+(bad.length?' · '+bad.length+' líneas sin coincidencia':''),bad.length>0);return false}})};
+ACT.replist=()=>{const l=repFiltered().filter(r=>r.activo);printHTML('<div class="hdr"><img src="'+LOGO+'" alt=""><div><h1 style="margin:0">Listado de artículos</h1>'+h(DB.cfg.nombre)+' · '+fdate(TODAY())+'</div></div><table><thead><tr><th>Código</th><th>Descripción</th><th>Marca</th><th>Rubro</th><th>Rosca</th><th>Junta</th><th>P. venta</th><th>Stock</th></tr></thead><tbody>'+l.map(r=>'<tr><td>'+h(r.cod)+'</td><td>'+h(r.desc)+'</td><td>'+h(r.marca)+'</td><td>'+h(r.rubro)+'</td><td>'+h(r.rosca)+'</td><td>'+h(r.junta)+'</td><td>'+fmt(r.pv)+'</td><td>'+r.qty+'</td></tr>').join('')+'</tbody></table><p class="sm">'+vbLine()+'</p>')};
+ACT.repcsv=()=>{csvDown('repuestos_'+TODAY()+'.csv',[['Código','Cód. proveedor','Descripción','Marca','Rubro','Proveedor','P. compra','% ganancia','P. venta','IVA','Stock','Alarma','Reposición','Rosca','Junta','Aplicación']].concat(repFiltered().map(r=>[r.cod,r.codProv,r.desc,r.marca,r.rubro,(provOf(r.provId)||{}).n,r.pc,r2(r.gan),r.pv,r.iva,r.qty,r.alarma,r.repos,r.rosca,r.junta,r.apl.replace(/\n/g,' / ')])))};
+ACT.repfalt=()=>{const l=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).sort((a,b)=>(provOf(a.provId).n).localeCompare(provOf(b.provId).n));if(!l.length){toast('No hay faltantes.');return}csvDown('faltantes_'+TODAY()+'.csv',[['Proveedor','Código','Descripción','Marca','Stock','Reposición','A pedir']].concat(l.map(r=>[(provOf(r.provId)||{}).n,r.cod,r.desc,r.marca,r.qty,r.repos,Math.max(0,r.repos-r.qty)])))};
+document.addEventListener('keydown',e=>{if(!ME||VIEW!=='repuestos'||!$('#modal').hidden||!isBoss())return;if(e.key==='F1'){e.preventDefault();ACT.repedit({id:''})}else if(e.key==='F2'&&UI.repSel){e.preventDefault();ACT.repedit({id:UI.repSel})}else if(e.key==='F3'&&UI.repSel){e.preventDefault();ACT.repdel()}});
+</script>
+<script>
+/* ===== Proveedores y compras ===== */
+V.compras=()=>{const tab=UI.compTab,deuda=DB.provs.reduce((a,p)=>a+provDeuda(p.id),0);let b='';
+ if(tab==='prov')b='<div class="tw"><table><thead><tr><th>Proveedor</th><th>CUIT</th><th>Teléfono</th><th class="n">Deuda</th><th>Acciones</th></tr></thead><tbody>'+DB.provs.filter(p=>p.activo).map(p=>{const d=provDeuda(p.id);return '<tr><td><b>'+h(p.n)+'</b></td><td>'+h(p.cuit)+'</td><td>'+h(p.tel)+'</td><td class="n">'+(d>0.005?'<b style="color:var(--bad)">'+fmt(d)+'</b>':'—')+'</td><td><div class="row"><button class="btn s" data-act="ingnew" data-id="'+p.id+'">📥 Ingreso</button><button class="btn s" data-act="ocnew" data-id="'+p.id+'">OC</button><button class="btn s" data-act="ppago" data-id="'+p.id+'"'+(d>0.005?'':' disabled')+'>💵 Pago</button><button class="btn s" data-act="pnc" data-id="'+p.id+'"'+(d>0.005?'':' disabled')+'>NC</button><button class="btn s" data-act="plibro" data-id="'+p.id+'">Libro</button><button class="btn s" data-act="pedit" data-id="'+p.id+'">✎</button></div></td></tr>'}).join('')+'</tbody></table></div>';
+ else if(tab==='oc')b='<div class="tw"><table><thead><tr><th>OC</th><th>Fecha</th><th>Proveedor</th><th>Ítems</th><th>Estado</th><th></th></tr></thead><tbody>'+(DB.ocs.length?DB.ocs.slice().reverse().map(o=>'<tr><td>OC-'+String(o.num).padStart(4,'0')+'</td><td>'+fdate(o.fecha)+'</td><td>'+h((provOf(o.provId)||{}).n)+'</td><td>'+o.lines.map(l=>l.qty+'× '+h((repOf(l.repId)||{}).desc)).join(', ')+'</td><td><span class="badge '+(o.estado==='Pendiente'?'warn':o.estado==='Recibida'?'ok':'')+'">'+o.estado+'</span></td><td>'+(o.estado==='Pendiente'?'<div class="row"><button class="btn s p" data-act="ocrecibir" data-id="'+o.id+'">Recibir</button><a class="btn s" target="_blank" rel="noopener" href="'+h(wa((provOf(o.provId)||{}).tel,'Pedido a '+(provOf(o.provId)||{}).n+' · '+DB.cfg.nombre+':\n'+o.lines.map(l=>l.qty+' × '+(repOf(l.repId)||{}).desc+' ('+(repOf(l.repId)||{}).cod+')').join('\n')))+'">WhatsApp</a><button class="btn s" data-act="ocanul" data-id="'+o.id+'">Anular</button></div>':'')+'</td></tr>').join(''):'<tr><td colspan="6" class="mut c">Sin órdenes de compra.</td></tr>')+'</tbody></table></div>';
+ else{const falt=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma);const by={};falt.forEach(r=>(by[r.provId]=by[r.provId]||[]).push(r));
+  b=Object.keys(by).length?Object.keys(by).map(pid=>'<div class="card"><div class="row"><h3 class="sp">'+h(provOf(pid).n)+'</h3><button class="btn p s" data-act="ocsug" data-id="'+pid+'">Crear OC con lo sugerido</button></div><table><tbody>'+by[pid].map(r=>'<tr><td>'+h(r.desc)+' <span class="mut sm">'+h(r.marca)+'</span></td><td class="n">stock '+r.qty+'</td><td class="n">alarma '+r.alarma+'</td><td class="n">pedir <b>'+Math.max(1,r.repos-r.qty)+'</b></td></tr>').join('')+'</tbody></table></div>').join(''):'<p class="mut">No hay artículos en alarma.</p>'}
+ return '<div class="bar"><h2>Proveedores y compras</h2><span class="sp"></span><span class="mut">Deuda total: <b style="color:'+(deuda>0?'var(--bad)':'inherit')+'">'+fmt(deuda)+'</b></span><button class="btn p" data-act="pnew">➕ Proveedor</button></div>'+
+ '<div class="chips" style="margin-bottom:10px">'+[['prov','Proveedores'],['oc','Órdenes de compra'],['sug','Reposición sugerida']].map(t=>'<button class="chip'+(tab===t[0]?' on':'')+'" data-act="comptab" data-t="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+b};
+ACT.comptab=d=>{UI.compTab=d.t;renderView()};
+ACT.pnew=()=>ACT.pedit({id:''});
+ACT.pedit=d=>{const p=d.id?provOf(d.id):{n:'',cuit:'',tel:'',mail:''};modal({title:d.id?'Editar proveedor':'Nuevo proveedor',body:'<div class="g2"><div class="f"><label for="pv_n">Razón social</label><input id="pv_n" value="'+h(p.n)+'"></div><div class="f"><label for="pv_c">CUIT</label><input id="pv_c" inputmode="numeric" placeholder="30-12345678-9" value="'+h(p.cuit)+'"></div><div class="f"><label for="pv_t">Teléfono</label><input id="pv_t" value="'+h(p.tel)+'"></div><div class="f"><label for="pv_m">Correo</label><input id="pv_m" type="email" value="'+h(p.mail)+'"></div></div>',
+ onOk:()=>{const n=val('pv_n').trim();if(n.length<3){merr('Cargá la razón social.');return false}if(!cuitOk(val('pv_c'))){merr('CUIT inválido: revisá el dígito verificador.');return false}const c=cuitFmt(val('pv_c'));if(DB.provs.some(x=>x.cuit===c&&x!==p)){merr('Ya existe un proveedor con ese CUIT.');return false}
+  const x=d.id?p:{id:uid('p'),activo:true};Object.assign(x,{n,cuit:c,tel:val('pv_t').trim(),mail:val('pv_m').trim()});if(!d.id)DB.provs.push(x);audit('Proveedor '+(d.id?'editado':'nuevo'),n);save();renderView();return true}})};
+function ledgerAdd(provId,tipo,monto,ref,asig){const l={id:uid('lg'),provId,fecha:TODAY(),tipo,monto:r2(monto),ref:ref||'',asig:asig||[],u:ME.n};DB.ledger.push(l);return l}
+ACT.plibro=d=>{const p=provOf(d.id);let s=0;const rows=DB.ledger.filter(l=>l.provId===d.id).sort((a,b)=>a.fecha<b.fecha?-1:1).map(l=>{s+=l.tipo==='Compra'?l.monto:-l.monto;return '<tr><td>'+fdate(l.fecha)+'</td><td>'+l.tipo+'</td><td>'+h(l.ref)+(l.asig&&l.asig.length?'<br><span class="sm mut">'+l.asig.map(a=>h((DB.cajas.find(c=>c.id===a.cajaId)||{}).n)+': '+fmt(a.monto)).join(' · ')+'</span>':'')+'</td><td class="n">'+(l.tipo==='Compra'?fmt(l.monto):'')+'</td><td class="n">'+(l.tipo!=='Compra'?fmt(l.monto):'')+'</td><td class="n"><b>'+fmt(s)+'</b></td></tr>'}).join('');
+ modal({title:'Libro de '+p.n,wide:true,hideOk:true,cancel:'Cerrar',body:'<div class="tw"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Referencia</th><th class="n">Debe (compra)</th><th class="n">Haber (pago / NC)</th><th class="n">Saldo</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="mut c">Sin movimientos.</td></tr>')+'</tbody></table></div><p class="sm mut">El libro es sólo-agregar: las correcciones se hacen con notas de crédito o pagos compensatorios.</p>'})};
+/* editor de líneas (ingreso / OC) */
+function ingBody(){const I=UI.ing,p=provOf(I.provId);const pool=DB.repuestos.filter(r=>r.activo&&r.provId===I.provId);const lst=pool.length?pool:DB.repuestos.filter(r=>r.activo);let tot=0;
+ const rows=I.lines.map((l,i)=>{const r=repOf(l.repId),t=r2(l.qty*l.costo*(1+r.iva/100));tot+=t;return '<tr><td>'+h(r.desc)+' <span class="mut sm">'+h(r.marca)+' · IVA '+r.iva+'%</span></td><td><input data-chg="lninp" data-i="'+i+'" data-f="qty" value="'+l.qty+'" inputmode="numeric" style="width:80px" aria-label="Cantidad"></td><td><input data-chg="lninp" data-i="'+i+'" data-f="costo" value="'+l.costo+'" inputmode="decimal" style="width:110px" aria-label="Costo unitario"></td><td class="n" id="ln_t'+i+'">'+fmt(t)+'</td><td><button class="btn s" data-act="lndel" data-i="'+i+'" aria-label="Quitar">✕</button></td></tr>'}).join('');
+ return '<p>Proveedor: <b>'+h(p.n)+'</b> · deuda actual '+fmt(provDeuda(p.id))+'</p>'+
+ (I.mode==='ing'?'<div class="g3"><div class="f"><label for="ig_ref">N° de remito / factura</label><input id="ig_ref" data-chg="ingf" data-f="ref" value="'+h(I.ref)+'"></div><div class="f"><label for="ig_forma">Forma de pago</label><select id="ig_forma" data-chg="ingf" data-f="forma"><option value="cc"'+(I.forma==='cc'?' selected':'')+'>A cuenta (queda deuda)</option><option value="ef"'+(I.forma==='ef'?' selected':'')+'>Contado en efectivo (sale de caja)</option></select></div>'+(I.forma==='ef'?'<div class="f"><label for="ig_caja">Caja</label><select id="ig_caja" data-chg="ingf" data-f="cajaId">'+opts(DB.cajas,I.cajaId,c=>[c.id,c.n+' · '+fmt(cajaEfectivo(c.id))])+'</select></div>':'')+'</div>':'<div class="f"><label for="ig_obs">Observaciones</label><input id="ig_obs" data-chg="ingf" data-f="obs" value="'+h(I.obs||'')+'"></div>')+
+ '<div class="tw"><table class="itbl"><thead><tr><th>Artículo</th><th>Cantidad</th><th>Costo unit. (neto)</th><th class="n">Total c/IVA</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="5" class="mut c">Agregá artículos.</td></tr>')+'</tbody></table></div>'+
+ '<div class="row" style="margin-top:8px"><select id="ln_add" style="max-width:420px" aria-label="Artículo">'+lst.map(r=>'<option value="'+r.id+'">'+h(r.desc+' · '+r.marca+' · stock '+r.qty)+'</option>').join('')+'</select><button class="btn s" data-act="lnadd">Agregar</button><span class="sp"></span><b>Total: <span id="ln_tot">'+fmt(tot)+'</span></b></div>'}
+CHG.lninp=t=>{const l=UI.ing.lines[+t.dataset.i];l[t.dataset.f]=t.dataset.f==='qty'?(parseInt(t.value)||0):num(t.value);const r=repOf(l.repId);const c=$('#ln_t'+t.dataset.i);if(c)c.textContent=fmt(l.qty*l.costo*(1+r.iva/100));$('#ln_tot').textContent=fmt(UI.ing.lines.reduce((a,x)=>a+x.qty*x.costo*(1+repOf(x.repId).iva/100),0))};
+CHG.ingf=t=>{UI.ing[t.dataset.f]=t.value;if(t.dataset.f==='forma')rerenderModalBody(ingBody())};
+ACT.lnadd=()=>{const r=repOf(val('ln_add'));if(!r)return;const ex=UI.ing.lines.find(l=>l.repId===r.id);if(ex)ex.qty++;else UI.ing.lines.push({repId:r.id,qty:1,costo:r.pc});rerenderModalBody(ingBody())};
+ACT.lndel=d=>{UI.ing.lines.splice(+d.i,1);rerenderModalBody(ingBody())};
+function ingTotal(){return r2(UI.ing.lines.reduce((a,l)=>a+l.qty*l.costo*(1+repOf(l.repId).iva/100),0))}
+function lineCheck(){const L=UI.ing.lines;if(!L.length)throw new Error('Agregá al menos un artículo.');L.forEach(l=>{if(!(l.qty>0))throw new Error('Hay cantidades inválidas.');if(!(l.costo>0))throw new Error('Hay costos inválidos (deben ser mayores a cero).')})}
+ACT.ingnew=d=>{UI.ing={mode:'ing',provId:d.id,ocId:'',ref:'',forma:'cc',cajaId:'C1',lines:[]};ingOpen()};
+function ingOpen(){modal({title:'Ingreso de mercadería',wide:true,ok:'Confirmar ingreso',body:ingBody(),noFocus:true,
+ onOk:()=>{try{const I=UI.ing;lineCheck();if(I.ref.trim().length<3)throw new Error('Cargá el N° de remito o factura.');const tot=ingTotal();
+  if(I.forma==='ef'){if(!DB.turno.abierto)throw new Error('Abrí el turno de caja para pagar en efectivo.');if(cajaEfectivo(I.cajaId)<tot-0.004)throw new Error('La caja no tiene efectivo suficiente ('+fmt(cajaEfectivo(I.cajaId))+').')}
+  I.lines.forEach(l=>{const r=repOf(l.repId);r.qty+=l.qty;if(Math.abs(r.pc-l.costo)>0.004){r.pAnt=r.pv;r.pc=r2(l.costo);r.pv=r2(r.pc*(1+r.gan/100));r.fAct=TODAY()}});
+  const lg=ledgerAdd(I.provId,'Compra',tot,I.ref.trim());
+  if(I.forma==='ef'){cajaMov(I.cajaId,'egreso','f4',tot,'Compra contado · '+provOf(I.provId).n+' · '+I.ref.trim());ledgerAdd(I.provId,'Pago',tot,'Contado · '+I.ref.trim(),[{cajaId:I.cajaId,monto:tot}])}
+  if(I.ocId){const oc=DB.ocs.find(x=>x.id===I.ocId);if(oc)oc.estado='Recibida'}
+  audit('Ingreso de mercadería',provOf(I.provId).n+' '+fmt(tot));save();closeModal();renderView();toast('Ingreso registrado · stock y costos actualizados');return false}catch(e){merr(e.message);return false}}})}
+ACT.ocnew=d=>{UI.ing={mode:'oc',provId:d.id,lines:[],obs:''};ocOpen()};
+function ocOpen(){modal({title:'Orden de compra',wide:true,ok:'Crear OC',body:ingBody(),noFocus:true,onOk:()=>{try{lineCheck();DB.seq.oc++;DB.ocs.push({id:uid('oc'),num:DB.seq.oc,provId:UI.ing.provId,fecha:TODAY(),lines:UI.ing.lines.map(l=>({repId:l.repId,qty:l.qty,costo:l.costo})),estado:'Pendiente',obs:UI.ing.obs||''});audit('OC creada','OC-'+DB.seq.oc);save();UI.compTab='oc';closeModal();renderView();toast('OC creada');return false}catch(e){merr(e.message);return false}}})}
+ACT.ocsug=d=>{const L=DB.repuestos.filter(r=>r.activo&&r.provId===d.id&&r.qty<=r.alarma).map(r=>({repId:r.id,qty:Math.max(1,r.repos-r.qty),costo:r.pc}));UI.ing={mode:'oc',provId:d.id,lines:L,obs:'Reposición sugerida'};ocOpen()};
+ACT.ocrecibir=d=>{const o=DB.ocs.find(x=>x.id===d.id);UI.ing={mode:'ing',provId:o.provId,ocId:o.id,ref:'',forma:'cc',cajaId:'C1',lines:o.lines.map(l=>({repId:l.repId,qty:l.qty,costo:l.costo}))};ingOpen()};
+ACT.ocanul=d=>confirmBox('¿Anular esta orden de compra?',()=>{DB.ocs.find(x=>x.id===d.id).estado='Anulada';audit('OC anulada');save();renderView()},'Anular');
+ACT.ppago=d=>{const p=provOf(d.id),deu=provDeuda(d.id);UI.pp={id:d.id};
+ modal({title:'Pago a '+p.n,wide:true,ok:'Registrar pago',body:'<p>Deuda: <b>'+fmt(deu)+'</b></p><div class="g3"><div class="f"><label for="pp_m">Monto del pago</label><input id="pp_m" inputmode="decimal" value="'+deu+'" data-chg="ppcalc"></div><div class="f"><label for="pp_k">Medio</label><select id="pp_k" data-chg="ppcalc"><option value="ef">Efectivo (de una o varias cajas)</option><option value="tr">Transferencia</option></select></div><div class="f"><label for="pp_r">Referencia / comprobante</label><input id="pp_r" placeholder="Recibo, N° de transferencia…"></div></div><div id="pp_cj"></div><div id="pp_res" class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f"></div>',calc:()=>{ppRows();CHG.ppcalc({id:'x'})},
+ onOk:()=>{try{const r=ppCalc();if(r.err)throw new Error(r.err);if(val('pp_r').trim().length<3)throw new Error('Cargá la referencia del pago.');
+  const m=r2(num(val('pp_m')));if(val('pp_k')==='ef'){if(!DB.turno.abierto)throw new Error('Abrí el turno de caja.');const lg=ledgerAdd(p.id,'Pago',m,val('pp_r').trim(),r.asig);r.asig.forEach(a=>cajaMov(a.cajaId,'egreso','f4',a.monto,'Pago a '+p.n+' · '+val('pp_r').trim(),{lg:lg.id}))}else ledgerAdd(p.id,'Pago',m,'Transferencia · '+val('pp_r').trim(),[]);
+  audit('Pago a proveedor',p.n+' '+fmt(m));save();closeModal();renderView();toast('Pago registrado');return false}catch(e){merr(e.message);return false}}})};
+function ppRows(){const el=$('#pp_cj');if(!el)return;el.innerHTML=val('pp_k')==='ef'?'<h3>Reparto entre cajas (efectivo disponible)</h3><div class="g3">'+(DB.turno.abierto?DB.cajas.map(c=>'<div class="f"><label for="pp_c_'+c.id+'">'+h(c.n)+' · disponible '+fmt(cajaEfectivo(c.id))+'</label><input id="pp_c_'+c.id+'" data-chg="ppcalc" inputmode="decimal" placeholder="0,00"></div>').join(''):'<p class="mut">Turno de caja cerrado.</p>')+'</div>':''}
+function ppCalc(){const m=r2(num(val('pp_m'))),deu=provDeuda(UI.pp.id);if(!(m>0))return{err:'Ingresá el monto.'};if(m>deu+0.004)return{err:'El pago supera la deuda ('+fmt(deu)+').'};
+ if(val('pp_k')!=='ef')return{asig:[],resta:0,ok:true};let s=0;const asig=[];for(const c of DB.cajas){const el=document.getElementById('pp_c_'+c.id);const v=el?r2(num(el.value)):0;if(v<0)return{err:'Importe negativo.'};if(v>0){if(v>cajaEfectivo(c.id)+0.004)return{err:'La '+c.n+' no tiene efectivo suficiente.'};asig.push({cajaId:c.id,monto:v});s+=v}}
+ s=r2(s);if(Math.abs(s-m)>0.004)return{err:'El reparto ('+fmt(s)+') debe sumar exactamente '+fmt(m)+' (faltan '+fmt(m-s)+').',asig,soft:true};return{asig,ok:true}}
+CHG.ppcalc=t=>{if(t.id==='pp_k')ppRows();if(!$('#pp_res'))return;const r=ppCalc();$('#pp_res').innerHTML=r.err?'⚠ '+h(r.err):'✔ Todo en orden: el pago se registra de una sola vez (todo o nada).'};
+ACT.pnc=d=>{const p=provOf(d.id);modal({title:'Nota de crédito de '+p.n,ok:'Registrar NC',body:'<div class="g2"><div class="f"><label for="nc_m">Monto</label><input id="nc_m" inputmode="decimal"></div><div class="f"><label for="nc_r">Motivo / N° de NC</label><input id="nc_r"></div></div>',onOk:()=>{const m=r2(num(val('nc_m')));if(!(m>0)){merr('Monto inválido.');return false}if(m>provDeuda(p.id)+0.004){merr('La NC supera la deuda.');return false}if(val('nc_r').trim().length<3){merr('Indicá el motivo o N° de NC.');return false}ledgerAdd(p.id,'NC',m,val('nc_r').trim());audit('NC de proveedor',p.n+' '+fmt(m));save();renderView();return true}})};
+
+/* ===== Caja ===== */
+V.caja=()=>{const T=DB.turno;let b='';
+ if(!T.abierto){b='<div class="card"><h3>Turno de caja cerrado</h3><p class="mut">Abrí el turno con el efectivo inicial de cada caja para poder cobrar en efectivo y pagar proveedores.</p><div class="g3">'+DB.cajas.map(c=>'<div class="f"><label for="ap_'+c.id+'">Apertura · '+h(c.n)+'</label><input id="ap_'+c.id+'" inputmode="decimal" value="0"></div>').join('')+'</div><button class="btn p" data-act="cajaabrir">Abrir turno</button></div>'}
+ else{const ms=DB.movs.filter(m=>m.turnoId===T.id).sort((a,b)=>b.t-a.t);
+  b='<div class="g3" style="margin-bottom:12px">'+DB.cajas.map(c=>'<div class="kpi" style="cursor:default"><div class="l">'+h(c.n)+(c.principal?' · principal':'')+'</div><div class="v">'+fmt(cajaEfectivo(c.id))+'</div><div class="sm mut">Apertura '+fmt(T.apert[c.id]||0)+'</div></div>').join('')+'</div>'+
+  '<div class="row" style="margin-bottom:10px"><button class="btn p" data-act="cajamov" data-t="ingreso">➕ Ingreso</button><button class="btn" data-act="cajamov" data-t="egreso">➖ Egreso</button><button class="btn" data-act="cajatras">⇄ Traspaso entre cajas</button><span class="sp"></span><button class="btn d" data-act="cajacierre">Arqueo y cierre de turno</button></div>'+
+  '<div class="chips" style="margin-bottom:8px">'+[['mov','Movimientos del turno'],['ne','Cobros de hoy por medio'],['hist','Turnos cerrados']].map(t=>'<button class="chip'+(UI.cajaTab===t[0]?' on':'')+'" data-act="cajatab" data-t="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+cajaTabBody(ms)}
+ if(!T.abierto)b+='<h3>Turnos cerrados</h3>'+cajaHist();
+ return '<div class="bar"><h2>Caja</h2><span class="badge '+(T.abierto?'ok':'warn')+'">'+(T.abierto?'Turno abierto · '+fdate(T.fecha)+' · '+h(T.por):'Cerrado')+'</span></div>'+b};
+function cajaTabBody(ms){if(UI.cajaTab==='hist')return cajaHist();
+ if(UI.cajaTab==='ne'){const by={};DB.ots.forEach(o=>o.pagos.forEach(p=>{if(p.fecha===TODAY())by[p.medio]=(by[p.medio]||0)+p.monto}));const k=Object.keys(by);return '<div class="tw"><table><thead><tr><th>Medio</th><th class="n">Cobrado hoy</th></tr></thead><tbody>'+(k.length?k.map(x=>'<tr><td>'+x+'</td><td class="n">'+fmt(by[x])+'</td></tr>').join(''):'<tr><td colspan="2" class="mut c">Sin cobros hoy.</td></tr>')+'</tbody></table></div><p class="sm mut">Transferencias y tarjetas no pasan por el efectivo de caja; la cuenta corriente es deuda del cliente.</p>'}
+ return '<div class="tw"><table><thead><tr><th>Hora</th><th>Caja</th><th>Tipo</th><th>Rubro</th><th>Detalle</th><th>Usuario</th><th class="n">Importe</th></tr></thead><tbody>'+(ms.length?ms.map(m=>'<tr><td>'+new Date(m.t).toTimeString().slice(0,5)+'</td><td>'+h((DB.cajas.find(c=>c.id===m.cajaId)||{}).n)+'</td><td>'+(m.tr?'Traspaso':m.tipo)+'</td><td>'+h((rubFin(m.conc)||{}).n)+'</td><td>'+h(m.ref)+'</td><td>'+h(m.u)+'</td><td class="n" style="color:'+(m.tipo==='ingreso'?'var(--ok)':'var(--bad)')+'">'+(m.tipo==='ingreso'?'+':'−')+fmt(m.monto)+'</td></tr>').join(''):'<tr><td colspan="7" class="mut c">Sin movimientos en este turno.</td></tr>')+'</tbody></table></div>'}
+function cajaHist(){return DB.hist.length?'<div class="tw"><table><thead><tr><th>Turno</th><th>Fecha</th><th>Cerró</th><th>Arqueo por caja</th><th>Motivo de diferencia</th></tr></thead><tbody>'+DB.hist.slice().reverse().map(x=>'<tr><td>'+h(x.id)+'</td><td>'+fdate(x.fecha)+'</td><td>'+h(x.por)+'</td><td>'+x.cierres.map(c=>h(c.n)+': esperado '+fmt(c.esp)+' · contado '+fmt(c.cont)+' · <b style="color:'+(Math.abs(c.dif)>0.004?'var(--bad)':'var(--ok)')+'">dif. '+fmt(c.dif)+'</b>').join('<br>')+'</td><td>'+h(x.motivo||'—')+'</td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Todavía no hay turnos cerrados.</p>'}
+ACT.cajatab=d=>{UI.cajaTab=d.t;renderView()};
+ACT.cajaabrir=()=>{const ap={};for(const c of DB.cajas){const v=r2(num(val('ap_'+c.id)));if(v<0){toast('Apertura negativa.',1);return}ap[c.id]=v}DB.seq.tc++;DB.turno={abierto:true,id:'T'+DB.seq.tc,fecha:TODAY(),apert:ap,por:ME.n};audit('Turno de caja abierto',DB.turno.id);save();renderView();toast('Turno abierto')};
+ACT.cajamov=d=>{const ing=d.t==='ingreso';modal({title:ing?'Ingreso manual de efectivo':'Egreso de efectivo',ok:'Registrar',body:'<div class="g2"><div class="f"><label for="cm_c">Caja</label><select id="cm_c">'+opts(DB.cajas,'C1',c=>[c.id,c.n+' · '+fmt(cajaEfectivo(c.id))])+'</select></div><div class="f"><label for="cm_r">Rubro financiero (obligatorio)</label><select id="cm_r">'+opts(DB.rubrosFin.filter(r=>r.t===(ing?'ing':'egr')),'',r=>[r.id,r.n],'— elegir rubro —')+'</select></div><div class="f"><label for="cm_m">Monto</label><input id="cm_m" inputmode="decimal"></div><div class="f"><label for="cm_d">Detalle</label><input id="cm_d" placeholder="Qué es y a quién"></div></div>',
+ onOk:()=>{const m=r2(num(val('cm_m')));if(!val('cm_r')){merr('Elegí el rubro financiero.');return false}if(!(m>0)){merr('Monto inválido.');return false}if(val('cm_d').trim().length<3){merr('Escribí el detalle.');return false}if(!ing&&m>cajaEfectivo(val('cm_c'))+0.004){merr('La caja no tiene efectivo suficiente.');return false}
+  cajaMov(val('cm_c'),d.t,val('cm_r'),m,val('cm_d').trim());audit('Caja '+d.t,fmt(m)+' · '+val('cm_d').trim());save();renderView();return true}})};
+ACT.cajatras=()=>{modal({title:'Traspaso entre cajas',ok:'Traspasar',body:'<div class="g2"><div class="f"><label for="tr_o">Desde</label><select id="tr_o">'+opts(DB.cajas,'C1',c=>[c.id,c.n+' · '+fmt(cajaEfectivo(c.id))])+'</select></div><div class="f"><label for="tr_d">Hacia</label><select id="tr_d">'+opts(DB.cajas,'C2',c=>[c.id,c.n])+'</select></div><div class="f"><label for="tr_m">Monto</label><input id="tr_m" inputmode="decimal"></div><div class="f"><label for="tr_r">Rubro'+(DB.cfg.traspasoSinRubro?' (opcional: usa “Traspaso interno”)':' (obligatorio)')+'</label><select id="tr_r">'+opts(DB.rubrosFin.filter(r=>!r.oculto),'',r=>[r.id,r.n],DB.cfg.traspasoSinRubro?'Traspaso interno':'— elegir rubro —')+'</select></div><div class="f"><label for="tr_c">Comprobante N°</label><input id="tr_c"></div><div class="f"><label for="tr_a">Autoriza</label><select id="tr_a">'+opts(DB.users.filter(u=>u.rol==='dueno'||u.rol==='jefe'),'',u=>[u.n,u.n],'— elegir —')+'</select></div></div>',
+ onOk:()=>{const o=val('tr_o'),dd=val('tr_d'),m=r2(num(val('tr_m')));if(o===dd){merr('Origen y destino deben ser distintos.');return false}if(!(m>0)){merr('Monto inválido.');return false}if(m>cajaEfectivo(o)+0.004){merr('La caja de origen no tiene efectivo suficiente.');return false}
+  let rub=val('tr_r');if(!rub){if(DB.cfg.traspasoSinRubro)rub='sys';else{merr('Elegí el rubro financiero.');return false}}if(val('tr_c').trim().length<2){merr('Cargá el N° de comprobante.');return false}if(!val('tr_a')){merr('Indicá quién autoriza.');return false}
+  const tid=uid('tr'),ref='Traspaso '+(DB.cajas.find(c=>c.id===o)||{}).n+' → '+(DB.cajas.find(c=>c.id===dd)||{}).n+' · comp. '+val('tr_c').trim()+' · autoriza '+val('tr_a');cajaMov(o,'egreso',rub,m,ref,{tr:tid});cajaMov(dd,'ingreso',rub,m,ref,{tr:tid});audit('Traspaso entre cajas',fmt(m)+' · '+val('tr_c').trim());save();renderView();return true}})};
+ACT.cajacierre=()=>{modal({title:'Arqueo y cierre del turno',ok:'Cerrar turno',wide:true,body:'<p class="sm mut">Contá el efectivo de cada caja. Si hay diferencia, el motivo es obligatorio.</p><div class="tw"><table class="itbl"><thead><tr><th>Caja</th><th class="n">Esperado</th><th>Contado</th><th class="n">Diferencia</th></tr></thead><tbody>'+DB.cajas.map(c=>'<tr><td>'+h(c.n)+'</td><td class="n">'+fmt(cajaEfectivo(c.id))+'</td><td><input id="ar_'+c.id+'" data-chg="arcalc" inputmode="decimal" placeholder="0,00"></td><td class="n" id="ard_'+c.id+'">—</td></tr>').join('')+'</tbody></table></div><div class="f" style="margin-top:10px"><label for="ar_m">Motivo de la diferencia (si corresponde)</label><input id="ar_m"></div>',
+ onOk:()=>{const ci=[];let dif=false;for(const c of DB.cajas){const raw=val('ar_'+c.id).trim();if(raw===''){merr('Contá el efectivo de '+c.n+'.');return false}const cont=r2(num(raw)),esp=cajaEfectivo(c.id),d=r2(cont-esp);if(cont<0){merr('Importe negativo.');return false}if(Math.abs(d)>0.004)dif=true;ci.push({cajaId:c.id,n:c.n,esp,cont,dif:d})}
+  if(dif&&val('ar_m').trim().length<4){merr('Hay diferencias: indicá el motivo.');return false}DB.hist.push({id:DB.turno.id,fecha:DB.turno.fecha,por:ME.n,cierres:ci,motivo:val('ar_m').trim()});DB.turno={abierto:false,id:DB.turno.id,fecha:DB.turno.fecha,apert:{},por:''};audit('Turno de caja cerrado',DB.hist[DB.hist.length-1].id);save();closeModal();renderView();toast('Turno cerrado');return false}})};
+CHG.arcalc=t=>{const id=t.id.slice(3);const esp=cajaEfectivo(id),e=document.getElementById('ard_'+id);if(t.value.trim()===''){e.textContent='—';return}const d=r2(num(t.value)-esp);e.innerHTML='<b style="color:'+(Math.abs(d)>0.004?'var(--bad)':'var(--ok)')+'">'+fmt(d)+'</b>'};
+
+/* ===== Equipamiento ===== */
+V.equipo=()=>{const cats=[...new Set(DB.equip.map(e=>e.cat))];const l=DB.equip.filter(e=>!UI.eqCat||e.cat===UI.eqCat);const ok=DB.equip.filter(e=>e.est==='ok').length,pct=Math.round(ok/DB.equip.length*100);const ed=isBoss();
+ return '<div class="bar"><h2>Equipamiento y habilitación del taller</h2><span class="sp"></span>'+(ed?'<button class="btn s" data-act="eqcsv">Lista de faltantes (Excel)</button>':'')+'</div>'+
+ '<div class="card"><div class="row"><b>Taller listo: '+pct+' %</b><span class="mut sm">'+ok+' de '+DB.equip.length+' ítems disponibles · '+DB.equip.filter(e=>e.est==='falta').length+' faltan · '+DB.equip.filter(e=>e.est==='mant').length+' en mantenimiento</span></div><div class="pbar" style="margin-top:6px" role="progressbar" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+pct+'%"></i></div></div>'+
+ '<div class="chips" style="margin-bottom:10px"><button class="chip'+(!UI.eqCat?' on':'')+'" data-act="eqcat" data-c="">Todo</button>'+cats.map(c=>'<button class="chip'+(UI.eqCat===c?' on':'')+'" data-act="eqcat" data-c="'+h(c)+'">'+h(c)+'</button>').join('')+'</div>'+
+ '<div class="tw"><table class="itbl"><thead><tr><th>Ítem</th><th>Estado</th><th>Cant.</th><th>Próx. calibración / service</th><th>Nota</th></tr></thead><tbody>'+l.map(e=>'<tr><td><span class="mut sm">'+h(e.cat)+'</span><br>'+h(e.n)+'</td><td><select data-chg="eqf" data-id="'+e.id+'" data-f="est" aria-label="Estado"'+(ed?'':' disabled')+'><option value="ok"'+(e.est==='ok'?' selected':'')+'>Disponible</option><option value="falta"'+(e.est==='falta'?' selected':'')+'>Falta</option><option value="mant"'+(e.est==='mant'?' selected':'')+'>En mantenimiento</option></select></td><td><input style="width:70px" data-chg="eqf" data-id="'+e.id+'" data-f="cant" value="'+e.cant+'" inputmode="numeric"'+(ed?'':' disabled')+' aria-label="Cantidad"></td><td><input type="date" data-chg="eqf" data-id="'+e.id+'" data-f="prox" value="'+h(e.prox)+'"'+(ed?'':' disabled')+' aria-label="Próxima calibración">'+(e.prox&&daysTo(e.prox)<=30?' <span class="badge '+(daysTo(e.prox)<0?'bad':'warn')+'">'+(daysTo(e.prox)<0?'vencido':'en '+daysTo(e.prox)+' d')+'</span>':'')+'</td><td><input data-chg="eqf" data-id="'+e.id+'" data-f="nota" value="'+h(e.nota)+'"'+(ed?'':' disabled')+' aria-label="Nota"></td></tr>').join('')+'</tbody></table></div>'};
+ACT.eqcat=d=>{UI.eqCat=d.c;renderView()};
+CHG.eqf=t=>{const e=DB.equip.find(x=>x.id===t.dataset.id);if(!e||!isBoss())return;const f=t.dataset.f;e[f]=f==='cant'?(parseInt(t.value)||0):t.value;audit('Equipamiento',e.n+' · '+f+' = '+t.value);save();if(f==='est')renderView()};
+ACT.eqcsv=()=>csvDown('equipamiento_faltante.csv',[['Categoría','Ítem','Estado','Cantidad requerida']].concat(DB.equip.filter(e=>e.est!=='ok').map(e=>[e.cat,e.n,e.est==='falta'?'Falta':'En mantenimiento',e.cant])));
+
+/* ===== Seguridad y medio ambiente ===== */
+V.seguridad=()=>{const t=UI.segTab;let b='';const ed=isBoss()||ME.rol==='mecanico';
+ if(t==='epp')b='<div class="tw"><table><thead><tr><th>Elemento de protección personal</th><th class="n">Stock</th><th class="n">Mínimo</th><th></th></tr></thead><tbody>'+DB.epp.map(e=>'<tr><td>'+h(e.n)+(e.stock<e.min?' <span class="badge warn">bajo mínimo</span>':'')+'</td><td class="n">'+e.stock+'</td><td class="n">'+e.min+'</td><td><div class="row"><button class="btn s" data-act="eppent" data-id="'+e.id+'">Entregar a personal</button>'+(isBoss()?'<button class="btn s" data-act="eppadd" data-id="'+e.id+'">+ Ingreso</button>':'')+'</div></td></tr>').join('')+'</tbody></table></div><h3 style="margin-top:12px">Entregas registradas</h3>'+(DB.entregas.length?'<div class="tw"><table><tbody>'+DB.entregas.slice(0,15).map(x=>'<tr><td>'+fdate(x.fecha)+'</td><td>'+h(x.pers)+'</td><td>'+h(x.n)+' × '+x.cant+'</td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Sin entregas.</p>');
+ else if(t==='ext')b='<div class="tw"><table><thead><tr><th>Ubicación</th><th>Tipo</th><th>Vencimiento de carga</th><th></th></tr></thead><tbody>'+DB.extint.map(x=>{const d=daysTo(x.venc);return '<tr><td>'+h(x.ubic)+'</td><td>'+h(x.tipo)+'</td><td>'+fdate(x.venc)+' <span class="badge '+(d<0?'bad':d<=30?'warn':'ok')+'">'+(d<0?'vencido':d<=30?'en '+d+' d':'vigente')+'</span></td><td>'+(isBoss()?'<button class="btn s" data-act="extrec" data-id="'+x.id+'">Registrar recarga</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div><p class="sm mut">Plazos de recarga y señalética exigida: [VERIFICAR] con el prestador habilitado y la normativa vigente.</p>'+(isBoss()?'<button class="btn s" data-act="extnew">➕ Agregar extintor</button>':'');
+ else if(t==='res'){const tipos=['Aceite usado','Baterías','Filtros usados','Líquido refrigerante','Sólidos contaminados'];b='<div class="g4" style="margin-bottom:10px">'+tipos.map(x=>'<div class="kpi" style="cursor:default"><div class="v">'+resStock(x)+' <span class="sm">'+((DB.resid.find(r=>r.tipo===x)||{unidad:x==='Baterías'||x==='Filtros usados'?'u':x==='Sólidos contaminados'?'kg':'L'}).unidad)+'</span></div><div class="l">'+x+' acumulado</div></div>').join('')+'</div>'+(isBoss()?'<div class="row" style="margin-bottom:8px"><button class="btn s" data-act="resgen">➕ Registrar generación</button><button class="btn s p" data-act="resret">🚛 Registrar retiro del gestor</button></div>':'')+'<div class="tw"><table><thead><tr><th>Fecha</th><th>Tipo</th><th class="n">Cantidad</th><th>Referencia</th></tr></thead><tbody>'+DB.resid.slice().sort((a,b)=>a.fecha<b.fecha?1:-1).slice(0,30).map(r=>'<tr><td>'+fdate(r.fecha)+'</td><td>'+h(r.tipo)+'</td><td class="n" style="color:'+(r.cant<0?'var(--ok)':'inherit')+'">'+(r.cant>0?'+':'')+r.cant+' '+r.unidad+'</td><td>'+h(r.ref)+'</td></tr>').join('')+'</tbody></table></div><p class="sm mut">La generación se carga sola al entregar una OT con aceite, filtros o baterías. Requisitos de gestión de residuos peligrosos: [VERIFICAR] con la autoridad ambiental.</p>'}
+ else b='<div class="tw"><table><thead><tr><th>Habilitación / seguro</th><th>Ente</th><th>Vencimiento</th><th></th></tr></thead><tbody>'+DB.habil.map(x=>{const d=daysTo(x.venc);return '<tr><td>'+h(x.n)+'</td><td>'+h(x.ent)+'</td><td>'+fdate(x.venc)+' <span class="badge '+(d<0?'bad':d<=30?'warn':'ok')+'">'+(d<0?'vencida':d<=30?'en '+d+' d':'vigente')+'</span></td><td>'+(isBoss()?'<button class="btn s" data-act="habren" data-id="'+x.id+'">Renovar</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div><p class="sm mut">Requisitos y plazos: [VERIFICAR] con el municipio, la ART y la aseguradora. Los datos cargados son de ejemplo.</p>'+(isBoss()?'<button class="btn s" data-act="habnew">➕ Agregar</button>':'');
+ return '<div class="bar"><h2>Seguridad y medio ambiente</h2></div><div class="chips" style="margin-bottom:10px">'+[['epp','EPP'],['ext','Extintores'],['res','Residuos peligrosos'],['hab','Habilitaciones y seguros']].map(x=>'<button class="chip'+(t===x[0]?' on':'')+'" data-act="segtab" data-t="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+b};
+ACT.segtab=d=>{UI.segTab=d.t;renderView()};
+ACT.eppent=d=>{const e=DB.epp.find(x=>x.id===d.id);modal({title:'Entregar: '+e.n,ok:'Registrar entrega',body:'<div class="g2"><div class="f"><label for="ee_p">Personal</label><select id="ee_p">'+opts(DB.users.filter(u=>u.rol!=='dueno'),'',u=>[u.n,u.n],'— elegir —')+'</select></div><div class="f"><label for="ee_c">Cantidad</label><input id="ee_c" type="number" min="1" value="1"></div></div><p class="mut sm">Stock disponible: '+e.stock+'</p>',onOk:()=>{const c=parseInt(val('ee_c'));if(!val('ee_p')){merr('Elegí a quién se entrega.');return false}if(!(c>0)||c>e.stock){merr('Cantidad inválida o mayor al stock.');return false}e.stock-=c;DB.entregas.unshift({fecha:TODAY(),pers:val('ee_p'),n:e.n,cant:c});audit('Entrega de EPP',e.n+' × '+c+' a '+val('ee_p'));save();renderView();return true}})};
+ACT.eppadd=d=>{const e=DB.epp.find(x=>x.id===d.id);modal({title:'Ingreso de '+e.n,ok:'Sumar',body:'<div class="f"><label for="ea_c">Cantidad que ingresa</label><input id="ea_c" type="number" min="1" value="1"></div>',onOk:()=>{const c=parseInt(val('ea_c'));if(!(c>0)){merr('Cantidad inválida.');return false}e.stock+=c;audit('Ingreso de EPP',e.n+' × '+c);save();renderView();return true}})};
+ACT.extrec=d=>{const x=DB.extint.find(y=>y.id===d.id);modal({title:'Recarga de extintor',ok:'Guardar',body:'<p>'+h(x.ubic)+' · '+h(x.tipo)+'</p><div class="f"><label for="xr_f">Nuevo vencimiento de carga</label><input type="date" id="xr_f" value="'+addDays(365)+'"></div>',onOk:()=>{if(!val('xr_f')||val('xr_f')<=TODAY()){merr('La nueva fecha debe ser posterior a hoy.');return false}x.venc=val('xr_f');audit('Extintor recargado',x.ubic);save();renderView();return true}})};
+ACT.extnew=()=>{modal({title:'Nuevo extintor',ok:'Agregar',body:'<div class="g3"><div class="f"><label for="xn_u">Ubicación</label><input id="xn_u"></div><div class="f"><label for="xn_t">Tipo / capacidad</label><input id="xn_t" placeholder="ABC 5 kg"></div><div class="f"><label for="xn_f">Vencimiento de carga</label><input type="date" id="xn_f"></div></div>',onOk:()=>{if(val('xn_u').trim().length<3||!val('xn_t').trim()||!val('xn_f')){merr('Completá ubicación, tipo y vencimiento.');return false}DB.extint.push({id:uid('x'),ubic:val('xn_u').trim(),tipo:val('xn_t').trim(),venc:val('xn_f')});audit('Extintor agregado',val('xn_u'));save();renderView();return true}})};
+ACT.resgen=()=>resForm('gen');ACT.resret=()=>resForm('ret');
+function resForm(k){const tipos=['Aceite usado','Baterías','Filtros usados','Líquido refrigerante','Sólidos contaminados'];modal({title:k==='gen'?'Registrar generación de residuo':'Retiro por gestor autorizado',ok:'Registrar',body:'<div class="g2"><div class="f"><label for="rs_t">Tipo</label><select id="rs_t">'+opts(tipos,'',x=>[x,x])+'</select></div><div class="f"><label for="rs_c">Cantidad</label><input id="rs_c" inputmode="decimal"></div>'+(k==='ret'?'<div class="f"><label for="rs_g">Gestor</label><input id="rs_g" placeholder="Razón social del gestor"></div><div class="f"><label for="rs_n">N° de certificado / manifiesto</label><input id="rs_n"></div>':'<div class="f"><label for="rs_n">Referencia</label><input id="rs_n" placeholder="Origen del residuo"></div>')+'</div>',
+ onOk:()=>{const t=val('rs_t'),c=num(val('rs_c'));if(!(c>0)){merr('Cantidad inválida.');return false}const u=t==='Baterías'||t==='Filtros usados'?'u':t==='Sólidos contaminados'?'kg':'L';if(k==='ret'){if(c>resStock(t)+0.0001){merr('No podés retirar más de lo acumulado ('+resStock(t)+' '+u+').');return false}if(val('rs_g').trim().length<3||val('rs_n').trim().length<3){merr('Cargá gestor y N° de certificado.');return false}}
+  DB.resid.push({id:uid('z'),fecha:TODAY(),tipo:t,cant:k==='ret'?-c:c,unidad:u,ref:k==='ret'?'Retiro '+val('rs_g').trim()+' · cert. '+val('rs_n').trim():(val('rs_n').trim()||'Carga manual')});audit('Residuos',(k==='ret'?'Retiro ':'Generación ')+t+' '+c);save();renderView();return true}})}
+ACT.habren=d=>{const x=DB.habil.find(y=>y.id===d.id);modal({title:'Renovar: '+x.n,ok:'Guardar',body:'<div class="f"><label for="hr_f">Nuevo vencimiento</label><input type="date" id="hr_f" value="'+addDays(365)+'"></div>',onOk:()=>{if(!val('hr_f')||val('hr_f')<=TODAY()){merr('La fecha debe ser posterior a hoy.');return false}x.venc=val('hr_f');audit('Renovación',x.n);save();renderView();return true}})};
+ACT.habnew=()=>{modal({title:'Nueva habilitación o seguro',ok:'Agregar',body:'<div class="g3"><div class="f"><label for="hn_n">Nombre</label><input id="hn_n"></div><div class="f"><label for="hn_e">Ente / aseguradora</label><input id="hn_e"></div><div class="f"><label for="hn_f">Vencimiento</label><input type="date" id="hn_f"></div></div>',onOk:()=>{if(val('hn_n').trim().length<3||!val('hn_f')){merr('Completá nombre y vencimiento.');return false}DB.habil.push({id:uid('h'),n:val('hn_n').trim(),ent:val('hn_e').trim(),venc:val('hn_f')});audit('Habilitación agregada',val('hn_n'));save();renderView();return true}})};
+
+/* ===== Personal ===== */
+V.personal=()=>{const ini=TODAY().slice(0,8)+'01';return '<div class="bar"><h2>Personal</h2><span class="sp"></span>'+(ME.rol==='dueno'?'<button class="btn p" data-act="peredit" data-id="">➕ Agregar persona</button>':'')+'</div><div class="tw"><table><thead><tr><th>Nombre</th><th>Rol</th><th>Especialidad</th><th class="n">% comisión MO</th><th class="n">OT activas</th><th class="n">OT entregadas (mes)</th><th class="n">Comisión estimada (mes)</th></tr></thead><tbody>'+DB.users.map(u=>{const a=DB.ots.filter(o=>o.mecId===u.id&&o.estado!=='Entregado').length,e=DB.ots.filter(o=>o.mecId===u.id&&o.estado==='Entregado'&&o.entregada>=ini);const mo=e.reduce((s,o)=>s+otTotal(o).mo,0);return '<tr'+(ME.rol==='dueno'?' class="clk" data-act="peredit" data-id="'+u.id+'"':'')+'><td><b>'+h(u.n)+'</b></td><td>'+ROL[u.rol]+'</td><td>'+h(u.esp)+'</td><td class="n">'+u.com+'%</td><td class="n">'+a+'</td><td class="n">'+e.length+'</td><td class="n">'+(u.com?fmt(mo*u.com/100):'—')+'</td></tr>'}).join('')+'</tbody></table></div><p class="sm mut">La comisión estimada se calcula sobre la mano de obra neta de las OT entregadas en el mes.</p>'};
+ACT.peredit=d=>{const u=d.id?userOf(d.id):{n:'',rol:'mecanico',esp:'',com:0};modal({title:d.id?'Editar persona':'Nueva persona',ok:'Guardar',body:'<div class="g2"><div class="f"><label for="pe_n">Nombre</label><input id="pe_n" value="'+h(u.n)+'"></div><div class="f"><label for="pe_r">Rol</label><select id="pe_r">'+opts(Object.keys(ROL),u.rol,k=>[k,ROL[k]])+'</select></div><div class="f"><label for="pe_e">Especialidad / puesto</label><input id="pe_e" value="'+h(u.esp)+'"></div><div class="f"><label for="pe_c">% comisión sobre mano de obra</label><input id="pe_c" inputmode="decimal" value="'+u.com+'"></div></div>',
+ onOk:()=>{const c=num(val('pe_c'));if(val('pe_n').trim().length<3){merr('Cargá el nombre.');return false}if(c<0||c>50){merr('La comisión debe estar entre 0 y 50 %.');return false}if(d.id&&u.rol==='dueno'&&val('pe_r')!=='dueno'&&DB.users.filter(x=>x.rol==='dueno').length<2){merr('Debe haber al menos un dueño.');return false}
+  const x=d.id?u:{id:uid('u')};Object.assign(x,{n:val('pe_n').trim(),rol:val('pe_r'),esp:val('pe_e').trim(),com:c});if(!d.id)DB.users.push(x);audit('Personal '+(d.id?'editado':'nuevo'),x.n);save();renderView();return true}})};
+
+/* ===== Reportes ===== */
+function repRange(){const t=TODAY();return UI.repoPer==='hoy'?[t,t]:UI.repoPer==='sem'?[addDays(-6),t]:UI.repoPer==='mes'?[t.slice(0,8)+'01',t]:['0000-00-00','9999-99-99']}
+V.reportes=()=>{const [a,b]=repRange();const os=DB.ots.filter(o=>o.estado==='Entregado'&&o.entregada>=a&&o.entregada<=b);let neto=0,iva=0,costo=0,rep=0,mo=0;const mec={},rub={};
+ os.forEach(o=>{const t=otTotal(o);neto+=t.neto;iva+=t.iva;costo+=t.costo;rep+=t.rep;mo+=t.mo;const k=(userOf(o.mecId)||{n:'Sin asignar'}).n;mec[k]=(mec[k]||0)+t.mo;o.items.forEach(i=>{if(i.k==='rep'){const r=repOf(i.repId),k2=r?r.rubro:'Otros';const x=rub[k2]=rub[k2]||{v:0,c:0};x.v+=i.qty*i.pu;x.c+=i.qty*(i.costo||0)}})});
+ const med={};DB.ots.forEach(o=>o.pagos.forEach(p=>{if(p.fecha>=a&&p.fecha<=b)med[p.medio]=(med[p.medio]||0)+p.monto}));const mx=Math.max(1,...Object.values(mec),...Object.values(rub).map(x=>x.v));
+ const bars=(o,f)=>Object.keys(o).length?Object.keys(o).sort((x,y)=>f(o[y])-f(o[x])).map(k=>'<div style="margin:6px 0"><div class="row sm"><span class="sp">'+h(k)+'</span><b>'+fmt(f(o[k]))+'</b></div><div class="hbar" style="width:'+Math.max(1,f(o[k])/mx*100)+'%"></div></div>').join(''):'<p class="mut">Sin datos.</p>';
+ return '<div class="bar"><h2>Reportes</h2><div class="chips">'+[['hoy','Hoy'],['sem','7 días'],['mes','Este mes'],['todo','Todo']].map(x=>'<button class="chip'+(UI.repoPer===x[0]?' on':'')+'" data-act="repoper" data-p="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><span class="sp"></span><button class="btn s" data-act="repocsv">Exportar OT (Excel)</button></div>'+
+ '<div class="g4" style="margin-bottom:12px"><div class="kpi" style="cursor:default"><div class="v">'+os.length+'</div><div class="l">OT entregadas</div></div><div class="kpi" style="cursor:default"><div class="v">'+fmt(neto+iva)+'</div><div class="l">Facturación total (c/IVA)</div></div><div class="kpi okk" style="cursor:default"><div class="v">'+fmt(neto-costo)+'</div><div class="l">Margen bruto (neto − costo repuestos)</div></div><div class="kpi" style="cursor:default"><div class="v">'+fmt(os.length?(neto+iva)/os.length:0)+'</div><div class="l">Ticket promedio</div></div></div>'+
+ '<div class="g2"><div class="card"><h3>Mano de obra por mecánico (neto)</h3>'+bars(mec,x=>x)+'</div><div class="card"><h3>Venta de repuestos por rubro (neto)</h3>'+bars(rub,x=>x.v)+'</div></div>'+
+ '<div class="g2"><div class="card"><h3>Composición</h3><p>Repuestos: <b>'+fmt(rep)+'</b> · Mano de obra: <b>'+fmt(mo)+'</b> · IVA: <b>'+fmt(iva)+'</b></p><p class="sm mut">Costo de repuestos vendidos: '+fmt(costo)+'</p></div><div class="card"><h3>Cobros del período por medio</h3>'+(Object.keys(med).length?Object.keys(med).map(k=>'<div class="row"><span class="sp">'+k+'</span><b>'+fmt(med[k])+'</b></div>').join(''):'<p class="mut">Sin cobros.</p>')+'</div></div>'+
+ '<div class="card"><h3>Posición actual</h3><div class="g3"><div>Deuda de clientes<br><b>'+fmt(DB.clientes.reduce((s,c)=>s+c.saldo,0))+'</b></div><div>Deuda con proveedores<br><b>'+fmt(DB.provs.reduce((s,p)=>s+provDeuda(p.id),0))+'</b></div><div>Stock valorizado a costo<br><b>'+fmt(DB.repuestos.filter(r=>r.activo).reduce((s,r)=>s+r.qty*r.pc,0))+'</b></div></div></div>'};
+ACT.repoper=d=>{UI.repoPer=d.p;renderView()};
+ACT.repocsv=()=>{const [a,b]=repRange();csvDown('ordenes_'+TODAY()+'.csv',[['OT','Fecha ingreso','Entrega','Patente','Cliente','Mecánico','Neto','IVA','Total','Costo repuestos']].concat(DB.ots.filter(o=>o.estado==='Entregado'&&o.entregada>=a&&o.entregada<=b).map(o=>{const t=otTotal(o);return [otNum(o),o.fecha,o.entregada,(vehOf(o.vehId)||{}).pat,(cliOf(o.cliId)||{}).n,(userOf(o.mecId)||{}).n||'',t.neto,t.iva,t.total,t.costo]})))};
+
+/* ===== Configuración ===== */
+V.config=()=>{const c=DB.cfg;return '<div class="bar"><h2>Configuración</h2></div><div class="card"><h3>Datos del taller</h3><div class="g3"><div class="f"><label for="cf_n">Nombre</label><input id="cf_n" value="'+h(c.nombre)+'"></div><div class="f"><label for="cf_d">Dirección</label><input id="cf_d" value="'+h(c.dir)+'"></div><div class="f"><label for="cf_t">Teléfono / WhatsApp</label><input id="cf_t" value="'+h(c.tel)+'"></div><div class="f"><label for="cf_m">Correo</label><input id="cf_m" value="'+h(c.mail)+'"></div><div class="f"><label for="cf_f">Facebook</label><input id="cf_f" value="'+h(c.fb)+'"></div><div class="f"><label for="cf_i">Instagram</label><input id="cf_i" value="'+h(c.ig)+'"></div></div><button class="btn p" data-act="cfsave">Guardar datos</button></div>'+
+ '<div class="card"><h3>Opciones (banderas)</h3><label style="font-weight:500;color:var(--tx)"><input type="checkbox" style="width:auto;min-height:0" '+(c.traspasoSinRubro?'checked':'')+' data-chg="cfflag" data-f="traspasoSinRubro"> Permitir traspasos entre cajas sin elegir rubro (usa el concepto interno oculto “Traspaso interno”). Apagada por defecto.</label><p class="sm mut">El rubro financiero sigue siendo obligatorio en ingresos y egresos de caja.</p></div>'+
+ '<div class="card"><h3>Catálogo de mano de obra</h3><div class="tw"><table class="itbl"><thead><tr><th>Servicio</th><th class="n">Precio neto</th></tr></thead><tbody>'+DB.servicios.map(s=>'<tr><td>'+h(s.n)+'</td><td><input style="max-width:140px;margin-left:auto;display:block;text-align:right" inputmode="decimal" data-chg="cfserv" data-id="'+s.id+'" value="'+s.pu+'" aria-label="Precio '+h(s.n)+'"></td></tr>').join('')+'</tbody></table></div></div>'+
+ '<div class="card"><h3>Respaldo y demo</h3><div class="row"><button class="btn" data-act="cfexp">Exportar respaldo (JSON)</button><label class="btn" style="margin:0">Importar respaldo<input type="file" accept=".json,application/json" id="cf_imp" hidden data-chg="cfimp"></label><button class="btn d" data-act="cfreset">Restablecer datos de demo</button></div></div>'+
+ '<div class="card"><h3>Auditoría (últimos movimientos)</h3><div class="tw" style="max-height:300px"><table><thead><tr><th>Cuándo</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead><tbody>'+DB.audit.slice(0,60).map(a=>'<tr><td>'+ftime(a.t)+'</td><td>'+h(a.u)+'</td><td>'+h(a.a)+'</td><td>'+h(a.d)+'</td></tr>').join('')+'</tbody></table></div></div>'};
+ACT.cfsave=()=>{const c=DB.cfg;if(val('cf_n').trim().length<3){toast('Cargá el nombre.',1);return}Object.assign(c,{nombre:val('cf_n').trim(),dir:val('cf_d').trim(),tel:val('cf_t').trim(),mail:val('cf_m').trim(),fb:val('cf_f').trim(),ig:val('cf_i').trim()});audit('Datos del taller editados');save();toast('Datos guardados')};
+CHG.cfflag=t=>{DB.cfg[t.dataset.f]=t.checked;audit('Bandera',t.dataset.f+' = '+t.checked);save()};
+CHG.cfserv=t=>{const s=DB.servicios.find(x=>x.id===t.dataset.id);const v=num(t.value);if(v>=0){s.pu=v;save()}};
+ACT.cfexp=()=>{const b=new Blob([JSON.stringify(DB,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='respaldo_taller_'+TODAY()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)};
+CHG.cfimp=t=>{const f=t.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!o||o.ver!==1||!Array.isArray(o.ots)||!Array.isArray(o.repuestos))throw 0;confirmBox('Se reemplazan todos los datos actuales por los del respaldo. ¿Continuar?',()=>{DB=o;save();ME=userOf(ME.id)||DB.users[0];renderShell();toast('Respaldo importado')},'Importar')}catch(e){toast('El archivo no es un respaldo válido.',1)}};rd.readAsText(f)};
+ACT.cfreset=()=>confirmBox('Se borran los cambios y vuelven los datos de ejemplo. ¿Continuar?',()=>{resetDemo();ME=DB.users[0];renderShell();toast('Datos de demo restablecidos')},'Restablecer');
+
+/* ===== Eventos globales ===== */
+document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.disabled)return;const f=ACT[a.dataset.act];if(!f)return;f(a.dataset,a,e)});
+document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.chg&&CHG[t.dataset.chg])CHG[t.dataset.chg](t,e)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&MODAL)closeModal();if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.cell,.kc')){e.preventDefault();e.target.click()}});
+ACT.mclose=()=>closeModal();
+ACT.mok=()=>{if(!MODAL||!MODAL.onOk)return;merr('');try{const r=MODAL.onOk();if(r===true)closeModal()}catch(e){merr(e.message||'Error inesperado.')}};
+(function init(){try{const id=sessionStorage.getItem(SS);if(id)ME=userOf(id)||null}catch(e){}if(ME)renderShell();else renderLogin()})();
+</script>
+</body>
+</html>
