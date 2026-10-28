@@ -126,6 +126,18 @@ tr.off td{opacity:.5}
 .det{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:10px}
 .pill{display:inline-block;background:#eef1f5;border-radius:6px;padding:1px 7px;font-size:.8rem}
 #printArea{display:none}
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.dg>div{background:#f6f8fa;border-radius:8px;padding:6px 8px;min-width:0}.dg label{margin:0;font-size:.7rem}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.thumb{position:relative;width:96px;height:96px;border-radius:8px;overflow:hidden;border:1px solid var(--bd);cursor:zoom-in;background:#eef1f5}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .btn{position:absolute;top:2px;right:2px;min-height:26px;padding:0 7px;background:rgba(255,255,255,.92)}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:80;display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+#lb img{max-width:100%;max-height:100%;border-radius:8px}
+.filebtn{position:relative;margin:0;cursor:pointer}
+.inl{width:96px;min-height:34px;padding:4px 6px;text-align:right}
+.cr input,.er input{min-height:36px}
+.steps{font-size:.8rem;color:var(--mut);margin-top:6px}
 @media print{body>*:not(#printArea){display:none!important}#printArea{display:block!important;padding:0;color:#000;background:#fff}#printArea table th{position:static}}
 .pa h1{font-size:1.3rem}.pa .hdr{display:flex;gap:14px;align-items:center;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:10px}.pa .hdr img{width:80px}
 .pa td,.pa th{border:1px solid #999;font-size:.85rem}
@@ -149,7 +161,7 @@ const LOGO="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFB
 <script>
 'use strict';
 /* ===== Sistema VB · taller mecánico · DEMO (datos locales en el navegador) ===== */
-const LS='sbcs_vb26_demo_v1', SS='sbcs_vb26_user';
+const LS='sbcs_vb26_demo_v2', SS='sbcs_vb26_user';
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const h=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const r2=n=>Math.round((+n||0)*100)/100;
@@ -176,8 +188,8 @@ function mkCuit(pre,n){for(;;n++){const b=pre+String(n).padStart(8,'0');const dv
 
 /* ---------- Datos de ejemplo ---------- */
 function seed(){
- const d={ver:1,seq:{ot:0,tu:0,oc:0,mov:0,tc:1},
- cfg:{nombre:'SebaChavez Car Service',dir:'Jujuy 251 - Salta',tel:'3875971922',mail:'schavezcarservice@gmail.com',fb:'sebachavezcarservice',ig:'sebachavez_carservice',vhora:18000,rubrosOblig:true,traspasoSinRubro:false},
+ const d={ver:2,seq:{ot:0,tu:0,oc:0,mov:0,tc:1},
+ cfg:{nombre:'SebaChavez Car Service',dir:'Jujuy 251 - Salta',tel:'3875971922',mail:'schavezcarservice@gmail.com',fb:'sebachavezcarservice',ig:'sebachavez_carservice',vhora:18000,rubrosOblig:true,traspasoSinRubro:false,recepCobra:false},
  users:[
   {id:'u1',n:'Seba Chavez',rol:'dueno',esp:'Dueño · gestión',com:0},
   {id:'u2',n:'Marcelo Torres',rol:'jefe',esp:'Jefe de taller · motor y transmisión',com:10},
@@ -203,7 +215,7 @@ function seed(){
  provs:[],repuestos:[],clientes:[],vehs:[],ots:[],turnos:[],ocs:[],ledger:[],
  cajas:[{id:'C1',n:'Caja mostrador',principal:true},{id:'C2',n:'Caja taller'}],
  turno:{abierto:true,id:'T1',fecha:TODAY(),apert:{C1:20000,C2:5000},por:'Seba Chavez'},
- movs:[],hist:[],audit:[],
+ movs:[],hist:[],audit:[],kardex:[],
  equip:[],extint:[],epp:[],resid:[],habil:[],entregas:[]};
 
  /* proveedores */
@@ -248,7 +260,12 @@ function seed(){
  ['MON-G8101','MON-G8101','Amortiguador delantero G8101','MONROE','SUSPENSIÓN','Frenos y Suspensión Salta',39500,50,4,2,4,'','','CHEVROLET Corsa · Classic'],
  ['REF-ORG-5L','REF-ORG-5L','Refrigerante orgánico 50% x5L','ELAION','REFRIGERACIÓN','Lubricantes del Norte',9800,55,10,3,6,'','','Larga vida · uso general'],
  ['H4-60-55','H4-60-55','Lámpara H4 60/55W','BOSCH','ILUMINACIÓN','Distribuidora San Roque',2400,80,30,6,12,'','','Universal']];
- R.forEach((r,i)=>{const pv=r2(r[6]*(1+r[7]/100));d.repuestos.push({id:'r'+(i+1),cod:r[0],codProv:r[1],desc:r[2],marca:r[3],rubro:r[4],provId:pid(r[5]),pc:r[6],gan:r[7],pv:pv,qty:r[8],alarma:r[9],repos:r[10],venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:r[11],junta:r[12],apl:r[13],activo:true})});
+ R.forEach((r,i)=>{const pv=r2(r[6]*(1+r[7]/100));d.repuestos.push({id:'r'+(i+1),cod:r[0],codProv:r[1],desc:r[2],marca:r[3],rubro:r[4],provId:pid(r[5]),pc:r[6],gan:r[7],pv:pv,qty:r[8],alarma:r[9],repos:r[10],venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:r[11],junta:r[12],apl:r[13],activo:true,cods:[],oem:'',eq:[],largo:'',ancho:'',alto:'',dext:'',dint:'',valv:'',picos:'',obs:'',fuente:(r[11]||r[12]||r[13])?(i===2?'taller':'ejemplo'):'',fVerif:'',hist:[]})});
+ /* equivalencias que ya figuran en el listado del taller (misma descripción, distinta marca) y un producto con 2 códigos */
+ const RX=n=>d.repuestos.find(x=>x.id===n);
+ [['r11','r12'],['r14','r15']].forEach(p=>{const a=RX(p[0]),b=RX(p[1]);a.eq.push({m:b.marca,c:b.cod});b.eq.push({m:a.marca,c:a.cod})});
+ RX('r8').cods.push('WO140');
+ d.repuestos.forEach(r=>d.kardex.push({id:'k'+r.id,t:Date.now()-864e5*30,repId:r.id,tipo:'Saldo inicial de la demo',delta:r.qty,saldo:r.qty,ref:'',u:'sistema'}));
 
  /* clientes y vehículos */
  const C=[['Carlos Aramayo','20-12345678-?','3874001122',true,150000],['Valeria Cruz','','3874556677',false,0],['Transportes Lerma SRL','','3874888999',true,400000],['Hugo Mamaní','','3875112233',false,0],['Julieta Ferreyra','','3874990011',false,0],['Gastón Pérez','','3875334455',false,0]];
@@ -261,13 +278,13 @@ function seed(){
  function mk(cli,veh,mot,est,mec,dias,items,extra){
   d.seq.ot++;const v=d.vehs.find(x=>x.id===veh);
   const o={id:'ot'+d.seq.ot,num:d.seq.ot,fecha:addDays(-dias),cliId:cli,vehId:veh,km:v.km,motivo:mot,estado:est,mecId:mec,recurso:'',presAprob:est!=='Recibido'&&est!=='Diagnóstico'&&est!=='Presupuesto',
-   items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2'},obs:'',pagos:[],entregada:'',ccTomado:0,...extra};
-  items.forEach(it=>{if(it[0]==='r'){const r=rp(it[1]);o.items.push({k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:it[2],pu:r.pv,iva:r.iva,costo:r.pc})}
-   else{const s=d.servicios.find(x=>x.id===it[1]);o.items.push({k:'mo',desc:s.n,qty:it[2],pu:s.pu,iva:21,costo:0})}});
+   items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2'},obs:'',pagos:[],entregada:'',ccTomado:0,pedido:'',fotos:[],presEnv:(est==='En reparación'||est==='Listo'||est==='Entregado')?{f:addDays(-dias),u:'Seba Chavez'}:null,presApF:(est==='En reparación'||est==='Listo'||est==='Entregado')?addDays(-dias):'',...extra};
+  items.forEach(it=>{if(it[0]==='r'){const r=rp(it[1]);o.items.push({k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:it[2],pu:r.pv,pu0:r.pv,iva:r.iva,costo:r.pc})}
+   else{const s=d.servicios.find(x=>x.id===it[1]);o.items.push({k:'mo',desc:s.n,qty:it[2],pu:s.pu,pu0:s.pu,iva:21,costo:0})}});
   d.ots.push(o);return o};
  mk('c1','v1','Service 70.000 km y ruido en tren delantero','En reparación','u2',0,[['r','WO130',1],['r','ELAION F30 10W40 x4L',1],['m','s1',1],['m','s5',1]]);
  mk('c2','v3','Frena largo y vibra el volante','Presupuesto','u5',0,[['r','GDB1550 pastillas delanteras',1],['m','s2',1],['m','s4',1]]);
- mk('c3','v4','Pierde potencia y humea','Diagnóstico','u6',1,[['m','s5',1],['m','s8',1]]);
+ mk('c3','v4','Pierde potencia y humea','Diagnóstico','u6',1,[]);
  mk('c4','v6','Cambio de batería, no arranca por la mañana','Listo','u4',1,[['r','Batería 12x65 Ah',1],['m','s12',0.5]]);
  mk('c5','v7','Service completo + distribución','En reparación','u2',2,[['r','Kit de distribución K015569',1],['r','WO139',1],['r','ELAION F50 5W30 x4L',1],['m','s7',1],['m','s1',1]]);
  mk('c6','v8','Control de 40.000 km','Recibido','',0,[]);
@@ -275,7 +292,7 @@ function seed(){
  const e2=mk('c3','v5','Service + alineación','Entregado','u2',3,[['r','WO155',1],['r','ELAION D10 15W40 x4L (diésel)',2],['m','s1',1],['m','s4',1]],{entregada:addDays(-2)});
  const e3=mk('c2','v3','Cambio de aceite y filtro','Entregado','u4',1,[['r','WO131',1],['r','ELAION F30 10W40 x4L',1],['m','s1',1]],{entregada:addDays(-1)});
  [e1,e2,e3].forEach((o,i)=>{const t=otTotal(o).total;o.pagos.push({id:uid('pg'),fecha:o.entregada,medio:i===0?'Transferencia':'Efectivo',monto:t,cajaId:i===0?'':'C1'})});
- d.ots[1].items.forEach(()=>{});
+ d.ots[1].obs='Pastillas delanteras al límite y discos con alabeo leve. Vibra el volante al frenar.';d.ots[1].pedido='Pastillas delanteras, alineación y balanceo.';d.ots[0].obs='Ruido en tren delantero: bujes del brazo con juego. Service completo.';
  /* turnos */
  const tu=(dias,hr,dur,rec,cli,veh,srv,est)=>{d.seq.tu++;d.turnos.push({id:'t'+d.seq.tu,fecha:addDays(dias),hora:hr,dur,rec,cliId:cli,vehId:veh,srv,estado:est,otId:''})};
  tu(0,9,2,0,'c1','v1','Service 70.000 km','En taller');tu(0,10,1,2,'c3','v4','Alineación y balanceo','Confirmado');tu(0,14,2,1,'c5','v7','Cambio de distribución','Confirmado');tu(0,15,1,3,'c4','v6','Cambio de aceite','Pendiente');
@@ -318,11 +335,14 @@ function seed(){
 
 /* ---------- estado ---------- */
 let DB=loadDB();
-function loadDB(){try{const j=localStorage.getItem(LS);if(j){const o=JSON.parse(j);if(o&&o.ver===1)return o}}catch(e){}return seed()}
-function save(){try{localStorage.setItem(LS,JSON.stringify(DB))}catch(e){}}
+function loadDB(){try{const j=localStorage.getItem(LS);if(j){const o=JSON.parse(j);if(o&&o.ver===2)return o}}catch(e){}return seed()}
+let SAVEERR=false;
+function save(){try{localStorage.setItem(LS,JSON.stringify(DB));SAVEERR=false}catch(e){if(!SAVEERR){SAVEERR=true;setTimeout(()=>toast('No hay espacio en el navegador para guardar (¿demasiadas fotos?). Exportá un respaldo.',1),0)}}}
 function resetDemo(){try{localStorage.removeItem(LS)}catch(e){}DB=seed();save()}
 let ME=null,VIEW='dash',UI={otMode:'tablero',otEst:'',otQ:'',otMec:'',repQ:'',repRub:'',repSel:'',cliQ:'',turFecha:TODAY(),cajaTab:'mov',compTab:'prov',repTab:'',eqCat:'',segTab:'epp',repoPer:'mes'};
 function audit(a,d){DB.audit.unshift({t:Date.now(),u:ME?ME.n:'sistema',a,d:d||''});if(DB.audit.length>400)DB.audit.length=400}
+const ncode=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+function stockMove(r,delta,tipo,ref){r.qty=r.qty+delta;DB.kardex.push({id:uid('k'),t:Date.now(),repId:r.id,tipo,delta,saldo:r.qty,ref:ref||'',u:ME?ME.n:'sistema'});if(DB.kardex.length>3000)DB.kardex.splice(0,500)}
 const userOf=id=>DB.users.find(u=>u.id===id);
 const cliOf=id=>DB.clientes.find(c=>c.id===id);
 const vehOf=id=>DB.vehs.find(v=>v.id===id);
@@ -335,13 +355,16 @@ function otTotal(o){let neto=0,iva=0,costo=0,rep=0,mo=0;(o.items||[]).forEach(i=
  neto=r2(neto);iva=r2(iva);const total=r2(neto+iva);const pagado=r2((o.pagos||[]).reduce((a,p)=>a+p.monto,0))+r2(o.ccTomado||0);return{neto,iva,total,pagado:r2(pagado),saldo:r2(total-pagado),costo:r2(costo),rep:r2(rep),mo:r2(mo)}}
 const isBoss=()=>ME&&(ME.rol==='dueno'||ME.rol==='jefe');
 const canCost=()=>isBoss();
+const canPrice=()=>!!ME&&(ME.rol==='dueno'||ME.rol==='jefe'||ME.rol==='recepcion');
+const canBudget=()=>isBoss();
+const canCharge=()=>isBoss()||(!!ME&&ME.rol==='recepcion'&&!!DB.cfg.recepCobra);
 const PERM={dueno:'*',jefe:['dash','ot','turnos','clientes','repuestos','compras','caja','equipo','seguridad','personal','reportes'],recepcion:['dash','ot','turnos','clientes','repuestos','caja'],mecanico:['dash','ot','turnos','repuestos','equipo','seguridad'],limpieza:['dash','seguridad']};
 const can=v=>{const p=PERM[ME.rol];return p==='*'||(p&&p.indexOf(v)>=0)};
 const ROL={dueno:'Dueño',jefe:'Jefe de taller',recepcion:'Recepción',mecanico:'Mecánico',limpieza:'Limpieza'};
 const NAV=[['dash','🏠','Panel'],['ot','🔧','Órdenes de trabajo'],['turnos','📅','Turnos'],['clientes','👤','Clientes y vehículos'],['repuestos','📦','Repuestos'],['compras','🚚','Proveedores y compras'],['caja','💵','Caja'],['equipo','🛠️','Equipamiento'],['seguridad','🦺','Seguridad y ambiente'],['personal','👷','Personal'],['reportes','📊','Reportes'],['config','⚙️','Configuración']];
 
 /* ---------- UI helpers ---------- */
-function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='on'+(bad?' bad':'');clearTimeout(toast.k);toast.k=setTimeout(()=>t.className='',2600)}
+function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='on'+(bad?' bad':'');clearTimeout(toast.k);toast.k=setTimeout(()=>t.className='',Math.max(2600,String(m).length*55))}
 let MODAL=null;
 function modal(o){ // {title,body,ok,onOk,wide,cancel,hideOk,calc}
  MODAL=o;const m=$('#modal');m.hidden=false;
@@ -369,7 +392,7 @@ function vbBlock(){return '<div class="vb" role="contentinfo" aria-label="Crédi
 </script>
 <script>
 /* ===== Registros ===== */
-const V={},ACT={},CHG={};
+const V={},ACT={},CHG={},CHGC={};
 const provDeuda=id=>r2(DB.ledger.filter(l=>l.provId===id).reduce((a,l)=>a+(l.tipo==='Compra'?l.monto:-l.monto),0));
 const cajaEfectivo=cid=>{if(!DB.turno.abierto)return 0;let s=DB.turno.apert[cid]||0;DB.movs.filter(m=>m.turnoId===DB.turno.id&&m.cajaId===cid).forEach(m=>{s+=m.tipo==='ingreso'?m.monto:-m.monto});return r2(s)};
 
@@ -394,7 +417,7 @@ function renderLogin(){
  DB.users.filter(u=>u.rol!=='limpieza').map(u=>'<button class="ucard" data-act="login" data-id="'+u.id+'"><span class="av">'+h(u.n.split(' ').map(x=>x[0]).slice(0,2).join(''))+'</span><span><b>'+h(u.n)+'</b><br><span class="mut sm">'+h(ROL[u.rol])+' · '+h(u.esp)+'</span></span></button>').join('')+
  vbBlock()+'</div>'}
 ACT.login=d=>{ME=userOf(d.id);try{sessionStorage.setItem(SS,ME.id)}catch(e){}audit('Ingreso','Perfil '+ROL[ME.rol]);save();renderShell()};
-ACT.logout=()=>{audit('Salida');try{sessionStorage.removeItem(SS)}catch(e){}ME=null;save();renderLogin()};
+ACT.logout=()=>{audit('Salida');MODAL=null;$('#modal').hidden=true;$('#modal').innerHTML='';const lb=$('#lb');if(lb)lb.remove();try{sessionStorage.removeItem(SS)}catch(e){}ME=null;save();renderLogin()};
 ACT.menu=()=>$('#side').classList.toggle('open');
 
 function renderShell(){
@@ -413,13 +436,13 @@ ACT.go=d=>go(d.v);
 
 /* ===== Panel ===== */
 V.dash=()=>{
- const act=DB.ots.filter(o=>o.estado!=='Entregado'),tu=DB.turnos.filter(t=>t.fecha===TODAY()&&t.estado!=='Cancelado').sort((a,b)=>a.hora-b.hora);
+ const act=DB.ots.filter(o=>o.estado!=='Entregado'&&otVisible(o)),tu=DB.turnos.filter(t=>t.fecha===TODAY()&&t.estado!=='Cancelado').sort((a,b)=>a.hora-b.hora);
  let cobHoy=0;DB.ots.forEach(o=>o.pagos.forEach(p=>{if(p.fecha===TODAY()&&p.medio!=='Cuenta corriente')cobHoy+=p.monto}));
  const dcli=DB.clientes.reduce((a,c)=>a+c.saldo,0),dprov=DB.provs.reduce((a,p)=>a+provDeuda(p.id),0),bajo=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).length;
  const al=alertas();
  const k=(v,l,go,cls)=>'<button class="kpi '+(cls||'')+'" data-act="go" data-v="'+go+'"><div class="v">'+v+'</div><div class="l">'+l+'</div></button>';
  return '<div class="bar"><h2>Panel · '+h(DB.cfg.nombre)+'</h2><span class="mut sm">'+h(new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}))+'</span></div>'+
- '<div class="g4" style="margin-bottom:14px">'+k(act.length,'Vehículos en taller','ot')+k(act.filter(o=>o.estado==='Listo').length,'Listos para entregar','ot','okk')+k(tu.length,'Turnos de hoy','turnos')+k(fmt(cobHoy),'Cobrado hoy (sin cta. cte.)','caja','okk')+
+ '<div class="g4" style="margin-bottom:14px">'+k(act.length,'Vehículos en taller','ot')+k(act.filter(o=>o.estado==='Listo').length,'Listos para entregar','ot','okk')+k(tu.length,'Turnos de hoy','turnos')+(canPrice()&&can('caja')?k(fmt(cobHoy),'Cobrado hoy (sin cta. cte.)','caja','okk'):'')+
  (can('clientes')?k(fmt(dcli),'Deuda de clientes','clientes',dcli?'bad':''):'')+(can('compras')?k(fmt(dprov),'Deuda con proveedores','compras',dprov?'bad':''):'')+k(bajo,'Repuestos en alarma','repuestos',bajo?'bad':'')+k(al.filter(a=>a.t!=='ok').length,'Alertas de seguridad y vencimientos','seguridad',al.some(a=>a.t==='bad')?'bad':'')+'</div>'+
  '<div class="g2"><div class="card"><h3>En el taller ahora</h3>'+(act.length?'<div class="tw"><table><thead><tr><th>OT</th><th>Vehículo</th><th>Estado</th><th>Mecánico</th></tr></thead><tbody>'+act.map(o=>{const v=vehOf(o.vehId)||{};return '<tr class="clk" data-act="otopen" data-id="'+o.id+'"><td>'+otNum(o)+'</td><td><b>'+h(v.pat)+'</b> <span class="mut sm">'+h(v.marca+' '+v.mod)+'</span></td><td><span class="badge b-'+o.estado+'">'+o.estado+'</span></td><td>'+h((userOf(o.mecId)||{n:'— sin asignar'}).n)+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="mut">No hay vehículos en el taller.</p>')+'</div>'+
  '<div class="card"><h3>Turnos de hoy</h3>'+(tu.length?tu.map(t=>{const v=vehOf(t.vehId)||{};return '<div class="row" style="padding:6px 0;border-bottom:1px solid #eef1f4"><b style="width:56px">'+String(t.hora).padStart(2,'0')+':00</b><span class="sp"><b>'+h(v.pat)+'</b> · '+h(t.srv)+'<br><span class="mut sm">'+h((cliOf(t.cliId)||{}).n)+' · '+h(RECURSOS[t.rec])+'</span></span><span class="badge '+(t.estado==='Confirmado'?'ok':t.estado==='Pendiente'?'warn':'')+'">'+t.estado+'</span></div>'}).join(''):'<p class="mut">Sin turnos para hoy.</p>')+'<button class="btn s" style="margin-top:8px" data-act="go" data-v="turnos">Ver agenda</button></div></div>'+
@@ -448,101 +471,228 @@ function readPicker(){
  return{cid,vid}}
 
 /* ===== Órdenes de trabajo ===== */
-function otFiltered(){const q=norm(UI.otQ);return DB.ots.filter(o=>{if(UI.otEst&&o.estado!==UI.otEst)return false;if(UI.otMec&&o.mecId!==UI.otMec)return false;
-  if(ME.rol==='mecanico'&&o.mecId&&o.mecId!==ME.id&&false)return false;
+/* Reglas de la reunión con el cliente:
+   · El mecánico NO ve precios ni valores, ni el presupuesto. Da el diagnóstico (con fotos), confirma la reparación y entrega al jefe/dueño.
+   · El presupuesto lo arma y entrega el dueño o el jefe de taller; el cliente lo aprueba SIN cobrar.
+   · Se cobra al entregar el vehículo (se pueden sumar adicionales, p. ej. focos, hasta ese momento).
+   · La mano de obra se puede editar en el momento (valor y cantidad). */
+const otVisible=o=>{if(!ME||ME.rol!=='mecanico')return true;return o.mecId===ME.id||(!o.mecId&&(o.estado==='Recibido'||o.estado==='Diagnóstico'))};
+function newOT(cid,vid,km,mot,mec,rec,check){DB.seq.ot++;const v=vehOf(vid)||{};
+ const o={id:'ot'+DB.seq.ot,num:DB.seq.ot,fecha:TODAY(),cliId:cid,vehId:vid,km:km||v.km||0,motivo:mot,estado:'Recibido',mecId:mec||'',recurso:rec===undefined?'':String(rec),presAprob:false,presEnv:null,presApF:'',items:[],
+  check:check||{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2'},obs:'',pedido:'',fotos:[],pagos:[],entregada:''};
+ DB.ots.unshift(o);return o}
+function otFiltered(){const q=norm(UI.otQ);return DB.ots.filter(o=>{if(!otVisible(o))return false;if(UI.otEst&&o.estado!==UI.otEst)return false;if(UI.otMec&&o.mecId!==UI.otMec)return false;
   if(q){const v=vehOf(o.vehId)||{},c=cliOf(o.cliId)||{};if(!norm([otNum(o),v.pat,v.marca,v.mod,c.n,o.motivo].join(' ')).includes(q))return false}return true}).sort((a,b)=>b.num-a.num)}
 V.ot=()=>{
- const l=otFiltered();
+ const l=otFiltered(),price=canPrice(),mech=ME.rol==='mecanico';
  let body;
  if(UI.otMode==='tablero'){
   body='<div class="kan">'+ESTADOS.map(e=>{const xs=l.filter(o=>o.estado===e);return '<div class="kcol"><h4>'+e+'<span>'+xs.length+'</span></h4>'+xs.map(o=>{const v=vehOf(o.vehId)||{},t=otTotal(o);
-    return '<div class="kc'+(e==='Listo'&&t.saldo>0?' deuda':'')+'" tabindex="0" data-act="otopen" data-id="'+o.id+'"><div class="row"><span class="pat">'+h(v.pat)+'</span><span class="sp"></span><span class="mut sm">'+otNum(o)+'</span></div><div class="sm">'+h(v.marca+' '+v.mod)+'</div><div class="sm mut" style="margin:3px 0">'+h(o.motivo.length>60?o.motivo.slice(0,58)+'…':o.motivo)+'</div><div class="row sm"><span>'+h((userOf(o.mecId)||{n:'Sin asignar'}).n.split(' ')[0])+'</span><span class="sp"></span><b>'+fmt(t.total)+'</b></div>'+(e!=='Entregado'&&t.saldo>0.005&&t.pagado>0?'<div class="sm" style="color:var(--bad)">Saldo '+fmt(t.saldo)+'</div>':'')+'</div>'}).join('')+'</div>'}).join('')+'</div>'}
- else body='<div class="tw"><table><thead><tr><th>OT</th><th>Fecha</th><th>Patente</th><th>Vehículo</th><th>Cliente</th><th>Estado</th><th>Mecánico</th><th class="n">Total</th><th class="n">Saldo</th></tr></thead><tbody>'+l.map(o=>{const v=vehOf(o.vehId)||{},t=otTotal(o);return '<tr class="clk" data-act="otopen" data-id="'+o.id+'"><td>'+otNum(o)+'</td><td>'+fdate(o.fecha)+'</td><td><b>'+h(v.pat)+'</b></td><td>'+h(v.marca+' '+v.mod)+'</td><td>'+h((cliOf(o.cliId)||{}).n)+'</td><td><span class="badge b-'+o.estado+'">'+o.estado+'</span></td><td>'+h((userOf(o.mecId)||{n:'—'}).n)+'</td><td class="n">'+fmt(t.total)+'</td><td class="n">'+(t.saldo>0.005?'<b style="color:var(--bad)">'+fmt(t.saldo)+'</b>':'—')+'</td></tr>'}).join('')+(l.length?'':'<tr><td colspan="9" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>';
+    return '<div class="kc'+(e==='Listo'&&price&&t.saldo>0?' deuda':'')+'" tabindex="0" data-act="otopen" data-id="'+o.id+'"><div class="row"><span class="pat">'+h(v.pat)+'</span><span class="sp"></span><span class="mut sm">'+otNum(o)+'</span></div><div class="sm">'+h(v.marca+' '+v.mod)+'</div><div class="sm mut" style="margin:3px 0">'+h(o.motivo.length>60?o.motivo.slice(0,58)+'…':o.motivo)+'</div><div class="row sm"><span>'+h((userOf(o.mecId)||{n:'Sin asignar'}).n.split(' ')[0])+'</span><span class="sp"></span>'+(price?'<b>'+fmt(t.total)+'</b>':(o.fotos&&o.fotos.length?'<span>📷 '+o.fotos.length+'</span>':''))+'</div></div>'}).join('')+'</div>'}).join('')+'</div>'}
+ else body='<div class="tw"><table><thead><tr><th>OT</th><th>Fecha</th><th>Patente</th><th>Vehículo</th><th>Cliente</th><th>Estado</th><th>Mecánico</th>'+(price?'<th class="n">Total</th><th class="n">Saldo</th>':'')+'</tr></thead><tbody>'+l.map(o=>{const v=vehOf(o.vehId)||{},t=otTotal(o);return '<tr class="clk" data-act="otopen" data-id="'+o.id+'"><td>'+otNum(o)+'</td><td>'+fdate(o.fecha)+'</td><td><b>'+h(v.pat)+'</b></td><td>'+h(v.marca+' '+v.mod)+'</td><td>'+h((cliOf(o.cliId)||{}).n)+'</td><td><span class="badge b-'+o.estado+'">'+o.estado+'</span></td><td>'+h((userOf(o.mecId)||{n:'—'}).n)+'</td>'+(price?'<td class="n">'+fmt(t.total)+'</td><td class="n">'+(t.saldo>0.005?'<b style="color:var(--bad)">'+fmt(t.saldo)+'</b>':'—')+'</td>':'')+'</tr>'}).join('')+(l.length?'':'<tr><td colspan="9" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>';
  return '<div class="bar"><h2>Órdenes de trabajo</h2><input id="otq" style="max-width:240px" placeholder="Buscar patente, cliente, N° OT…" value="'+h(UI.otQ)+'" data-chg="otq" aria-label="Buscar OT">'+
- '<select id="otm" style="max-width:190px" data-chg="otm" aria-label="Filtrar por mecánico">'+opts(DB.users.filter(u=>u.rol==='mecanico'||u.rol==='jefe'),UI.otMec,u=>[u.id,u.n],'Todos los mecánicos')+'</select><span class="sp"></span>'+
+ (mech?'':'<select id="otm" style="max-width:190px" data-chg="otm" aria-label="Filtrar por mecánico">'+opts(DB.users.filter(u=>u.rol==='mecanico'||u.rol==='jefe'),UI.otMec,u=>[u.id,u.n],'Todos los mecánicos')+'</select>')+'<span class="sp"></span>'+
  '<div class="chips"><button class="chip'+(UI.otMode==='tablero'?' on':'')+'" data-act="otmode" data-m="tablero">Tablero</button><button class="chip'+(UI.otMode==='lista'?' on':'')+'" data-act="otmode" data-m="lista">Lista</button></div>'+
- '<button class="btn p" data-act="otnew">➕ Nueva OT</button></div>'+
+ (mech?'':'<button class="btn p" data-act="otnew">➕ Nueva OT</button>')+'</div>'+
+ (mech?'<div class="demoflag">Ves tus órdenes y las que están sin asignar para tomar. Tu parte: diagnóstico (con fotos), confirmar la reparación y pasar al jefe de taller o dueño. No se muestran precios ni valores.</div>':'')+
  '<div class="chips" style="margin-bottom:10px"><button class="chip'+(!UI.otEst?' on':'')+'" data-act="otest" data-e="">Todas</button>'+ESTADOS.map(e=>'<button class="chip'+(UI.otEst===e?' on':'')+'" data-act="otest" data-e="'+e+'">'+e+'</button>').join('')+'</div>'+body};
 CHG.otq=t=>{UI.otQ=t.value;const p=t.selectionStart;renderView();const n=$('#otq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(e){}}};
 CHG.otm=t=>{UI.otMec=t.value;renderView()};
 ACT.otmode=d=>{UI.otMode=d.m;renderView()};
 ACT.otest=d=>{UI.otEst=d.e;renderView()};
 ACT.otnew=d=>{
+ if(ME.rol==='mecanico')return;
  modal({title:'Nueva orden de trabajo (recepción del vehículo)',wide:true,ok:'Crear OT',body:pickerHTML(d.cli||'',d.veh||'')+
  '<div class="g3"><div class="f"><label for="n_km">Kilometraje actual</label><input id="n_km" inputmode="numeric" placeholder="68200"></div><div class="f"><label for="n_mec">Mecánico</label><select id="n_mec">'+opts(DB.users.filter(u=>u.rol==='mecanico'||u.rol==='jefe'),'',u=>[u.id,u.n+' · '+u.esp.split(' · ')[0]],'— asignar luego —')+'</select></div><div class="f"><label for="n_rec">Puesto de trabajo</label><select id="n_rec">'+opts(RECURSOS.map((r,i)=>[i,r]),'',x=>x,'— sin asignar —')+'</select></div></div>'+
  '<div class="f"><label for="n_mot">Motivo de ingreso / lo que pide el cliente</label><textarea id="n_mot" placeholder="Ej.: service de 70.000 km, ruido en tren delantero"></textarea></div>'+
  '<div class="card" style="background:#f8fafc"><h3>Checklist de recepción</h3><div class="g3">'+[['aceite','Nivel de aceite OK'],['luces','Luces funcionando'],['neum','Neumáticos en condiciones'],['auxilio','Rueda de auxilio / criquet'],['docs','Documentación a la vista'],['rayones','Rayones / golpes previos (anotar)']].map(c=>'<label style="font-weight:500;color:var(--tx)"><input type="checkbox" id="n_ck_'+c[0]+'" style="width:auto;min-height:0" '+(c[0]!=='rayones'?'checked':'')+'> '+c[1]+'</label>').join('')+'</div><div class="f" style="margin-top:8px;max-width:200px"><label for="n_comb">Combustible</label><select id="n_comb">'+opts(['Reserva','1/4','1/2','3/4','Lleno'],'1/2')+'</select></div></div>',
  calc:()=>pkFill(d.veh||''),
  onOk:()=>{try{const{cid,vid}=readPicker();const mot=val('n_mot').trim();if(mot.length<4)throw new Error('Describí el motivo de ingreso.');const km=parseInt(val('n_km'))||0;const v=vehOf(vid);if(km&&v.km&&km<v.km-1&&!confirm('El kilometraje ('+km+') es menor al último registrado ('+v.km+'). ¿Continuar?'))return false;
-   DB.seq.ot++;const o={id:'ot'+DB.seq.ot,num:DB.seq.ot,fecha:TODAY(),cliId:cid,vehId:vid,km:km||v.km,motivo:mot,estado:'Recibido',mecId:val('n_mec'),recurso:val('n_rec'),presAprob:false,items:[],
-   check:{aceite:chk('n_ck_aceite'),luces:chk('n_ck_luces'),neum:chk('n_ck_neum'),rayones:chk('n_ck_rayones'),auxilio:chk('n_ck_auxilio'),docs:chk('n_ck_docs'),comb:val('n_comb')},obs:'',pagos:[],entregada:''};
-   if(km)v.km=km;DB.ots.unshift(o);audit('OT creada',otNum(o)+' · '+v.pat);save();closeModal();renderView();toast(otNum(o)+' creada');setTimeout(()=>ACT.otopen({id:o.id}),50);return false}catch(e){merr(e.message);return false}}})};
+   const o=newOT(cid,vid,km,mot,val('n_mec'),val('n_rec'),{aceite:chk('n_ck_aceite'),luces:chk('n_ck_luces'),neum:chk('n_ck_neum'),rayones:chk('n_ck_rayones'),auxilio:chk('n_ck_auxilio'),docs:chk('n_ck_docs'),comb:val('n_comb')});
+   if(km)v.km=km;audit('OT creada',otNum(o)+' · '+v.pat);save();closeModal();renderView();toast(otNum(o)+' creada');setTimeout(()=>ACT.otopen({id:o.id}),50);return false}catch(e){merr(e.message);return false}}})};
 
-ACT.otopen=d=>{const o=otOf(d.id);if(!o)return;modal({title:otNum(o)+' · '+(vehOf(o.vehId)||{}).pat,wide:true,hideOk:true,cancel:'Cerrar',body:otBody(o),noFocus:true,onClose:()=>renderView()})};
-function otRefresh(o){rerenderModalBody(otBody(o));save()}
+ACT.otopen=d=>{const o=otOf(d.id);if(!o)return;if(!otVisible(o)){toast('Esa orden está asignada a otro mecánico.',1);return}
+ modal({title:otNum(o)+' · '+(vehOf(o.vehId)||{}).pat,wide:true,hideOk:true,cancel:'Cerrar',body:otBody(o),noFocus:true,onClose:()=>renderView(),calc:()=>CHG.otrepsel()})};
+function otRefresh(o){rerenderModalBody(otBody(o));save();CHG.otrepsel()}
+
+/* ---- bloques de la pantalla de OT ---- */
+function otFlowHTML(o){
+ const lock=o.estado==='Entregado',mech=ME.rol==='mecanico',bud=canBudget()&&!lock;
+ const B=(to,txt)=>'<button class="btn p" data-act="otestado" data-id="'+o.id+'" data-to="'+to+'">'+txt+'</button>';
+ let a='';
+ if(mech&&!lock){
+  if(o.estado==='Recibido')a=B('Diagnóstico','🔍 Tomar y empezar diagnóstico');
+  else if(o.estado==='Diagnóstico')a=B('Presupuesto','➡ Enviar diagnóstico al jefe / dueño');
+  else if(o.estado==='Presupuesto')a='<span class="mut">Diagnóstico enviado. El jefe de taller o el dueño arman y entregan el presupuesto al cliente.</span>';
+  else if(o.estado==='En reparación')a=B('Listo','✔ Reparación terminada: confirmar y entregar al jefe / dueño');
+  else if(o.estado==='Listo')a='<span class="mut">Reparación confirmada. La entrega y el cobro los hace el jefe de taller o el dueño.</span>';
+ }
+ const chips=bud?'<div class="chips" style="margin-top:8px">'+ESTADOS.slice(0,5).map(e=>'<button class="chip'+(o.estado===e?' on':'')+'" data-act="otestado" data-id="'+o.id+'" data-to="'+e+'">'+e+'</button>').join('')+'</div>':'';
+ return '<div class="card"><h3>Estado y flujo</h3><div class="row"><span class="badge b-'+o.estado+'" style="font-size:.9rem">'+o.estado+'</span><span class="sp">'+a+'</span></div>'+chips+
+  '<div class="steps">Recibido → Diagnóstico (mecánico) → Presupuesto (jefe / dueño) → En reparación (mecánico) → Listo → Entregado y cobrado (jefe / dueño)</div></div>'}
+function otPresHTML(o){
+ if(!canPrice())return '';
+ const bud=canBudget()&&o.estado!=='Entregado';
+ const st=o.presAprob?'<span class="badge ok">Aprobado por el cliente el '+fdate(o.presApF)+' · sin cobro</span>':o.presEnv?'<span class="badge warn">Entregado al cliente el '+fdate(o.presEnv.f)+' · falta aprobación</span>':'<span class="badge">Presupuesto sin entregar</span>';
+ const bt=bud?(!o.presEnv?'<button class="btn s" data-act="otpres" data-id="'+o.id+'" data-a="env">📤 Marcar presupuesto entregado al cliente</button>':!o.presAprob?'<button class="btn s p" data-act="otpres" data-id="'+o.id+'" data-a="apr">✔ El cliente aprobó (sin cobrar)</button>':'<button class="btn s" data-act="otpres" data-id="'+o.id+'" data-a="des">↩ Quitar aprobación</button>'):'';
+ return '<div class="card"><h3>Presupuesto</h3><div class="row">'+st+'<span class="sp"></span>'+bt+'</div><p class="sm mut" style="margin:6px 0 0">El presupuesto se aprueba sin cobrar. El cobro se hace al entregar el vehículo, por si hay que sumar adicionales (por ejemplo, cambio de focos).</p></div>'}
+function otTotsHTML(o){const t=otTotal(o);let ex=0;o.items.forEach(i=>{if(i.extra)ex+=i.qty*i.pu*(1+i.iva/100)});
+ return 'Neto '+fmt(t.neto)+' · IVA '+fmt(t.iva)+'<br><b style="font-size:1.2rem">Total '+fmt(t.total)+'</b>'+(ex>0?'<br><span class="sm" style="color:#8a5a00">Incluye adicionales posteriores a la aprobación: '+fmt(r2(ex))+'</span>':'')+(canCost()?'<br><span class="mut sm">Costo repuestos '+fmt(t.costo)+' · margen bruto '+fmt(r2(t.neto-t.costo))+'</span>':'')}
+function otItemsHTML(o){
+ const lock=o.estado==='Entregado',price=canPrice(),ed=canBudget()&&!lock;
+ const head=price?'<th>Detalle</th><th class="n">Cant. / horas</th><th class="n">P. unit. (neto)</th><th class="n">IVA</th><th class="n">Importe</th><th></th>':'<th>Detalle</th><th class="n">Cantidad</th>';
+ const rows=o.items.map((i,ix)=>{const edt=i.pu0!==undefined&&Math.abs(i.pu-i.pu0)>0.004;
+  const d=(i.k==='rep'?'📦 ':'🔧 ')+h(i.desc)+'<span id="li_b'+ix+'">'+(edt?' <span class="badge">valor editado</span>':'')+'</span>'+(i.extra?' <span class="badge warn">adicional</span>':'');
+  if(!price)return '<tr><td>'+d+'</td><td class="n">'+i.qty+'</td></tr>';
+  const mo=ed&&i.k==='mo';
+  const at=f=>' data-chg="otlinef" data-chgc="otlineaud" data-id="'+o.id+'" data-i="'+ix+'" data-f="'+f+'"';
+  return '<tr><td>'+d+'</td><td class="n">'+(mo?'<input class="inl" inputmode="decimal" value="'+i.qty+'"'+at('qty')+' aria-label="Cantidad u horas">':i.qty)+'</td><td class="n">'+(mo?'<input class="inl" style="width:120px" inputmode="decimal" value="'+i.pu+'"'+at('pu')+' aria-label="Valor unitario de mano de obra">':fmt(i.pu))+'</td><td class="n">'+i.iva+'%</td><td class="n" id="li_t'+ix+'">'+fmt(r2(i.qty*i.pu))+'</td><td class="n">'+(ed?'<button class="btn s" data-act="otdel" data-id="'+o.id+'" data-i="'+ix+'" aria-label="Quitar">✕</button>':'')+'</td></tr>'}).join('');
+ return '<div class="tw"><table class="itbl"><thead><tr>'+head+'</tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="mut c">Sin ítems cargados.</td></tr>')+'</tbody></table></div>'}
+function otFotosHTML(o){
+ const lock=o.estado==='Entregado',mech=ME.rol==='mecanico',ok=!lock&&(isBoss()||mech);
+ return '<div class="card"><h3>📷 Fotos del diagnóstico ('+o.fotos.length+'/6)</h3>'+(o.fotos.length?'<div class="thumbs">'+o.fotos.map(f=>'<div class="thumb" tabindex="0" data-act="fotover" data-id="'+o.id+'" data-f="'+f.id+'" title="'+h(f.u+' · '+ftime(f.t))+'"><img src="'+f.data+'" alt="Foto del diagnóstico: '+h(f.n)+'">'+(ok&&(isBoss()||f.u===ME.n)?'<button class="btn s" data-act="fotodel" data-id="'+o.id+'" data-f="'+f.id+'" aria-label="Quitar foto">✕</button>':'')+'</div>').join('')+'</div>':'<p class="mut" style="margin:0">Sin fotos.</p>')+
+ (ok&&o.fotos.length<6?'<div class="row" style="margin-top:8px"><label class="btn s filebtn">📁 Subir imagen<input type="file" accept="image/*" multiple hidden id="o_foto" data-chg="otfoto" data-id="'+o.id+'"></label><label class="btn s filebtn">📷 Sacar foto<input type="file" accept="image/*" capture="environment" hidden id="o_foto2" data-chg="otfoto" data-id="'+o.id+'"></label></div>':'')+'</div>'}
 function otBody(o){
- const v=vehOf(o.vehId)||{},c=cliOf(o.cliId)||{},t=otTotal(o),lock=o.estado==='Entregado',cost=canCost();
- const rep=DB.repuestos.filter(r=>r.activo&&r.qty>0).slice(0,40);
- return '<div class="row" style="margin-bottom:8px"><div class="sp"><b style="font-size:1.1rem">'+h(v.marca+' '+v.mod)+(v.anio?' ('+v.anio+')':'')+'</b> · <span class="pill">'+h(v.pat)+'</span><br><span class="mut">'+h(c.n)+(c.tel?' · '+h(c.tel):'')+' · '+h(o.km)+' km · ingresó '+fdate(o.fecha)+'</span></div><span class="badge b-'+o.estado+'" style="font-size:.9rem">'+o.estado+'</span></div>'+
- '<div class="card"><h3>Estado</h3><div class="chips">'+ESTADOS.slice(0,5).map(e=>'<button class="chip'+(o.estado===e?' on':'')+'" data-act="otestado" data-id="'+o.id+'" data-to="'+e+'"'+(lock?' disabled':'')+'>'+e+'</button>').join('')+'</div>'+
- '<div class="row" style="margin-top:8px"><span class="badge '+(o.presAprob?'ok':'warn')+'">'+(o.presAprob?'Presupuesto aprobado por el cliente':'Presupuesto sin aprobar')+'</span>'+(!lock?'<button class="btn s" data-act="otaprob" data-id="'+o.id+'">'+(o.presAprob?'Quitar aprobación':'Marcar como aprobado')+'</button>':'')+'</div></div>'+
- '<div class="g3"><div class="f"><label for="o_mec">Mecánico</label><select id="o_mec" data-chg="otfield" data-id="'+o.id+'" data-f="mecId"'+(lock?' disabled':'')+'>'+opts(DB.users.filter(u=>u.rol==='mecanico'||u.rol==='jefe'),o.mecId,u=>[u.id,u.n],'— sin asignar —')+'</select></div>'+
- '<div class="f"><label for="o_rec">Puesto</label><select id="o_rec" data-chg="otfield" data-id="'+o.id+'" data-f="recurso"'+(lock?' disabled':'')+'>'+opts(RECURSOS.map((r,i)=>[String(i),r]),String(o.recurso),x=>x,'— sin asignar —')+'</select></div>'+
+ const v=vehOf(o.vehId)||{},c=cliOf(o.cliId)||{},t=otTotal(o),lock=o.estado==='Entregado',mech=ME.rol==='mecanico',price=canPrice(),bud=canBudget()&&!lock,
+  canDiag=!lock&&(isBoss()||(mech&&(o.mecId===ME.id||!o.mecId))),showItems=!mech||o.presAprob,asg=!lock&&!mech;
+ let s='<div class="row" style="margin-bottom:8px"><div class="sp"><b style="font-size:1.1rem">'+h(v.marca+' '+v.mod)+(v.anio?' ('+v.anio+')':'')+'</b> · <span class="pill">'+h(v.pat)+'</span><br><span class="mut">'+h(c.n)+(c.tel&&!mech?' · '+h(c.tel):'')+' · '+h(o.km)+' km · ingresó '+fdate(o.fecha)+'</span></div></div>';
+ s+=otFlowHTML(o)+otPresHTML(o);
+ s+='<div class="g3"><div class="f"><label for="o_mec">Mecánico</label><select id="o_mec" data-chg="otfield" data-id="'+o.id+'" data-f="mecId"'+(asg?'':' disabled')+'>'+opts(DB.users.filter(u=>u.rol==='mecanico'||u.rol==='jefe'),o.mecId,u=>[u.id,u.n],'— sin asignar —')+'</select></div>'+
+ '<div class="f"><label for="o_rec">Puesto</label><select id="o_rec" data-chg="otfield" data-id="'+o.id+'" data-f="recurso"'+(asg?'':' disabled')+'>'+opts(RECURSOS.map((r,i)=>[String(i),r]),String(o.recurso),x=>x,'— sin asignar —')+'</select></div>'+
  '<div class="f"><label for="o_km">Kilometraje</label><input id="o_km" inputmode="numeric" value="'+h(o.km)+'" data-chg="otfield" data-id="'+o.id+'" data-f="km"'+(lock?' disabled':'')+'></div></div>'+
  '<div class="f"><label>Motivo de ingreso</label><div>'+h(o.motivo)+'</div></div>'+
- '<div class="f"><label for="o_obs">Diagnóstico / observaciones del mecánico</label><textarea id="o_obs" data-chg="otfield" data-id="'+o.id+'" data-f="obs"'+(lock?' disabled':'')+'>'+h(o.obs)+'</textarea></div>'+
- '<div class="card"><h3>Repuestos y mano de obra</h3><div class="tw"><table class="itbl"><thead><tr><th>Detalle</th><th class="n">Cant.</th><th class="n">P. unit. (neto)</th><th class="n">IVA</th><th class="n">Importe</th><th></th></tr></thead><tbody>'+
- (o.items.length?o.items.map((i,ix)=>'<tr><td>'+(i.k==='rep'?'📦 ':'🔧 ')+h(i.desc)+'</td><td class="n">'+i.qty+'</td><td class="n">'+fmt(i.pu)+'</td><td class="n">'+i.iva+'%</td><td class="n">'+fmt(r2(i.qty*i.pu))+'</td><td class="n">'+(lock?'':'<button class="btn s" data-act="otdel" data-id="'+o.id+'" data-i="'+ix+'" aria-label="Quitar">✕</button>')+'</td></tr>').join(''):'<tr><td colspan="6" class="mut c">Sin ítems cargados.</td></tr>')+
- '</tbody></table></div>'+
- (lock?'':'<div class="g2" style="margin-top:10px"><div class="det"><b>Agregar repuesto</b><input id="o_rq" placeholder="Buscar código, descripción, marca, rosca o aplicación (ej.: astra)" data-chg="otrq" style="margin:6px 0"><select id="o_rep" size="1">'+repOptions('')+'</select><div class="row" style="margin-top:6px"><input id="o_rqty" type="number" min="1" value="1" style="max-width:90px" aria-label="Cantidad"><button class="btn p s" data-act="otaddrep" data-id="'+o.id+'">Agregar</button></div></div>'+
- '<div class="det"><b>Agregar mano de obra</b><select id="o_mo" style="margin:6px 0">'+opts(DB.servicios,'',s=>[s.id,s.n+' · '+fmt(s.pu)],'— elegir servicio —')+'</select><div class="row"><input id="o_mqty" type="number" min="0.25" step="0.25" value="1" style="max-width:90px" aria-label="Cantidad / horas"><button class="btn p s" data-act="otaddmo" data-id="'+o.id+'">Agregar</button></div></div></div>')+
- '<div class="r" style="margin-top:10px">Neto '+fmt(t.neto)+' · IVA '+fmt(t.iva)+'<br><b style="font-size:1.2rem">Total '+fmt(t.total)+'</b>'+(cost?'<br><span class="mut sm">Costo repuestos '+fmt(t.costo)+' · margen bruto '+fmt(t.neto-t.costo)+'</span>':'')+'</div></div>'+
- '<div class="card"><h3>Cobros</h3>'+(o.pagos.length?'<div class="tw"><table><thead><tr><th>Fecha</th><th>Medio</th><th class="n">Monto</th></tr></thead><tbody>'+o.pagos.map(p=>'<tr><td>'+fdate(p.fecha)+'</td><td>'+h(p.medio)+(p.cajaId?' · '+h((DB.cajas.find(x=>x.id===p.cajaId)||{}).n||''):'')+'</td><td class="n">'+fmt(p.monto)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Sin cobros registrados.</p>')+
- '<div class="row" style="margin-top:8px"><b>Saldo: <span style="color:'+(t.saldo>0.005?'var(--bad)':'var(--ok)')+'">'+fmt(Math.max(0,t.saldo))+'</span></b><span class="sp"></span>'+(!lock&&t.saldo>0.005&&o.items.length?'<button class="btn p" data-act="otcobrar" data-id="'+o.id+'">💵 Cobrar</button>':'')+'</div></div>'+
- '<div class="row"><button class="btn" data-act="otprint" data-id="'+o.id+'" data-p="pres">🖨 Presupuesto</button><button class="btn" data-act="otprint" data-id="'+o.id+'" data-p="ot">🖨 Orden de trabajo</button>'+(c.tel?'<a class="btn" target="_blank" rel="noopener" href="'+h(wa(c.tel,'Hola '+c.n+', te escribimos de '+DB.cfg.nombre+'. Tu '+v.marca+' '+v.mod+' ('+v.pat+') está en estado: '+o.estado+'.'+(o.estado==='Listo'?' Ya podés retirarlo. Saldo: '+fmt(Math.max(0,t.saldo)):'')))+'">💬 Avisar por WhatsApp</a>':'')+'<span class="sp"></span>'+
- (!lock&&o.estado==='Listo'?'<button class="btn d" data-act="otentregar" data-id="'+o.id+'">✔ Entregar vehículo</button>':'')+(lock?'<span class="badge">Entregada el '+fdate(o.entregada)+'</span>':'')+'</div>'}
-function repOptions(q){const nq=norm(q);const l=DB.repuestos.filter(r=>r.activo&&(!nq||norm([r.cod,r.desc,r.marca,r.rubro,r.rosca,r.apl].join(' ')).includes(nq))).slice(0,60);
- return l.length?l.map(r=>'<option value="'+r.id+'"'+(r.qty<=0?' disabled':'')+'>'+h(r.desc+' · '+r.marca+' · stock '+r.qty+' · '+fmt(r.pv))+'</option>').join(''):'<option value="">Sin coincidencias</option>'}
-CHG.otrq=t=>{const s=$('#o_rep');if(s)s.innerHTML=repOptions(t.value)};
-CHG.otfield=t=>{const o=otOf(t.dataset.id);if(!o||o.estado==='Entregado')return;const f=t.dataset.f;let v=t.value;if(f==='km')v=parseInt(v)||0;o[f]=v;if(f==='km'&&v){const x=vehOf(o.vehId);if(x)x.km=Math.max(x.km,v)}save()};
-ACT.otaprob=d=>{const o=otOf(d.id);o.presAprob=!o.presAprob;audit('Presupuesto '+(o.presAprob?'aprobado':'sin aprobar'),otNum(o));otRefresh(o)};
-ACT.otestado=d=>{const o=otOf(d.id);const to=d.to;if(o.estado===to)return;
- if(to==='En reparación'&&!o.presAprob){toast('Para pasar a “En reparación” el presupuesto debe estar aprobado por el cliente.',1);return}
- if((to==='En reparación'||to==='Listo')&&!o.mecId){toast('Asigná un mecánico antes de continuar.',1);return}
- if(to==='Listo'&&!o.items.length){toast('La OT no tiene ítems cargados.',1);return}
- o.estado=to;audit('OT '+otNum(o),'Estado → '+to);otRefresh(o);renderView()};
-ACT.otaddrep=d=>{const o=otOf(d.id),r=repOf(val('o_rep'));const q=parseInt(val('o_rqty'));if(!r){toast('Elegí un repuesto.',1);return}if(!(q>0)){toast('Cantidad inválida.',1);return}
- if(q>r.qty){toast('Stock insuficiente: disponibles '+r.qty+' de '+r.desc+'.',1);return}
- r.qty-=q;const ex=o.items.find(i=>i.k==='rep'&&i.repId===r.id);if(ex)ex.qty+=q;else o.items.push({k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:q,pu:r.pv,iva:r.iva,costo:r.pc});
- audit('OT '+otNum(o),'+ '+q+' × '+r.desc);otRefresh(o)};
-ACT.otaddmo=d=>{const o=otOf(d.id),s=DB.servicios.find(x=>x.id===val('o_mo'));const q=num(val('o_mqty'));if(!s){toast('Elegí un servicio.',1);return}if(!(q>0)){toast('Cantidad inválida.',1);return}
- o.items.push({k:'mo',desc:s.n,qty:q,pu:s.pu,iva:21,costo:0});audit('OT '+otNum(o),'+ MO '+s.n);otRefresh(o)};
-ACT.otdel=d=>{const o=otOf(d.id),i=o.items[+d.i];if(!i)return;if(i.k==='rep'){const r=repOf(i.repId);if(r)r.qty+=i.qty}o.items.splice(+d.i,1);audit('OT '+otNum(o),'− '+i.desc);otRefresh(o)};
+ '<div class="f"><label for="o_obs">Diagnóstico del mecánico</label><textarea id="o_obs" data-chg="otfield" data-id="'+o.id+'" data-f="obs"'+(canDiag?'':' disabled')+' placeholder="Qué se encontró, qué hay que hacer (mínimo 10 caracteres para enviarlo)">'+h(o.obs)+'</textarea></div>'+
+ '<div class="f"><label for="o_ped">Repuestos / trabajos que recomienda (sin precios)</label><textarea id="o_ped" data-chg="otfield" data-id="'+o.id+'" data-f="pedido"'+(canDiag?'':' disabled')+' placeholder="Ej.: pastillas delanteras, alineación y balanceo">'+h(o.pedido||'')+'</textarea></div>';
+ s+=otFotosHTML(o);
+ if(showItems){
+  s+='<div class="card"><h3>'+(mech?'Trabajos y repuestos autorizados (sin valores)':'Repuestos y mano de obra')+'</h3>'+otItemsHTML(o)+
+  (bud?'<div class="g2" style="margin-top:10px"><div class="det"><b>Agregar repuesto</b><input id="o_rq" placeholder="Código (cualquiera de sus códigos), descripción, marca, rosca o aplicación (ej.: astra)" data-chg="otrq" style="margin:6px 0"><select id="o_rep" data-chg="otrepsel" aria-label="Repuesto">'+repOptions('')+'</select><div id="o_eq" class="sm" style="margin:6px 0"></div><div class="row"><input id="o_rqty" type="number" min="1" value="1" style="max-width:90px" aria-label="Cantidad"><button class="btn p s" data-act="otaddrep" data-id="'+o.id+'">Agregar</button></div></div>'+
+  '<div class="det"><b>Agregar mano de obra</b> <span class="mut sm">(el valor se puede editar acá y en la tabla)</span><select id="o_mo" data-chg="otmosel" style="margin:6px 0">'+opts(DB.servicios,'',s=>[s.id,s.n+' · '+fmt(s.pu)],'— elegir servicio —')+'<option value="__libre">✎ Trabajo libre (describirlo)</option></select><input id="o_mdesc" placeholder="Descripción del trabajo" hidden style="margin-bottom:6px" aria-label="Descripción del trabajo libre"><div class="row"><input id="o_mqty" type="number" min="0.25" step="0.25" value="1" style="max-width:90px" aria-label="Horas o cantidad"><input id="o_mpu" inputmode="decimal" placeholder="Valor $ (neto)" style="max-width:150px" aria-label="Valor de la mano de obra"><button class="btn p s" data-act="otaddmo" data-id="'+o.id+'">Agregar</button></div></div></div>':'')+
+  (price?'<div class="r" id="ot_tots" style="margin-top:10px">'+otTotsHTML(o)+'</div>':'')+'</div>';
+ } else s+='<div class="demoflag">El presupuesto lo arman y entregan el jefe de taller o el dueño. Cuando el cliente lo apruebe vas a ver acá los trabajos y repuestos autorizados (sin valores).</div>';
+ if(price)s+='<div class="card"><h3>Cobro</h3>'+(o.pagos.length?'<div class="tw"><table><thead><tr><th>Fecha</th><th>Medio</th><th class="n">Monto</th></tr></thead><tbody>'+o.pagos.map(p=>'<tr><td>'+fdate(p.fecha)+'</td><td>'+h(p.medio)+(p.cajaId?' · '+h((DB.cajas.find(x=>x.id===p.cajaId)||{}).n||''):'')+'</td><td class="n">'+fmt(p.monto)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="mut" style="margin:0">Todavía sin cobro: se cobra al entregar el vehículo.</p>')+
+  '<div class="row" style="margin-top:8px"><b>Saldo: <span style="color:'+(t.saldo>0.005?'var(--bad)':'var(--ok)')+'">'+fmt(Math.max(0,t.saldo))+'</span></b></div></div>';
+ s+='<div class="row">'+(price?'<button class="btn" data-act="otprint" data-id="'+o.id+'" data-p="pres">🖨 Presupuesto</button>':'')+'<button class="btn" data-act="otprint" data-id="'+o.id+'" data-p="ot">🖨 Orden de trabajo'+(price?'':' (sin valores)')+'</button>';
+ if(price&&c.tel){
+  s+='<a class="btn" target="_blank" rel="noopener" href="'+h(wa(c.tel,'Hola '+c.n+', te escribimos de '+DB.cfg.nombre+'. Tu '+v.marca+' '+v.mod+' ('+v.pat+') está en estado: '+o.estado+'.'+(o.estado==='Listo'?' Ya podés retirarlo. Total a abonar al retirar: '+fmt(Math.max(0,t.saldo)):'')))+'">💬 Avisar estado</a>';
+  if(canBudget()&&o.items.length&&!o.presAprob&&!lock)s+='<a class="btn" target="_blank" rel="noopener" href="'+h(wa(c.tel,'Hola '+c.n+', presupuesto de tu '+v.marca+' '+v.mod+' ('+v.pat+'):\n'+o.items.map(i=>'• '+i.qty+' × '+i.desc+' — '+fmt(r2(i.qty*i.pu*(1+i.iva/100)))).join('\n')+'\nTotal (IVA incl.): '+fmt(t.total)+'\nSe abona al retirar el vehículo. ¿Lo aprobás?'))+'">💬 Enviar presupuesto</a>'}
+ s+='<span class="sp"></span>';
+ if(o.estado==='Listo'&&canCharge())s+='<button class="btn d" data-act="otentregar" data-id="'+o.id+'">💵 Cobrar y entregar vehículo</button>';
+ else if(o.estado==='Listo'&&price)s+='<span class="mut sm">La entrega y el cobro los hace el dueño o el jefe de taller.</span>';
+ if(lock)s+='<span class="badge">Entregada el '+fdate(o.entregada)+(o.entregadaPor?' por '+h(o.entregadaPor):'')+'</span>';
+ return s+'</div>'}
 
-ACT.otcobrar=d=>{UI.cobroOt=d.id;const o=otOf(d.id),c=cliOf(o.cliId),t=otTotal(o);
- const abiertas=DB.turno.abierto?DB.cajas:[];
- modal({title:'Cobrar '+otNum(o),ok:'Registrar cobro',body:'<p>Saldo a cobrar: <b style="font-size:1.2rem">'+fmt(t.saldo)+'</b></p>'+
- '<div class="g2"><div class="f"><label for="pg_ef">Efectivo recibido</label><input id="pg_ef" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div><div class="f"><label for="pg_caja">Ingresa a la caja</label><select id="pg_caja">'+(abiertas.length?opts(abiertas,'C1',x=>[x.id,x.n]):'<option value="">⚠ No hay turno de caja abierto</option>')+'</select></div>'+
+/* ---- repuestos: opciones del selector ---- */
+function repOptions(q,sel){const nq=norm(q),nc=ncode(q);
+ let l=DB.repuestos.filter(r=>r.activo&&(!nq||repHay(r).includes(nq)||(nc&&repCodes(r).some(c=>ncode(c).includes(nc)))));
+ if(nq&&nc){const ex=l.filter(r=>repCodes(r).some(c=>ncode(c)===nc));l=ex.concat(l.filter(r=>ex.indexOf(r)<0))}
+ const s=sel&&repOf(sel);if(s&&s.qty>0)l=[s].concat(l.filter(r=>r!==s));
+ l=l.slice(0,60);
+ return l.length?l.map(r=>'<option value="'+r.id+'"'+(r.qty<=0?' disabled':'')+(s&&r.id===s.id?' selected':'')+'>'+h(r.desc+' · '+r.marca+' · stock '+r.qty+' · '+fmt(r.pv))+'</option>').join(''):'<option value="">Sin coincidencias</option>'}
+CHG.otrq=t=>{const s=$('#o_rep');if(s){s.innerHTML=repOptions(t.value);CHG.otrepsel()}};
+CHG.otrepsel=()=>{const box=$('#o_eq');if(!box)return;const r=repOf(val('o_rep'));if(!r){box.innerHTML='';return}const eq=equivOf(r);
+ box.innerHTML=eq.length?'<b>Equivalentes:</b><br>'+eq.map(e=>'<span class="pill">'+h(e.r.desc+' · '+e.r.marca)+' · stock '+e.r.qty+' · '+fmt(e.r.pv)+'</span> <span class="mut">'+h(e.txt)+'</span> <button class="btn s" data-act="otuseeq" data-id="'+e.r.id+'"'+(e.r.qty>0?'':' disabled')+'>Usar</button>').join('<br>'):'<span class="mut">Sin equivalentes cargados para este artículo.</span>'};
+ACT.otuseeq=d=>{const q=$('#o_rq');if(q)q.value='';const s=$('#o_rep');if(s){s.innerHTML=repOptions('',d.id);CHG.otrepsel()}};
+CHG.otmosel=t=>{const s=DB.servicios.find(x=>x.id===t.value);const dd=$('#o_mdesc');if(dd)dd.hidden=t.value!=='__libre';const p=$('#o_mpu');if(p)p.value=s?s.pu:''};
+
+/* ---- edición de campos de la OT ---- */
+CHG.otfield=t=>{const o=otOf(t.dataset.id);if(!o||o.estado==='Entregado')return;const f=t.dataset.f,mech=ME.rol==='mecanico';
+ if((f==='mecId'||f==='recurso')&&mech)return;
+ if((f==='obs'||f==='pedido')&&!(isBoss()||(mech&&(o.mecId===ME.id||!o.mecId))))return;
+ let v=t.value;if(f==='km')v=parseInt(v)||0;
+ if(mech&&(f==='obs'||f==='pedido')&&!o.mecId)o.mecId=ME.id;
+ o[f]=v;if(f==='km'&&v){const x=vehOf(o.vehId);if(x)x.km=Math.max(x.km,v)}save()};
+CHG.otlinef=t=>{const o=otOf(t.dataset.id);if(!o||o.estado==='Entregado'||!canBudget())return;const i=o.items[+t.dataset.i];if(!i||i.k!=='mo')return;const f=t.dataset.f,v=num(t.value);
+ if(f==='pu'){if(!(v>=0)||v>9999999||t.value.trim()===''){t.style.borderColor='var(--bad)';return}i.pu=r2(v)}else{if(!(v>0)||v>999){t.style.borderColor='var(--bad)';return}i.qty=v}
+ t.style.borderColor='';
+ const c=$('#li_t'+t.dataset.i);if(c)c.textContent=fmt(r2(i.qty*i.pu));const b=$('#li_b'+t.dataset.i);if(b)b.innerHTML=(i.pu0!==undefined&&Math.abs(i.pu-i.pu0)>0.004)?' <span class="badge">valor editado</span>':'';
+ const tt=$('#ot_tots');if(tt)tt.innerHTML=otTotsHTML(o);save()};
+CHGC.otlineaud=t=>{const o=otOf(t.dataset.id),i=o&&o.items[+t.dataset.i];if(!i)return;audit('OT '+otNum(o)+' · '+(t.dataset.f==='pu'?'valor de mano de obra editado':'cantidad de mano de obra editada'),i.desc+' → '+(t.dataset.f==='pu'?fmt(i.pu)+' (lista '+fmt(i.pu0)+')':i.qty));save()};
+
+/* ---- estados y presupuesto ---- */
+ACT.otestado=d=>{const o=otOf(d.id),to=d.to;if(!o||o.estado===to||o.estado==='Entregado')return;const mech=ME.rol==='mecanico';
+ if(mech){
+  if(!otVisible(o)){toast('Esta orden está asignada a otro mecánico.',1);return}
+  const ok=(o.estado==='Recibido'&&to==='Diagnóstico')||(o.estado==='Diagnóstico'&&to==='Presupuesto')||(o.estado==='En reparación'&&to==='Listo');
+  if(!ok){toast('Ese cambio de estado lo hace el jefe de taller o el dueño.',1);return}
+  if(to==='Diagnóstico'&&!o.mecId)o.mecId=ME.id;
+  if(to==='Presupuesto'&&(o.obs||'').trim().length<10){toast('Cargá el diagnóstico (mínimo 10 caracteres) antes de enviarlo al jefe / dueño.',1);return}
+ }else{
+  if(!canBudget()){toast('Tu perfil no puede cambiar el estado de la orden.',1);return}
+  if(to==='En reparación'&&!o.presAprob){toast('Para pasar a “En reparación” el cliente debe haber aprobado el presupuesto (no hace falta cobrar todavía).',1);return}
+  if((to==='En reparación'||to==='Listo')&&!o.mecId){toast('Asigná un mecánico antes de continuar.',1);return}
+  if(to==='Listo'&&!o.items.length){toast('La OT no tiene ítems cargados.',1);return}
+  if(to==='Listo'&&!o.presAprob){toast('Falta la aprobación del presupuesto por parte del cliente.',1);return}
+ }
+ audit('OT '+otNum(o),o.estado+' → '+to);o.estado=to;otRefresh(o);renderView()};
+ACT.otpres=d=>{const o=otOf(d.id);if(!o||!canBudget()||o.estado==='Entregado')return;
+ if(d.a==='env'){if(!o.items.length){toast('Cargá repuestos o mano de obra antes de entregar el presupuesto.',1);return}o.presEnv={f:TODAY(),u:ME.n};if(o.estado==='Recibido'||o.estado==='Diagnóstico')o.estado='Presupuesto';audit('Presupuesto entregado',otNum(o))}
+ else if(d.a==='apr'){if(!o.presEnv){toast('Primero marcá el presupuesto como entregado al cliente.',1);return}o.presAprob=true;o.presApF=TODAY();audit('Presupuesto aprobado (sin cobro)',otNum(o));
+  if(o.estado!=='En reparación'&&o.estado!=='Listo'){if(o.mecId)o.estado='En reparación';else toast('Aprobado. Asigná un mecánico para pasar a reparación.')}}
+ else{o.presAprob=false;o.presApF='';audit('Aprobación quitada',otNum(o))}
+ otRefresh(o);renderView()};
+
+/* ---- ítems ---- */
+ACT.otaddrep=d=>{const o=otOf(d.id);if(!o||!canBudget()||o.estado==='Entregado')return;const r=repOf(val('o_rep'));const q=parseInt(val('o_rqty'));if(!r){toast('Elegí un repuesto.',1);return}if(!(q>0)){toast('Cantidad inválida.',1);return}
+ if(q>r.qty){const eq=equivOf(r).filter(e=>e.r.qty>0);toast('Stock insuficiente: hay '+r.qty+' de '+r.desc+'.'+(eq.length?' Equivalentes con stock: '+eq.map(e=>e.r.desc+' '+e.r.marca+' ('+e.r.qty+')').join(', '):''),1);return}
+ stockMove(r,-q,'Uso en OT',otNum(o)+' · '+((vehOf(o.vehId)||{}).pat||''));
+ const ex=o.items.find(i=>i.k==='rep'&&i.repId===r.id&&!!i.extra===!!o.presAprob);if(ex)ex.qty+=q;else o.items.push({k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:q,pu:r.pv,pu0:r.pv,iva:r.iva,costo:r.pc,extra:!!o.presAprob});
+ audit('OT '+otNum(o),'+ '+q+' × '+r.desc+(o.presAprob?' (adicional)':''));otRefresh(o)};
+ACT.otaddmo=d=>{const o=otOf(d.id);if(!o||!canBudget()||o.estado==='Entregado')return;const sid=val('o_mo'),s=DB.servicios.find(x=>x.id===sid),libre=sid==='__libre';const q=num(val('o_mqty'));
+ if(!s&&!libre){toast('Elegí un servicio o “Trabajo libre”.',1);return}if(!(q>0)){toast('Cantidad inválida.',1);return}
+ const desc=libre?val('o_mdesc').trim():s.n;if(libre&&desc.length<4){toast('Describí el trabajo libre.',1);return}
+ const raw=val('o_mpu').trim(),pu=raw===''?(s?s.pu:NaN):num(raw);if(!(pu>=0)||pu>9999999){toast('Ingresá el valor de la mano de obra.',1);return}
+ o.items.push({k:'mo',desc,qty:q,pu:r2(pu),pu0:s?s.pu:r2(pu),iva:21,costo:0,extra:!!o.presAprob});audit('OT '+otNum(o),'+ MO '+desc+' '+fmt(r2(pu))+(o.presAprob?' (adicional)':''));otRefresh(o)};
+ACT.otdel=d=>{const o=otOf(d.id),i=o&&o.items[+d.i];if(!i||!canBudget()||o.estado==='Entregado')return;if(i.k==='rep'){const r=repOf(i.repId);if(r)stockMove(r,i.qty,'Devolución a stock (quitado de OT)',otNum(o))}o.items.splice(+d.i,1);audit('OT '+otNum(o),'− '+i.desc);otRefresh(o)};
+
+/* ---- fotos del diagnóstico ---- */
+function imgCompress(file,max,q){return new Promise((res,rej)=>{const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',q))};im.onerror=rej;im.src=rd.result};rd.onerror=rej;rd.readAsDataURL(file)})}
+CHG.otfoto=t=>{const o=otOf(t.dataset.id);const files=[...(t.files||[])];t.value='';if(!o||o.estado==='Entregado'||!files.length)return;
+ if(!(isBoss()||(ME.rol==='mecanico'&&otVisible(o)))){toast('No podés cargar fotos en esta orden.',1);return}
+ if(o.fotos.length+files.length>6){toast('Máximo 6 fotos por orden en la demo.',1);return}
+ files.forEach(f=>{if(!/^image\//.test(f.type)){toast('“'+f.name+'” no es una imagen.',1);return}
+  imgCompress(f,1280,.68).then(data=>{if(o.fotos.length>=6)return;o.fotos.push({id:uid('f'),n:f.name.slice(0,40),data,t:Date.now(),u:ME.n});audit('Foto de diagnóstico',otNum(o)+' · '+f.name.slice(0,30));otRefresh(o)}).catch(()=>toast('No se pudo leer la imagen.',1))})};
+ACT.fotover=d=>{const o=otOf(d.id),f=o&&o.fotos.find(x=>x.id===d.f);if(!f)return;const old=$('#lb');if(old)old.remove();const lb=document.createElement('div');lb.id='lb';lb.setAttribute('role','dialog');lb.setAttribute('aria-label','Foto ampliada');lb.innerHTML='<img src="'+f.data+'" alt="Foto ampliada del diagnóstico">';lb.addEventListener('click',()=>lb.remove());document.body.appendChild(lb)};
+ACT.fotodel=d=>{const o=otOf(d.id);if(!o||o.estado==='Entregado')return;const f=o.fotos.find(x=>x.id===d.f);if(!f||!(isBoss()||f.u===ME.n))return;o.fotos.splice(o.fotos.indexOf(f),1);audit('Foto quitada',otNum(o));otRefresh(o)};
+
+/* ---- cobrar y entregar (al final, con la posibilidad de haber sumado adicionales) ---- */
+function pgCalc(o){const t=otTotal(o),c=cliOf(o.cliId);const ef=r2(num(val('pg_ef'))),tr=r2(num(val('pg_tr'))),tj=r2(num(val('pg_tj')));let cc=r2(num(val('pg_cc')));
+ if([ef,tr,tj,cc].some(x=>x<0))return{err:'No se admiten importes negativos.'};
+ if(r2(tr+tj)>t.saldo+0.004)return{err:'Transferencia + tarjeta superan el saldo ('+fmt(t.saldo)+').'};
+ let efA,vuelto;
+ if(chk('pg_ccrest')){efA=r2(Math.min(ef,Math.max(0,t.saldo-tr-tj)));vuelto=r2(ef-efA);cc=r2(t.saldo-tr-tj-efA)}
+ else{if(r2(tr+tj+cc)>t.saldo+0.004)return{err:'Transferencia + tarjeta + cuenta corriente superan el saldo ('+fmt(t.saldo)+').'};efA=r2(Math.min(ef,Math.max(0,t.saldo-tr-tj-cc)));vuelto=r2(ef-efA)}
+ if(cc>0.004&&(!c||!c.cc))return{err:'El cliente no tiene cuenta corriente habilitada.'};
+ if(cc>0.004&&c.saldo+cc>c.lim+0.004)return{err:'Supera el límite de cuenta corriente del cliente ('+fmt(c.lim)+').'};
+ return{ef:efA,tr,tj,cc:r2(cc),vuelto,total:r2(efA+tr+tj+cc),resta:r2(t.saldo-efA-tr-tj-cc)}}
+CHG.pgcalc=()=>{const o=otOf(UI.cobroOt);if(!o||!$('#pg_res'))return;const r=pgCalc(o);$('#pg_res').innerHTML=r.err?'⚠ '+h(r.err):'Se cobra: <b>'+fmt(r.total)+'</b>'+(r.vuelto>0?' · <b>Vuelto a entregar: '+fmt(r.vuelto)+'</b>':'')+' · '+(r.resta>0.004?'<b>Falta cubrir '+fmt(r.resta)+'</b>':'Saldo cubierto: se puede entregar')};
+function finEntrega(o){o.estado='Entregado';o.entregada=TODAY();o.entregadaPor=ME.n;const v=vehOf(o.vehId);if(v){v.km=Math.max(v.km||0,o.km||0);if(v.km){v.proxKm=Math.ceil((v.km+1000)/10000)*10000;v.proxFecha=addDays(180)}}
+ o.items.forEach(i=>{if(i.k!=='rep')return;const r=repOf(i.repId);if(!r)return;let tipo='',cant=0,u='u';
+  if(r.rubro==='ACEITE LUBRICANTE'){tipo='Aceite usado';cant=i.qty*(/x\s*(\d+)\s*L/i.test(r.desc)?+RegExp.$1:4);u='L'}
+  else if(r.rubro==='FILTRO DE ACEITE'){tipo='Filtros usados';cant=i.qty}else if(r.rubro==='BATERÍAS'){tipo='Baterías';cant=i.qty}
+  if(tipo)DB.resid.push({id:uid('z'),fecha:TODAY(),tipo,cant,unidad:u,ref:'Generado en '+otNum(o)})});
+ const tu=DB.turnos.find(x=>x.otId===o.id);if(tu)tu.estado='Confirmado';
+ audit('OT entregada y cobrada',otNum(o)+' · '+fmt(otTotal(o).total))}
+ACT.otentregar=d=>{const o=otOf(d.id);if(!o)return;
+ if(!canCharge()){toast('La entrega y el cobro los hacen el dueño o el jefe de taller.',1);return}
+ if(o.estado!=='Listo'){toast('Para entregar, la reparación debe estar confirmada por el mecánico (estado “Listo”).',1);return}
+ const c=cliOf(o.cliId),t=otTotal(o);UI.cobroOt=o.id;
+ const done=()=>{save();closeModal();renderView();setTimeout(()=>ACT.otopen({id:o.id}),30)};
+ if(t.saldo<=0.005){confirmBox('El total ya está cobrado. ¿Confirmás la entrega del vehículo? La OT queda cerrada y no se puede editar.',()=>{finEntrega(o);done();toast(otNum(o)+' entregada')},'Entregar');return}
+ modal({title:'Cobrar y entregar · '+otNum(o),ok:'Cobrar y entregar',body:'<p>Total a cobrar al retirar el vehículo: <b style="font-size:1.2rem">'+fmt(t.saldo)+'</b> <span class="mut sm">(incluye los adicionales cargados)</span></p>'+
+ '<div class="g2"><div class="f"><label for="pg_ef">Efectivo recibido</label><input id="pg_ef" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div><div class="f"><label for="pg_caja">Ingresa a la caja</label><select id="pg_caja">'+(DB.turno.abierto?opts(DB.cajas,'C1',x=>[x.id,x.n]):'<option value="">⚠ No hay turno de caja abierto</option>')+'</select></div>'+
  '<div class="f"><label for="pg_tr">Transferencia</label><input id="pg_tr" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div><div class="f"><label for="pg_tj">Tarjeta (débito/crédito)</label><input id="pg_tj" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div>'+
- (c&&c.cc?'<div class="f"><label for="pg_cc">A cuenta corriente (límite '+fmt(c.lim)+' · deuda actual '+fmt(c.saldo)+')</label><input id="pg_cc" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div>':'')+'</div><div id="pg_res" class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f"></div>',
+ (c&&c.cc?'<div class="f"><label for="pg_cc">A cuenta corriente (límite '+fmt(c.lim)+' · deuda actual '+fmt(c.saldo)+')</label><input id="pg_cc" inputmode="decimal" data-chg="pgcalc" placeholder="0,00"></div><div class="f"><label style="font-weight:500;color:var(--tx)"><input type="checkbox" id="pg_ccrest" style="width:auto;min-height:0" data-chg="pgcalc"> Pasar a cuenta corriente lo que no se cobre ahora</label></div>':'')+
+ '</div><div id="pg_res" class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f"></div>',
  calc:()=>CHG.pgcalc(),
- onOk:()=>{try{const r=pgCalc(o);if(r.err)throw new Error(r.err);if(r.total<=0)throw new Error('Ingresá algún importe.');
+ onOk:()=>{try{const r=pgCalc(o);if(r.err)throw new Error(r.err);if(r.total<=0)throw new Error('Ingresá algún importe.');if(r.resta>0.004)throw new Error('Falta cubrir '+fmt(r.resta)+' para poder entregar el vehículo.');
   if(r.ef>0){if(!DB.turno.abierto)throw new Error('Abrí el turno de caja para cobrar en efectivo.');if(!val('pg_caja'))throw new Error('Elegí la caja.')}
   const f=TODAY();
   if(r.ef>0){o.pagos.push({id:uid('pg'),fecha:f,medio:'Efectivo',monto:r.ef,cajaId:val('pg_caja')});cajaMov(val('pg_caja'),'ingreso','f1',r.ef,otNum(o))}
   if(r.tr>0)o.pagos.push({id:uid('pg'),fecha:f,medio:'Transferencia',monto:r.tr,cajaId:''});
   if(r.tj>0)o.pagos.push({id:uid('pg'),fecha:f,medio:'Tarjeta',monto:r.tj,cajaId:''});
-  if(r.cc>0){o.pagos.push({id:uid('pg'),fecha:f,medio:'Cuenta corriente',monto:r.cc,cajaId:''});c.saldo=r2(c.saldo+r.cc)}
-  audit('Cobro '+otNum(o),fmt(r.total)+(r.vuelto>0?' (vuelto '+fmt(r.vuelto)+')':''));save();closeModal();
-  setTimeout(()=>ACT.otopen({id:o.id}),30);toast('Cobro registrado'+(r.vuelto>0?' · vuelto '+fmt(r.vuelto):''));return false}catch(e){merr(e.message);return false}}})};
-function pgCalc(o){const t=otTotal(o),c=cliOf(o.cliId);const ef=r2(num(val('pg_ef'))),tr=r2(num(val('pg_tr'))),tj=r2(num(val('pg_tj'))),cc=r2(num(val('pg_cc')));
- if([ef,tr,tj,cc].some(x=>x<0))return{err:'No se admiten importes negativos.'};
- const non=r2(tr+tj+cc);if(non>t.saldo+0.004)return{err:'Transferencia + tarjeta + cuenta corriente superan el saldo ('+fmt(t.saldo)+').'};
- if(cc>0&&(!c||!c.cc))return{err:'El cliente no tiene cuenta corriente habilitada.'};
- if(cc>0&&c.saldo+cc>c.lim+0.004)return{err:'Supera el límite de cuenta corriente del cliente ('+fmt(c.lim)+').'};
- const needCash=r2(Math.max(0,t.saldo-non)),efA=r2(Math.min(ef,needCash)),vuelto=r2(ef-efA);
- return{ef:efA,tr,tj,cc,vuelto,total:r2(efA+non),resta:r2(t.saldo-efA-non)}}
-CHG.pgcalc=()=>{const o=otOf(UI.cobroOt);if(!o||!$('#pg_res'))return;const r=pgCalc(o);$('#pg_res').innerHTML=r.err?'⚠ '+h(r.err):'Se cobra: <b>'+fmt(r.total)+'</b>'+(r.vuelto>0?' · <b>Vuelto a entregar: '+fmt(r.vuelto)+'</b>':'')+' · Queda pendiente: <b>'+fmt(r.resta)+'</b>'};
+  if(r.cc>0.004){o.pagos.push({id:uid('pg'),fecha:f,medio:'Cuenta corriente',monto:r.cc,cajaId:''});c.saldo=r2(c.saldo+r.cc)}
+  finEntrega(o);done();toast('Entregada y cobrada'+(r.vuelto>0?' · vuelto '+fmt(r.vuelto):''));return false}catch(e){merr(e.message);return false}}})};
 </script>
 <script>
 /* ===== Caja: movimiento base (rubro financiero obligatorio) ===== */
@@ -550,31 +700,18 @@ function cajaMov(cajaId,tipo,concId,monto,ref,extra){
  if(!rubFin(concId))throw new Error('Falta el rubro financiero del movimiento.');
  DB.seq.mov++;const m=Object.assign({id:'m'+DB.seq.mov,turnoId:DB.turno.id,cajaId,tipo,conc:concId,monto:r2(monto),ref:ref||'',u:ME?ME.n:'sistema',t:Date.now()},extra||{});DB.movs.push(m);return m}
 
-/* ===== Entregar OT / imprimir ===== */
-ACT.otentregar=d=>{const o=otOf(d.id),t=otTotal(o),c=cliOf(o.cliId);
- const fin=ccMonto=>{
-  if(ccMonto>0){o.pagos.push({id:uid('pg'),fecha:TODAY(),medio:'Cuenta corriente',monto:ccMonto,cajaId:''});c.saldo=r2(c.saldo+ccMonto)}
-  o.estado='Entregado';o.entregada=TODAY();const v=vehOf(o.vehId);if(v){v.km=Math.max(v.km||0,o.km||0);if(v.km){v.proxKm=Math.ceil((v.km+1000)/10000)*10000;v.proxFecha=addDays(180)}}
-  o.items.forEach(i=>{if(i.k!=='rep')return;const r=repOf(i.repId);if(!r)return;let tipo='',cant=0,u='u';
-   if(r.rubro==='ACEITE LUBRICANTE'){tipo='Aceite usado';cant=i.qty*(/x\s*(\d+)\s*L/i.test(r.desc)?+RegExp.$1:4);u='L'}
-   else if(r.rubro==='FILTRO DE ACEITE'){tipo='Filtros usados';cant=i.qty}else if(r.rubro==='BATERÍAS'){tipo='Baterías';cant=i.qty}
-   if(tipo)DB.resid.push({id:uid('z'),fecha:TODAY(),tipo,cant,unidad:u,ref:'Generado en '+otNum(o)})});
-  const tu=DB.turnos.find(x=>x.otId===o.id);if(tu)tu.estado='Confirmado';
-  audit('OT entregada',otNum(o)+(ccMonto>0?' · a cta. cte. '+fmt(ccMonto):''));save();closeModal();renderView();setTimeout(()=>ACT.otopen({id:o.id}),30);toast(otNum(o)+' entregada')};
- if(t.saldo>0.005){
-  if(c&&c.cc){if(c.saldo+t.saldo>c.lim+0.004){toast('El saldo supera el límite de cuenta corriente. Cobrá antes de entregar.',1);return}
-   confirmBox('Quedan '+fmt(t.saldo)+' sin cobrar. Se pasan a la cuenta corriente de '+c.n+'. ¿Entregar el vehículo?',()=>fin(t.saldo),'Entregar y pasar a cuenta corriente');return}
-  toast('Hay un saldo de '+fmt(t.saldo)+' sin cobrar. Cobralo antes de entregar.',1);return}
- confirmBox('¿Confirmás la entrega del vehículo? La OT queda cerrada y no se puede editar.',()=>fin(0),'Entregar')};
-
-ACT.otprint=d=>{const o=otOf(d.id),v=vehOf(o.vehId)||{},c=cliOf(o.cliId)||{},t=otTotal(o),pres=d.p==='pres';
- const ck=o.check||{};
+/* ===== Imprimir presupuesto / orden de trabajo (sin valores si el perfil no ve precios) ===== */
+ACT.otprint=d=>{const o=otOf(d.id);if(!o||!otVisible(o))return;const v=vehOf(o.vehId)||{},c=cliOf(o.cliId)||{},t=otTotal(o),price=canPrice(),pres=d.p==='pres'&&price,mech=ME.rol==='mecanico',ck=o.check||{};
+ const items=(mech&&!o.presAprob)?[]:o.items;
+ const th=price?'<th>Detalle</th><th>Cant.</th><th>P. unit.</th><th>IVA</th><th>Importe</th>':'<th>Detalle</th><th>Cant.</th>';
+ const rows=items.map(i=>'<tr><td>'+h(i.desc)+(i.extra?' <i>(adicional)</i>':'')+'</td><td>'+i.qty+'</td>'+(price?'<td>'+fmt(i.pu)+'</td><td>'+i.iva+'%</td><td>'+fmt(i.qty*i.pu)+'</td>':'')+'</tr>').join('');
  printHTML('<div class="hdr"><img src="'+LOGO+'" alt=""><div><h1 style="margin:0">'+h(DB.cfg.nombre)+'</h1>'+h(DB.cfg.dir)+' · Tel./WhatsApp '+h(DB.cfg.tel)+'<br>'+h(DB.cfg.mail)+' · Facebook: '+h(DB.cfg.fb)+' · Instagram: @'+h(DB.cfg.ig)+'</div></div>'+
- '<h2>'+(pres?'PRESUPUESTO':'ORDEN DE TRABAJO')+' · '+otNum(o)+'</h2><p>Fecha: '+fdate(o.fecha)+' · Cliente: <b>'+h(c.n)+'</b> '+h(c.tel)+'<br>Vehículo: <b>'+h(v.marca+' '+v.mod)+'</b> · Patente <b>'+h(v.pat)+'</b> · '+h(o.km)+' km · Mecánico: '+h((userOf(o.mecId)||{n:'—'}).n)+'</p><p>Motivo: '+h(o.motivo)+'</p>'+
- '<table><thead><tr><th>Detalle</th><th>Cant.</th><th>P. unit.</th><th>IVA</th><th>Importe</th></tr></thead><tbody>'+o.items.map(i=>'<tr><td>'+h(i.desc)+'</td><td>'+i.qty+'</td><td>'+fmt(i.pu)+'</td><td>'+i.iva+'%</td><td>'+fmt(i.qty*i.pu)+'</td></tr>').join('')+'</tbody></table>'+
- '<p style="text-align:right">Neto '+fmt(t.neto)+' · IVA '+fmt(t.iva)+' · <b>Total '+fmt(t.total)+'</b>'+(t.pagado?' · Pagado '+fmt(t.pagado)+' · Saldo '+fmt(Math.max(0,t.saldo)):'')+'</p>'+
- (pres?'<p class="sm">Presupuesto sujeto a revisión si el diagnóstico en desarmado difiere. Validez y condiciones: [VERIFICAR / completar por el taller].</p><p>Conformidad del cliente: ______________________</p>':
-  '<p class="sm">Recepción: aceite '+(ck.aceite?'OK':'revisar')+' · luces '+(ck.luces?'OK':'revisar')+' · neumáticos '+(ck.neum?'OK':'revisar')+' · auxilio '+(ck.auxilio?'sí':'no')+' · docs '+(ck.docs?'sí':'no')+' · combustible '+h(ck.comb)+' · golpes previos: '+(ck.rayones?'SÍ (ver observaciones)':'no')+'</p><p>Observaciones: '+h(o.obs||'')+'</p><p>Firma del cliente: ______________________ &nbsp;&nbsp; Firma del taller: ______________________</p>')+
+ '<h2>'+(pres?'PRESUPUESTO':'ORDEN DE TRABAJO')+' · '+otNum(o)+'</h2><p>Fecha: '+fdate(o.fecha)+' · Cliente: <b>'+h(c.n)+'</b> '+(mech?'':h(c.tel))+'<br>Vehículo: <b>'+h(v.marca+' '+v.mod)+'</b> · Patente <b>'+h(v.pat)+'</b> · '+h(o.km)+' km · Mecánico: '+h((userOf(o.mecId)||{n:'—'}).n)+'</p><p>Motivo: '+h(o.motivo)+'</p>'+
+ (pres?'':'<p>Diagnóstico: '+h(o.obs||'—')+'</p>')+
+ (items.length?'<table><thead><tr>'+th+'</tr></thead><tbody>'+rows+'</tbody></table>':'<p class="sm">Sin trabajos ni repuestos autorizados todavía.</p>')+
+ (price&&items.length?'<p style="text-align:right">Neto '+fmt(t.neto)+' · IVA '+fmt(t.iva)+' · <b>Total '+fmt(t.total)+'</b>'+(t.pagado?' · Pagado '+fmt(t.pagado)+' · Saldo '+fmt(Math.max(0,t.saldo)):'')+'</p>':'')+
+ (pres?'<p class="sm">El presupuesto se aprueba sin cobro; el total se abona al retirar el vehículo e incluye los adicionales que se autoricen. Sujeto a revisión si el desarmado difiere del diagnóstico. Validez y condiciones: [VERIFICAR / completar por el taller].</p><p>Conformidad del cliente: ______________________</p>':
+  '<p class="sm">Recepción: aceite '+(ck.aceite?'OK':'revisar')+' · luces '+(ck.luces?'OK':'revisar')+' · neumáticos '+(ck.neum?'OK':'revisar')+' · auxilio '+(ck.auxilio?'sí':'no')+' · docs '+(ck.docs?'sí':'no')+' · combustible '+h(ck.comb)+' · golpes previos: '+(ck.rayones?'SÍ (ver observaciones)':'no')+' · fotos del diagnóstico: '+(o.fotos||[]).length+'</p><p>Recomendado por el mecánico: '+h(o.pedido||'—')+'</p><p>Firma del cliente: ______________________ &nbsp;&nbsp; Firma del taller: ______________________</p>')+
  '<p class="sm" style="border-top:1px solid #999;padding-top:6px">Comprobante interno sin validez fiscal. '+vbLine()+'</p>')};
 
 /* ===== Turnos ===== */
@@ -601,8 +738,7 @@ ACT.tuopen=d=>{const t=DB.turnos.find(x=>x.id===d.id),v=vehOf(t.vehId)||{},c=cli
  (t.estado!=='Cancelado'&&!t.otId?'<button class="btn" data-act="tuedit" data-id="'+t.id+'">Reprogramar</button><button class="btn d" data-act="tuest" data-id="'+t.id+'" data-e="Cancelado">Cancelar turno</button>':'')+
  (c.tel?'<a class="btn" target="_blank" rel="noopener" href="'+h(wa(c.tel,'Hola '+c.n+', te recordamos tu turno en '+DB.cfg.nombre+' el '+fdate(t.fecha)+' a las '+String(t.hora).padStart(2,'0')+':00 ('+t.srv+'). Dirección: '+DB.cfg.dir+'. ¡Te esperamos!'))+'">💬 Recordar por WhatsApp</a>':'')+'</div>'})};
 ACT.tuest=d=>{const t=DB.turnos.find(x=>x.id===d.id);t.estado=d.e;audit('Turno '+d.e,t.id);save();closeModal();renderView();toast('Turno '+d.e.toLowerCase())};
-ACT.tuot=d=>{const t=DB.turnos.find(x=>x.id===d.id),v=vehOf(t.vehId);DB.seq.ot++;const o={id:'ot'+DB.seq.ot,num:DB.seq.ot,fecha:TODAY(),cliId:t.cliId,vehId:t.vehId,km:v.km,motivo:t.srv,estado:'Recibido',mecId:'',recurso:String(t.rec),presAprob:false,items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2'},obs:'',pagos:[],entregada:''};
- DB.ots.unshift(o);t.otId=o.id;t.estado='En taller';audit('OT desde turno',otNum(o));save();closeModal();renderView();setTimeout(()=>ACT.otopen({id:o.id}),30)};
+ACT.tuot=d=>{const t=DB.turnos.find(x=>x.id===d.id),v=vehOf(t.vehId);const o=newOT(t.cliId,t.vehId,v.km,t.srv,'',t.rec);t.otId=o.id;t.estado='En taller';audit('OT desde turno',otNum(o));save();closeModal();renderView();setTimeout(()=>ACT.otopen({id:o.id}),30)};
 ACT.tuedit=d=>{const t=DB.turnos.find(x=>x.id===d.id);
  modal({title:'Reprogramar turno',ok:'Guardar',body:'<div class="g4"><div class="f"><label for="te_f">Fecha</label><input type="date" id="te_f" value="'+t.fecha+'"></div><div class="f"><label for="te_h">Hora</label><select id="te_h">'+opts(HORAS,t.hora,x=>[x,String(x).padStart(2,'0')+':00'])+'</select></div><div class="f"><label for="te_d">Duración</label><select id="te_d">'+opts([1,2,3,4,5,6],t.dur)+'</select></div><div class="f"><label for="te_r">Puesto</label><select id="te_r">'+opts(RECURSOS.map((r,i)=>[i,r]),t.rec,x=>x)+'</select></div></div>',
  onOk:()=>{const cf=tuConflict(val('te_f'),+val('te_h'),+val('te_d'),+val('te_r'),t.id);if(cf){merr(cf);return false}t.fecha=val('te_f');t.hora=+val('te_h');t.dur=+val('te_d');t.rec=+val('te_r');audit('Turno reprogramado',t.id);save();UI.turFecha=t.fecha;renderView();return true}})};
@@ -634,40 +770,138 @@ ACT.clicobro=d=>{const c=cliOf(d.id);
   c.saldo=r2(c.saldo-m);audit('Cobro de cuenta corriente',c.n+' '+fmt(m));save();closeModal();renderView();setTimeout(()=>ACT.cliopen({id:c.id}),30);toast('Cobro registrado');return false}})};
 
 /* ===== Repuestos ===== */
-function repFiltered(){const q=norm(UI.repQ);return DB.repuestos.filter(r=>(UI.repInact||r.activo)&&(!UI.repRub||r.rubro===UI.repRub)&&(!UI.repProv||r.provId===UI.repProv)&&(!q||norm([r.cod,r.codProv,r.desc,r.marca,r.rubro,r.rosca,r.junta,r.apl].join(' ')).includes(q)))}
-V.repuestos=()=>{const l=repFiltered(),cost=canCost(),sel=repOf(UI.repSel),bajo=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).length;
- const stockVal=DB.repuestos.filter(r=>r.activo).reduce((a,r)=>a+r.qty*r.pc,0);
- return '<div class="bar"><h2>Repuestos e inventario</h2>'+(isBoss()?'<button class="btn p" data-act="repedit" data-id="">Nuevo (F1)</button><button class="btn" data-act="repedit" data-id="'+h(UI.repSel)+'"'+(sel?'':' disabled')+'>Modificar (F2)</button><button class="btn" data-act="repdel"'+(sel?'':' disabled')+'>Borrar (F3)</button>':'')+'<span class="sp"></span><span class="mut sm">'+l.length+' artículos · '+bajo+' en alarma'+(cost?' · stock a costo '+fmt(stockVal):'')+'</span></div>'+
- '<div class="bar"><input id="rq" style="max-width:300px" placeholder="Código, descripción, marca, rosca, aplicación (ej.: astra)" value="'+h(UI.repQ)+'" data-chg="repq" aria-label="Buscar repuesto"><select id="rrub" data-chg="reprub" style="max-width:220px" aria-label="Rubro">'+opts(DB.rubrosRep,UI.repRub,x=>[x,x],'Todos los rubros')+'</select><select id="rprov" data-chg="repprov" style="max-width:240px" aria-label="Proveedor">'+opts(DB.provs,UI.repProv,p=>[p.id,p.n],'Todos los proveedores')+'</select>'+(isBoss()?'<label style="margin:0;font-weight:500"><input type="checkbox" style="width:auto;min-height:0" '+(UI.repInact?'checked':'')+' data-chg="repinact"> ver dados de baja</label>':'')+'</div>'+
- '<div class="tw" style="max-height:52vh"><table><thead><tr><th>Código</th><th>Descripción</th><th>Rubro</th><th>Marca</th><th>Proveedor</th>'+(cost?'<th class="n">P. compra</th><th class="n">% gan.</th>':'')+'<th class="n">P. venta</th><th class="n">Stock</th><th class="n">Alarma</th></tr></thead><tbody>'+
- l.map(r=>'<tr class="clk'+(r.id===UI.repSel?' sel':'')+(r.activo&&r.qty<=r.alarma?' low':'')+(r.activo?'':' off')+'" data-act="repsel" data-id="'+r.id+'"><td>'+h(r.cod)+'</td><td><b>'+h(r.desc)+'</b></td><td>'+h(r.rubro)+'</td><td>'+h(r.marca)+'</td><td>'+h((provOf(r.provId)||{}).n)+'</td>'+(cost?'<td class="n">'+fmt(r.pc)+'</td><td class="n">'+r2(r.gan)+'%</td>':'')+'<td class="n"><b>'+fmt(r.pv)+'</b></td><td class="n">'+r.qty+'</td><td class="n">'+r.alarma+'</td></tr>').join('')+(l.length?'':'<tr><td colspan="10" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>'+
- '<div class="det"><div class="g3"><div><label>Rosca</label><b>'+h(sel?sel.rosca||'—':'—')+'</b></div><div><label>Junta</label><b>'+h(sel?sel.junta||'—':'—')+'</b></div><div><label>Reposición / alarma</label><b>'+(sel?sel.repos+' / '+sel.alarma:'—')+'</b>'+(sel&&sel.venc?' · vence '+fdate(sel.fvenc):'')+'</div></div><label style="margin-top:8px">Aplicación (vehículos compatibles)</label><div style="white-space:pre-line">'+h(sel?sel.apl||'—':'Seleccioná un artículo de la lista.')+'</div>'+(sel&&isBoss()?'<div class="row" style="margin-top:8px"><button class="btn s" data-act="repajuste">Ajustar stock</button></div>':'')+'</div>'+
- (isBoss()?'<div class="row" style="margin-top:10px"><button class="btn s" data-act="repmasivo">M. Precios %</button><button class="btn s" data-act="reprevert"'+(DB.undoPrecios?'':' disabled')+'>Revertir precios</button><button class="btn s" data-act="repingpre">Ingresar precios</button><button class="btn s" data-act="replist">Listado Art.</button><button class="btn s" data-act="repcsv">Sacar Excel</button><button class="btn s" data-act="repfalt">Excel faltantes</button></div>':'<div class="row" style="margin-top:10px"><button class="btn s" data-act="replist">Listado Art.</button></div>');
-};
+/* ----- Fichas técnicas: códigos, equivalencias y dimensiones (modelo del catálogo WEGA: Equivalencias + Dimensiones) ----- */
+const repCodes=r=>[r.cod,r.codProv].concat(r.cods||[]).filter(Boolean);
+function repHay(r){return norm([repCodes(r).join(' '),r.desc,r.marca,r.rubro,r.rosca,r.junta,r.apl,r.oem,(r.eq||[]).map(e=>e.m+' '+e.c).join(' '),r.alto,r.dext,r.dint,r.largo,r.ancho].join(' '))}
+const TECH=[['cod','Código principal'],['codProv','Código del proveedor'],['cods','Otros códigos'],['eq','Equivalencias'],['oem','OEM'],['largo','Largo'],['ancho','Ancho'],['alto','Alto'],['dext','Diámetro exterior'],['dint','Diámetro interior'],['rosca','Rosca'],['junta','Junta'],['valv','Válvula'],['picos','Picos'],['obs','Observaciones'],['apl','Aplicación']];
+function techStr(r,k){const v=r[k];if(k==='cods')return(v||[]).join(' | ');if(k==='eq')return(v||[]).map(e=>e.m+':'+e.c).join(' | ');return String(v==null?'':v)}
+function applyTech(r,ch,src,ver){r.hist=r.hist||[];const before={};TECH.forEach(k=>before[k[0]]=techStr(r,k[0]));Object.assign(r,ch);let n=0;
+ if(ver){r.fVerif=TODAY();r.fuente='catalogo'}
+ TECH.forEach(k=>{const a=techStr(r,k[0]);if(a!==before[k[0]]){n++;r.hist.unshift({t:Date.now(),u:ME?ME.n:'sistema',campo:k[1],antes:before[k[0]],desp:a,fuente:src})}});
+ if(!n&&ver)r.hist.unshift({t:Date.now(),u:ME.n,campo:'Verificación contra catálogo',antes:'',desp:'Sin cambios',fuente:src});
+ if(r.hist.length>200)r.hist.length=200;return n}
+function equivOf(r){const mine=repCodes(r).map(ncode),out=[];
+ DB.repuestos.forEach(x=>{if(x===r||!x.activo)return;const theirs=repCodes(x).map(ncode);
+  const decl=(r.eq||[]).some(e=>theirs.indexOf(ncode(e.c))>=0)||(x.eq||[]).some(e=>mine.indexOf(ncode(e.c))>=0);
+  if(decl){out.push({r:x,tipo:'decl',txt:'Equivalencia declarada'});return}
+  if(x.rubro===r.rubro&&r.rosca&&r.junta&&ncode(r.rosca)===ncode(x.rosca)&&ncode(r.junta)===ncode(x.junta)){
+   if(r.alto&&x.alto&&Math.abs(num(r.alto)-num(x.alto))>1)return;
+   out.push({r:x,tipo:'dim',txt:'Misma rosca y junta'+(r.alto&&x.alto?' · altura coincide':' · verificar altura')})}});
+ return out.sort((a,b)=>(a.tipo==='decl'?0:1)-(b.tipo==='decl'?0:1)||b.r.qty-a.r.qty)}
+function codeClash(codes,self){return DB.repuestos.find(x=>x!==self&&x.activo&&repCodes(x).some(c=>codes.some(a=>ncode(a)&&ncode(a)===ncode(c))))}
+function wegaUrl(r){const s=String(r.desc||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');return s?'https://wega.com.ar/catalogo/filtros/detalle/'+s:'https://wega.com.ar/catalogo'}
+const FUENTES=[['','— sin indicar —'],['catalogo','Catálogo WEGA'],['taller','Dato del taller'],['proveedor','Lista del proveedor'],['ejemplo','Ejemplo sin verificar']];
+function verBadge(r){if(r.fVerif){const d=-daysTo(r.fVerif);return '<span class="badge '+(d>180?'warn':'ok')+'">'+(d>180?'Revisar contra catálogo · verificado ':'Verificado con catálogo ')+fdate(r.fVerif)+'</span>'}
+ return '<span class="badge">'+(r.fuente==='taller'?'Dato del taller · sin verificar con catálogo':r.fuente==='ejemplo'?'Dato de ejemplo · sin verificar':r.fuente==='proveedor'?'Lista del proveedor · sin verificar':'Sin verificar con catálogo')+'</span>'}
+
+function repFiltered(){const q=norm(UI.repQ),nc=ncode(UI.repQ);return DB.repuestos.filter(r=>(UI.repInact||r.activo)&&(!UI.repRub||r.rubro===UI.repRub)&&(!UI.repProv||r.provId===UI.repProv)&&(!UI.repSinVer||!r.fVerif)&&(!q||repHay(r).includes(q)||(nc&&repCodes(r).some(c=>ncode(c).includes(nc)))))}
+function repDetHTML(r){
+ if(!r)return '<div class="det"><p class="mut" style="margin:0">Seleccioná un artículo de la lista para ver códigos, dimensiones, equivalencias y trazabilidad.</p></div>';
+ const pp=canPrice(),eq=equivOf(r);
+ const dims=[['Largo',r.largo],['Ancho',r.ancho],['Alto',r.alto],['Diám. exterior',r.dext],['Diám. interior',r.dint],['Rosca',r.rosca],['Junta',r.junta],['Válvula',r.valv],['Picos',r.picos]];
+ return '<div class="det"><div class="row"><b style="font-size:1.05rem">'+h(r.desc)+' · '+h(r.marca)+'</b>'+verBadge(r)+'<span class="sp"></span><button class="btn s" data-act="reptraza" data-id="'+r.id+'">🔎 Trazabilidad</button>'+(isBoss()?'<button class="btn s" data-act="repajuste">Ajustar stock</button>':'')+'</div>'+
+ '<div class="g3" style="margin-top:8px"><div><label>Códigos del producto</label><div><b>'+h(r.cod)+'</b> <span class="mut sm">principal</span>'+(r.codProv&&r.codProv!==r.cod?'<br>'+h(r.codProv)+' <span class="mut sm">proveedor</span>':'')+(r.cods||[]).map(c=>'<br>'+h(c)+' <span class="mut sm">otro código</span>').join('')+'</div></div>'+
+ '<div><label>Reposición / alarma</label><b>'+r.repos+' / '+r.alarma+'</b>'+(r.venc?' · vence '+fdate(r.fvenc):'')+'</div>'+
+ '<div><label>Catálogo WEGA</label><a href="'+h(wegaUrl(r))+'" target="_blank" rel="noopener">Abrir ficha de '+h(r.desc)+'</a><br><a href="https://wega.com.ar/catalogo" target="_blank" rel="noopener">Catálogo WEGA</a></div></div>'+
+ '<label style="margin-top:8px">Dimensiones (según catálogo)</label><div class="dg">'+dims.map(d=>'<div><label>'+d[0]+'</label><b>'+h(d[1]||'—')+'</b></div>').join('')+'</div>'+(r.obs?'<div class="sm mut" style="margin-top:4px">Observaciones: '+h(r.obs)+'</div>':'')+
+ '<label style="margin-top:8px">Equivalencias declaradas / OEM</label><div>'+((r.eq||[]).length?(r.eq).map(e=>{const x=DB.repuestos.find(y=>y.activo&&repCodes(y).some(c=>ncode(c)===ncode(e.c)));return '<span class="pill">'+h(e.m)+' · '+h(e.c)+'</span>'+(x?' <button class="btn s" data-act="repsel" data-id="'+x.id+'">ver en inventario</button>':'')}).join(' '):'<span class="mut">—</span>')+(r.oem?'<br>OEM: '+h(r.oem):'')+'</div>'+
+ '<label style="margin-top:8px">Equivalentes disponibles en el inventario</label><div>'+(eq.length?eq.map(e=>'<div class="row sm" style="padding:3px 0"><span class="pill">'+h(e.r.desc+' · '+e.r.marca)+'</span><span>stock <b>'+e.r.qty+'</b></span>'+(pp?'<span>'+fmt(e.r.pv)+'</span>':'')+'<span class="mut">'+h(e.txt)+'</span><button class="btn s" data-act="repsel" data-id="'+e.r.id+'">Ver</button></div>').join(''):'<span class="mut">No hay equivalentes cargados.</span>')+'</div>'+
+ '<label style="margin-top:8px">Aplicación (vehículos compatibles)</label><div style="white-space:pre-line">'+h(r.apl||'—')+'</div></div>'}
+V.repuestos=()=>{const l=repFiltered(),pc=canCost(),pp=canPrice(),sel=repOf(UI.repSel),bajo=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).length;
+ const stockVal=DB.repuestos.filter(r=>r.activo).reduce((a,r)=>a+r.qty*r.pc,0),sinv=DB.repuestos.filter(r=>r.activo&&!r.fVerif).length;
+ return '<div class="bar"><h2>Repuestos e inventario</h2>'+(isBoss()?'<button class="btn p" data-act="repedit" data-id="">Nuevo (F1)</button><button class="btn" data-act="repedit" data-id="'+h(UI.repSel)+'"'+(sel?'':' disabled')+'>Modificar (F2)</button><button class="btn" data-act="repdel"'+(sel?'':' disabled')+'>Borrar (F3)</button>':'')+'<span class="sp"></span><span class="mut sm">'+l.length+' artículos · '+bajo+' en alarma'+(pc?' · stock a costo '+fmt(stockVal):'')+'</span></div>'+
+ '<div class="bar"><input id="rq" style="max-width:320px" placeholder="Cualquier código, descripción, marca, rosca, aplicación (ej.: astra)" value="'+h(UI.repQ)+'" data-chg="repq" aria-label="Buscar repuesto"><select id="rrub" data-chg="reprub" style="max-width:220px" aria-label="Rubro">'+opts(DB.rubrosRep,UI.repRub,x=>[x,x],'Todos los rubros')+'</select><select id="rprov" data-chg="repprov" style="max-width:240px" aria-label="Proveedor">'+opts(DB.provs,UI.repProv,p=>[p.id,p.n],'Todos los proveedores')+'</select>'+(isBoss()?'<label style="margin:0;font-weight:500"><input type="checkbox" style="width:auto;min-height:0" '+(UI.repInact?'checked':'')+' data-chg="repinact"> ver dados de baja</label>':'')+'<label style="margin:0;font-weight:500"><input type="checkbox" style="width:auto;min-height:0" '+(UI.repSinVer?'checked':'')+' data-chg="repsinver"> sin verificar con catálogo ('+sinv+')</label></div>'+
+ '<div class="tw" style="max-height:48vh"><table><thead><tr><th>Código</th><th>Descripción</th><th>Rubro</th><th>Marca</th><th>Proveedor</th>'+(pc?'<th class="n">P. compra</th><th class="n">% gan.</th>':'')+(pp?'<th class="n">P. venta</th>':'')+'<th class="n">Stock</th><th class="n">Alarma</th></tr></thead><tbody>'+
+ l.map(r=>'<tr class="clk'+(r.id===UI.repSel?' sel':'')+(r.activo&&r.qty<=r.alarma?' low':'')+(r.activo?'':' off')+'" data-act="repsel" data-id="'+r.id+'"><td>'+h(r.cod)+((r.cods||[]).length?' <span class="pill" title="Otros códigos: '+h((r.cods).join(', '))+'">+'+r.cods.length+'</span>':'')+'</td><td><b>'+h(r.desc)+'</b></td><td>'+h(r.rubro)+'</td><td>'+h(r.marca)+'</td><td>'+h((provOf(r.provId)||{}).n)+'</td>'+(pc?'<td class="n">'+fmt(r.pc)+'</td><td class="n">'+r2(r.gan)+'%</td>':'')+(pp?'<td class="n"><b>'+fmt(r.pv)+'</b></td>':'')+'<td class="n">'+r.qty+'</td><td class="n">'+r.alarma+'</td></tr>').join('')+(l.length?'':'<tr><td colspan="10" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>'+
+ repDetHTML(sel)+
+ (isBoss()?'<div class="row" style="margin-top:10px"><button class="btn s" data-act="repmasivo">M. Precios %</button><button class="btn s" data-act="reprevert"'+(DB.undoPrecios?'':' disabled')+'>Revertir precios</button><button class="btn s" data-act="repingpre">Ingresar precios</button><button class="btn s" data-act="replist">Listado Art.</button><button class="btn s" data-act="repcsv">Sacar Excel</button><button class="btn s" data-act="repfalt">Excel faltantes</button><button class="btn s" data-act="repfimp">Fichas técnicas: importar CSV</button><button class="btn s" data-act="repfexp">Fichas técnicas: exportar</button></div>':pp?'<div class="row" style="margin-top:10px"><button class="btn s" data-act="replist">Listado Art.</button></div>':'')};
 CHG.repq=t=>{UI.repQ=t.value;const p=t.selectionStart;renderView();const n=$('#rq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(e){}}};
-CHG.reprub=t=>{UI.repRub=t.value;renderView()};CHG.repprov=t=>{UI.repProv=t.value;renderView()};CHG.repinact=t=>{UI.repInact=t.checked;renderView()};
-ACT.repsel=d=>{UI.repSel=d.id;renderView()};
-function repForm(r){return '<div class="g2"><div class="f"><label for="rp_cod">Código (EAN / interno)</label><input id="rp_cod" value="'+h(r.cod)+'"></div><div class="f"><label for="rp_cp">Código del proveedor</label><input id="rp_cp" value="'+h(r.codProv)+'"></div></div>'+
+CHG.reprub=t=>{UI.repRub=t.value;renderView()};CHG.repprov=t=>{UI.repProv=t.value;renderView()};CHG.repinact=t=>{UI.repInact=t.checked;renderView()};CHG.repsinver=t=>{UI.repSinVer=t.checked;renderView()};
+ACT.repsel=d=>{UI.repSel=d.id;if(!$('#modal').hidden)closeModal();renderView()};
+
+/* ---- alta / modificación ---- */
+const codRow=v=>'<div class="row cr" style="margin-bottom:6px"><input class="rp_c2" value="'+h(v)+'" placeholder="Otro código (EAN, del proveedor, de fábrica…)" aria-label="Otro código del producto"><button type="button" class="btn s" data-act="rpdelrow" aria-label="Quitar">✕</button></div>';
+const eqRow=(m,c)=>'<div class="row er" style="margin-bottom:6px"><input class="rp_em" style="max-width:150px" placeholder="Marca" value="'+h(m)+'" aria-label="Marca equivalente"><input class="rp_ec" placeholder="Código equivalente" value="'+h(c)+'" aria-label="Código equivalente"><button type="button" class="btn s" data-act="rpdelrow" aria-label="Quitar">✕</button></div>';
+ACT.rpaddcod=()=>{$('#rp_cods').insertAdjacentHTML('beforeend',codRow(''));const l=$$('.rp_c2');l[l.length-1].focus()};
+ACT.rpaddeq=()=>{$('#rp_eqs').insertAdjacentHTML('beforeend',eqRow('',''));const l=$$('.rp_em');l[l.length-1].focus()};
+ACT.rpdelrow=(d,a)=>{a.closest('.row').remove()};
+ACT.rpverhoy=()=>{$('#rp_fv2').value=TODAY();$('#rp_fu').value='catalogo'};
+function repForm(r){return '<div class="card" style="background:#f8fafc"><h3>Códigos del producto</h3><div class="g2"><div class="f"><label for="rp_cod">Código principal (EAN / interno)</label><input id="rp_cod" value="'+h(r.cod)+'"></div><div class="f"><label for="rp_cp">Código del proveedor</label><input id="rp_cp" value="'+h(r.codProv)+'"></div></div>'+
+ '<label>Otros códigos del mismo producto (hay productos con 2 o más códigos; todos sirven para buscar y escanear)</label><div id="rp_cods">'+(r.cods||[]).map(codRow).join('')+'</div><button type="button" class="btn s" data-act="rpaddcod">➕ Agregar otro código</button></div>'+
  '<div class="f"><label for="rp_d">Descripción</label><input id="rp_d" value="'+h(r.desc)+'"></div><div class="g3"><div class="f"><label for="rp_m">Marca</label><input id="rp_m" list="dl_m" value="'+h(r.marca)+'"><datalist id="dl_m">'+DB.marcas.map(m=>'<option value="'+h(m)+'">').join('')+'</datalist></div><div class="f"><label for="rp_r">Rubro</label><select id="rp_r">'+opts(DB.rubrosRep,r.rubro,x=>[x,x],'— elegir —')+'</select></div><div class="f"><label for="rp_p">Proveedor</label><select id="rp_p">'+opts(DB.provs.filter(p=>p.activo),r.provId,p=>[p.id,p.n],'— elegir —')+'</select></div></div>'+
  '<div class="g3"><div class="f"><label for="rp_pc">Precio compra (neto)</label><input id="rp_pc" inputmode="decimal" value="'+r.pc+'" data-chg="rpcalc"></div><div class="f"><label for="rp_g">% ganancia</label><input id="rp_g" inputmode="decimal" value="'+r2(r.gan)+'" data-chg="rpcalc"></div><div class="f"><label for="rp_pv">Precio venta (neto)</label><input id="rp_pv" inputmode="decimal" value="'+r.pv+'" data-chg="rpcalc"></div></div>'+
  '<div class="g4"><div class="f"><label for="rp_q">Cantidad</label><input id="rp_q" inputmode="numeric" value="'+r.qty+'"></div><div class="f"><label for="rp_a">Cant. alarma</label><input id="rp_a" inputmode="numeric" value="'+r.alarma+'"></div><div class="f"><label for="rp_rp">Cant. reposición</label><input id="rp_rp" inputmode="numeric" value="'+r.repos+'"></div><div class="f"><label for="rp_iva">I.V.A.</label><select id="rp_iva"><option value="10.5"'+(r.iva==10.5?' selected':'')+'>10,5 %</option><option value="21"'+(r.iva==10.5?'':' selected')+'>21 %</option></select></div></div>'+
  '<div class="row"><label style="margin:0;font-weight:500"><input type="checkbox" id="rp_v" style="width:auto;min-height:0" '+(r.venc?'checked':'')+' data-chg="rpvenc"> Con vencimiento</label><input type="date" id="rp_fv" style="max-width:170px" value="'+h(r.fvenc)+'" '+(r.venc?'':'hidden')+' aria-label="Fecha de vencimiento"><span class="mut sm">Precio anterior: '+(r.pAnt?fmt(r.pAnt):'—')+' · Actualizado: '+fdate(r.fAct)+'</span></div>'+
- '<div class="g2" style="margin-top:8px"><div class="f"><label for="rp_ro">Rosca</label><input id="rp_ro" value="'+h(r.rosca)+'"></div><div class="f"><label for="rp_j">Junta</label><input id="rp_j" value="'+h(r.junta)+'"></div></div><div class="f"><label for="rp_ap">Aplicación (un vehículo por línea)</label><textarea id="rp_ap" style="min-height:90px">'+h(r.apl)+'</textarea></div>'}
+ '<div class="card" style="background:#f8fafc;margin-top:10px"><h3>Dimensiones y equivalencias (como la ficha de <a href="'+h(wegaUrl(r))+'" target="_blank" rel="noopener">wega.com.ar</a>)</h3><p class="sm mut" style="margin-top:0">La ficha del catálogo publica Largo, Ancho, Alto, Diámetro exterior e interior, Rosca, Junta, Válvula, Picos, Observaciones, Equivalencias y OEM. No indica la unidad: se asume milímetros <b>[VERIFICAR]</b>. Copiá los valores de la ficha o importalos por CSV.</p>'+
+ '<div class="dg">'+[['rp_dl','Largo',r.largo],['rp_da','Ancho',r.ancho],['rp_dh','Alto',r.alto],['rp_de','Diám. exterior',r.dext],['rp_di','Diám. interior',r.dint],['rp_ro','Rosca',r.rosca],['rp_j','Junta',r.junta],['rp_dv','Válvula',r.valv],['rp_dp','Picos',r.picos]].map(x=>'<div><label for="'+x[0]+'">'+x[1]+'</label><input id="'+x[0]+'" value="'+h(x[2])+'"></div>').join('')+'</div>'+
+ '<div class="f" style="margin-top:8px"><label for="rp_do">Observaciones de la ficha</label><input id="rp_do" value="'+h(r.obs)+'"></div>'+
+ '<label>Equivalencias con otras marcas (marca + código)</label><div id="rp_eqs">'+(r.eq||[]).map(e=>eqRow(e.m,e.c)).join('')+'</div><button type="button" class="btn s" data-act="rpaddeq">➕ Agregar equivalencia</button>'+
+ '<div class="f" style="margin-top:8px"><label for="rp_oem">Códigos OEM (separados por coma)</label><input id="rp_oem" value="'+h(r.oem)+'"></div>'+
+ '<div class="f"><label for="rp_ap">Aplicación (un vehículo por línea)</label><textarea id="rp_ap" style="min-height:90px">'+h(r.apl)+'</textarea></div>'+
+ '<div class="g3"><div class="f"><label for="rp_fu">Fuente de estos datos</label><select id="rp_fu">'+FUENTES.map(f=>'<option value="'+f[0]+'"'+(r.fuente===f[0]?' selected':'')+'>'+f[1]+'</option>').join('')+'</select></div><div class="f"><label for="rp_fv2">Verificado contra el catálogo el</label><input type="date" id="rp_fv2" value="'+h(r.fVerif)+'"></div><div class="f"><label>&nbsp;</label><button type="button" class="btn s" data-act="rpverhoy">Verifiqué hoy en el catálogo</button></div></div></div>'}
 CHG.rpvenc=t=>{$('#rp_fv').hidden=!t.checked};
 CHG.rpcalc=t=>{const pc=num(val('rp_pc')),g=num(val('rp_g')),pv=num(val('rp_pv'));if(t.id==='rp_pv'){if(pc>0)$('#rp_g').value=r2((pv/pc-1)*100)}else $('#rp_pv').value=r2(pc*(1+g/100))};
-ACT.repedit=d=>{if(!isBoss())return;const nuevo=!d.id;const r=nuevo?{cod:'',codProv:'',desc:'',marca:'',rubro:UI.repRub||'',provId:UI.repProv||'',pc:0,gan:50,pv:0,qty:0,alarma:2,repos:0,venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:'',junta:'',apl:''}:repOf(d.id);if(!r)return;
+ACT.repedit=d=>{if(!isBoss())return;const nuevo=!d.id;const r=nuevo?{cod:'',codProv:'',desc:'',marca:'',rubro:UI.repRub||'',provId:UI.repProv||'',pc:0,gan:50,pv:0,qty:0,alarma:2,repos:0,venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:'',junta:'',apl:'',cods:[],oem:'',eq:[],largo:'',ancho:'',alto:'',dext:'',dint:'',valv:'',picos:'',obs:'',fuente:'',fVerif:'',hist:[]}:repOf(d.id);if(!r)return;
  modal({title:nuevo?'Nuevo artículo':'Modificar artículo',wide:true,body:repForm(r),
- onOk:()=>{try{const cod=val('rp_cod').trim();if(!cod)throw new Error('El código es obligatorio.');if(DB.repuestos.some(x=>x.cod===cod&&x!==r))throw new Error('Ya existe un artículo con ese código.');if(!val('rp_d').trim())throw new Error('La descripción es obligatoria.');if(!val('rp_r'))throw new Error('Elegí el rubro.');if(!val('rp_p'))throw new Error('Elegí el proveedor.');
+ onOk:()=>{try{const cod=val('rp_cod').trim(),cp=val('rp_cp').trim();if(!cod)throw new Error('El código principal es obligatorio.');if(!val('rp_d').trim())throw new Error('La descripción es obligatoria.');if(!val('rp_r'))throw new Error('Elegí el rubro.');if(!val('rp_p'))throw new Error('Elegí el proveedor.');
+  const cods=$$('.rp_c2').map(i=>i.value.trim()).filter(Boolean);if(cods.length>12)throw new Error('Máximo 12 códigos adicionales.');
+  const own=[cod,cp].filter(Boolean).map(ncode);const seen={};for(const c of cods){const n=ncode(c);if(!n)throw new Error('Hay un código adicional inválido.');if(own.indexOf(n)>=0)throw new Error('El código adicional “'+c+'” repite el código principal o el del proveedor.');if(seen[n])throw new Error('El código adicional “'+c+'” está repetido.');seen[n]=1}
+  const clash=codeClash([cod,cp].concat(cods),nuevo?null:r);if(clash)throw new Error('Un código ya pertenece a otro artículo: '+clash.desc+' ('+clash.marca+').');
+  const eq=$$('#rp_eqs .er').map(row=>({m:$('.rp_em',row).value.trim().toUpperCase(),c:$('.rp_ec',row).value.trim()})).filter(e=>e.m||e.c);if(eq.some(e=>!e.m||!e.c))throw new Error('Cada equivalencia necesita marca y código.');if(eq.some(e=>[cod,cp].concat(cods).some(c=>ncode(c)===ncode(e.c))))throw new Error('Una equivalencia repite un código del propio artículo.');
+  const dimv={largo:val('rp_dl'),ancho:val('rp_da'),alto:val('rp_dh'),dext:val('rp_de'),dint:val('rp_di')};for(const k in dimv){const v=dimv[k].trim();if(v&&!/^\d+([.,]\d+)?$/.test(v))throw new Error('Largo, ancho, alto y diámetros deben ser números (en mm).');dimv[k]=v.replace(',','.')}
   const pc=num(val('rp_pc')),g=num(val('rp_g')),pv=num(val('rp_pv'));if(pc<0||g<0||pv<0)throw new Error('Los precios y el porcentaje no pueden ser negativos.');if(pv<pc&&!confirm('El precio de venta es menor al de compra. ¿Continuar?'))return false;
   const q=parseInt(val('rp_q')),a=parseInt(val('rp_a')),rp=parseInt(val('rp_rp'));if([q,a,rp].some(x=>isNaN(x)||x<0))throw new Error('Cantidad, alarma y reposición deben ser números enteros ≥ 0.');
   if(chk('rp_v')&&!val('rp_fv'))throw new Error('Indicá la fecha de vencimiento.');
-  const x=nuevo?{id:uid('r'),activo:true,pAnt:0,fAct:''}:r;if(!nuevo&&Math.abs(x.pv-pv)>0.004){x.pAnt=x.pv;x.fAct=TODAY()}
-  Object.assign(x,{cod,codProv:val('rp_cp').trim(),desc:val('rp_d').trim(),marca:val('rp_m').trim().toUpperCase(),rubro:val('rp_r'),provId:val('rp_p'),pc,gan:g,pv,qty:q,alarma:a,repos:rp,iva:+val('rp_iva'),venc:chk('rp_v'),fvenc:chk('rp_v')?val('rp_fv'):'',rosca:val('rp_ro').trim(),junta:val('rp_j').trim(),apl:val('rp_ap').trim()});
-  if(x.marca&&DB.marcas.indexOf(x.marca)<0)DB.marcas.push(x.marca);if(nuevo){DB.repuestos.push(x);x.fAct=TODAY()}UI.repSel=x.id;audit(nuevo?'Artículo nuevo':'Artículo modificado',x.cod+' '+x.desc);save();closeModal();renderView();toast('Artículo guardado');return false}catch(e){merr(e.message);return false}}})};
+  if(val('rp_fv2')&&val('rp_fv2')>TODAY())throw new Error('La fecha de verificación no puede ser futura.');
+  const x=nuevo?{id:uid('r'),activo:true,pAnt:0,fAct:'',qty:0,hist:[]}:r;if(!nuevo&&Math.abs(x.pv-pv)>0.004){x.pAnt=x.pv;x.fAct=TODAY()}
+  const src='Edición manual · '+(FUENTES.find(f=>f[0]===val('rp_fu'))||FUENTES[0])[1];
+  Object.assign(x,{desc:val('rp_d').trim(),marca:val('rp_m').trim().toUpperCase(),rubro:val('rp_r'),provId:val('rp_p'),pc,gan:g,pv,alarma:a,repos:rp,iva:+val('rp_iva'),venc:chk('rp_v'),fvenc:chk('rp_v')?val('rp_fv'):'',fuente:val('rp_fu'),fVerif:val('rp_fv2')});
+  if(nuevo){Object.assign(x,{cod:'',codProv:'',cods:[],eq:[],oem:'',largo:'',ancho:'',alto:'',dext:'',dint:'',rosca:'',junta:'',valv:'',picos:'',obs:'',apl:''})}
+  applyTech(x,Object.assign({cod,codProv:cp,cods,eq,oem:val('rp_oem').trim(),rosca:val('rp_ro').trim(),junta:val('rp_j').trim(),valv:val('rp_dv').trim(),picos:val('rp_dp').trim(),obs:val('rp_do').trim(),apl:val('rp_ap').trim()},dimv),nuevo?'Alta del artículo':src,false);
+  if(x.marca&&DB.marcas.indexOf(x.marca)<0)DB.marcas.push(x.marca);
+  if(nuevo){DB.repuestos.push(x);x.fAct=TODAY();if(q)stockMove(x,q,'Alta del artículo','Stock inicial')}else if(q!==x.qty)stockMove(x,q-x.qty,'Edición de ficha','Cantidad corregida de '+x.qty+' a '+q);
+  UI.repSel=x.id;audit(nuevo?'Artículo nuevo':'Artículo modificado',x.cod+' '+x.desc);save();closeModal();renderView();toast('Artículo guardado');return false}catch(e){merr(e.message);return false}}})};
 ACT.repdel=()=>{const r=repOf(UI.repSel);if(!r||!isBoss())return;const usado=DB.ots.some(o=>o.items.some(i=>i.repId===r.id));
- confirmBox(usado?'“'+r.desc+'” figura en órdenes de trabajo: se dará de baja (no se borra el historial). ¿Continuar?':'¿Borrar definitivamente “'+r.desc+'”?',()=>{if(usado){r.activo=false}else{DB.repuestos.splice(DB.repuestos.indexOf(r),1);UI.repSel=''}audit('Artículo '+(usado?'dado de baja':'borrado'),r.cod);save();renderView()},'Sí')};
-ACT.repajuste=()=>{const r=repOf(UI.repSel);if(!r)return;modal({title:'Ajustar stock · '+r.desc,ok:'Ajustar',body:'<p>Stock actual: <b>'+r.qty+'</b></p><div class="g2"><div class="f"><label for="aj_q">Nuevo stock</label><input id="aj_q" inputmode="numeric" value="'+r.qty+'"></div><div class="f"><label for="aj_m">Motivo (obligatorio)</label><input id="aj_m" placeholder="Conteo físico, rotura, devolución…"></div></div>',
- onOk:()=>{const q=parseInt(val('aj_q'));if(isNaN(q)||q<0){merr('Cantidad inválida.');return false}if(val('aj_m').trim().length<4){merr('Indicá el motivo del ajuste.');return false}audit('Ajuste de stock',r.cod+': '+r.qty+' → '+q+' ('+val('aj_m').trim()+')');r.qty=q;save();renderView();return true}})};
+ confirmBox(usado?'“'+r.desc+'” figura en órdenes de trabajo: se dará de baja (no se borra el historial ni la trazabilidad). ¿Continuar?':'¿Borrar definitivamente “'+r.desc+'”?',()=>{if(usado){r.activo=false}else{DB.repuestos.splice(DB.repuestos.indexOf(r),1);UI.repSel=''}audit('Artículo '+(usado?'dado de baja':'borrado'),r.cod);save();renderView()},'Sí')};
+ACT.repajuste=()=>{const r=repOf(UI.repSel);if(!r||!isBoss())return;modal({title:'Ajustar stock · '+r.desc,ok:'Ajustar',body:'<p>Stock actual: <b>'+r.qty+'</b></p><div class="g2"><div class="f"><label for="aj_q">Nuevo stock</label><input id="aj_q" inputmode="numeric" value="'+r.qty+'"></div><div class="f"><label for="aj_m">Motivo (obligatorio)</label><input id="aj_m" placeholder="Conteo físico, rotura, devolución…"></div></div>',
+ onOk:()=>{const q=parseInt(val('aj_q'));if(isNaN(q)||q<0){merr('Cantidad inválida.');return false}if(q===r.qty){merr('El nuevo stock es igual al actual.');return false}if(val('aj_m').trim().length<4){merr('Indicá el motivo del ajuste.');return false}stockMove(r,q-r.qty,'Ajuste manual',val('aj_m').trim());audit('Ajuste de stock',r.cod+' → '+q+' ('+val('aj_m').trim()+')');save();renderView();return true}})};
+
+/* ---- trazabilidad: ficha técnica, movimientos de stock y uso en órdenes ---- */
+ACT.reptraza=d=>{const r=repOf(d.id||UI.repSel);if(!r)return;
+ const kx=DB.kardex.filter(k=>k.repId===r.id).slice(-80).reverse(),uso=DB.ots.filter(o=>o.items.some(i=>i.repId===r.id)).sort((a,b)=>b.num-a.num),hs=(r.hist||[]).slice(0,80);
+ const T=(head,rows,empty)=>'<div class="tw" style="max-height:230px"><table><thead><tr>'+head.map(x=>'<th>'+x+'</th>').join('')+'</tr></thead><tbody>'+(rows.length?rows.join(''):'<tr><td colspan="'+head.length+'" class="mut c">'+empty+'</td></tr>')+'</tbody></table></div>';
+ modal({title:'Trazabilidad · '+r.desc+' · '+r.marca,wide:true,hideOk:true,cancel:'Cerrar',noFocus:true,body:
+ '<div class="row" style="margin-bottom:8px">'+verBadge(r)+'<span class="sp"></span><span class="mut sm">Stock actual: <b>'+r.qty+'</b> · Códigos: '+h(repCodes(r).join(' · '))+'</span></div>'+
+ '<h3>Cambios de ficha (códigos, equivalencias y dimensiones)</h3>'+T(['Fecha','Usuario','Campo','Antes','Después','Fuente'],hs.map(x=>'<tr><td>'+ftime(x.t)+'</td><td>'+h(x.u)+'</td><td>'+h(x.campo)+'</td><td>'+h(x.antes||'—')+'</td><td>'+h(x.desp||'—')+'</td><td>'+h(x.fuente)+'</td></tr>'),'Sin cambios registrados desde que se cargó la demo.')+
+ '<h3 style="margin-top:12px">Movimientos de stock</h3>'+T(['Fecha','Movimiento','Cantidad','Saldo','Referencia','Usuario'],kx.map(k=>'<tr><td>'+ftime(k.t)+'</td><td>'+h(k.tipo)+'</td><td class="n" style="color:'+(k.delta<0?'var(--bad)':'var(--ok)')+'">'+(k.delta>0?'+':'')+k.delta+'</td><td class="n">'+k.saldo+'</td><td>'+h(k.ref)+'</td><td>'+h(k.u)+'</td></tr>'),'Sin movimientos.')+
+ '<h3 style="margin-top:12px">Uso en órdenes de trabajo (a qué vehículo fue)</h3>'+T(['OT','Fecha','Patente','Vehículo','Cantidad','Estado'],uso.map(o=>{const v=vehOf(o.vehId)||{};const q=o.items.filter(i=>i.repId===r.id).reduce((a,i)=>a+i.qty,0);return '<tr><td>'+otNum(o)+'</td><td>'+fdate(o.fecha)+'</td><td><b>'+h(v.pat)+'</b></td><td>'+h(v.marca+' '+v.mod)+'</td><td class="n">'+q+'</td><td><span class="badge b-'+o.estado+'">'+o.estado+'</span></td></tr>'}),'Todavía no se usó en ninguna orden.')+
+ '<p class="sm mut" style="margin-top:8px">Los datos técnicos son los cargados en este sistema; confirmalos contra la ficha oficial en wega.com.ar antes de recomendar un reemplazo.</p>'})};
+
+/* ---- fichas técnicas: exportar / importar CSV ---- */
+const FCOLS=['codigo','descripcion','largo','ancho','alto','diam_ext','diam_int','rosca','junta','valvula','picos','observaciones','equivalencias','oem','otros_codigos','aplicacion'];
+ACT.repfexp=()=>csvDown('fichas_tecnicas_'+TODAY()+'.csv',[FCOLS].concat(DB.repuestos.filter(r=>r.activo).map(r=>[r.cod,r.desc,r.largo,r.ancho,r.alto,r.dext,r.dint,r.rosca,r.junta,r.valv,r.picos,r.obs,(r.eq||[]).map(e=>e.m+':'+e.c).join('|'),r.oem,(r.cods||[]).join('|'),String(r.apl||'').split('\n').join('|')])));
+function parseCSV(t){t=String(t).replace(/^﻿/,'');const first=t.split(/\r?\n/)[0]||'';const sep=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?';':',';const rows=[];let row=[],cur='',q=false;
+ for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}else if(ch==='"')q=true;else if(ch===sep){row.push(cur);cur=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;row.push(cur);cur='';if(row.some(x=>x.trim()!==''))rows.push(row);row=[]}else cur+=ch}
+ row.push(cur);if(row.some(x=>x.trim()!==''))rows.push(row);return rows}
+CHG.fifile=t=>{const f=t.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const a=$('#fi_t');if(a)a.value=String(rd.result)};rd.readAsText(f)};
+ACT.repfimp=()=>{if(!isBoss())return;modal({title:'Importar fichas técnicas (equivalencias y dimensiones)',wide:true,ok:'Analizar y aplicar',body:
+ '<p class="sm mut">No hay API pública del catálogo para conectar de forma automática <b>[VERIFICAR con WEGA]</b>. Alternativa: copiá los datos de la ficha en un CSV con estas columnas y cargalo acá. Sólo se actualizan las celdas con valor; cada cambio queda en la trazabilidad y el artículo se marca como verificado hoy.</p><p class="sm"><code>'+FCOLS.join(';')+'</code><br><span class="mut">equivalencias: <code>MARCA:CODIGO|MARCA:CODIGO</code> · otros_codigos y aplicacion separados por <code>|</code> · el código identifica al artículo por cualquiera de sus códigos.</span></p>'+
+ '<div class="row"><label class="btn s filebtn">📁 Cargar archivo CSV<input type="file" accept=".csv,text/csv,text/plain" hidden id="fi_file" data-chg="fifile"></label><button class="btn s" data-act="repfexp" type="button">⬇ Descargar plantilla con mis datos</button></div><textarea id="fi_t" style="min-height:150px;margin-top:8px" aria-label="Contenido del CSV"></textarea>',
+ onOk:()=>{const rows=parseCSV(val('fi_t'));if(rows.length<2){merr('Pegá el encabezado y al menos una fila.');return false}
+  const hd=rows[0].map(x=>norm(x).replace(/[^a-z_]/g,''));const ix=k=>hd.indexOf(k);if(ix('codigo')<0){merr('Falta la columna “codigo”.');return false}
+  const plan=[],bad=[];
+  rows.slice(1).forEach((rw,n)=>{const g=k=>ix(k)<0?'':String(rw[ix(k)]==null?'':rw[ix(k)]).trim();const cd=g('codigo');const r=cd&&DB.repuestos.find(x=>x.activo&&repCodes(x).some(c=>ncode(c)===ncode(cd)));if(!r){bad.push(cd||'(fila '+(n+2)+')');return}
+   const ch={};let err='';const set=(k,v)=>{if(v!=='')ch[k]=v};
+   [['largo','largo'],['ancho','ancho'],['alto','alto'],['dext','diam_ext'],['dint','diam_int']].forEach(p=>{const v=g(p[1]);if(v){if(!/^\d+([.,]\d+)?$/.test(v))err='dimensión no numérica en '+p[1];else ch[p[0]]=v.replace(',','.')}});
+   set('rosca',g('rosca'));set('junta',g('junta'));set('valv',g('valvula'));set('picos',g('picos'));set('obs',g('observaciones'));set('oem',g('oem'));
+   const eqs=g('equivalencias');if(eqs){const arr=[];eqs.split('|').forEach(p=>{const i=p.indexOf(':');if(i<1||!p.slice(i+1).trim())err='equivalencias con formato inválido';else arr.push({m:p.slice(0,i).trim().toUpperCase(),c:p.slice(i+1).trim()})});if(!err)ch.eq=arr}
+   const oc=g('otros_codigos');if(oc){const arr=oc.split('|').map(x=>x.trim()).filter(Boolean);const own=[r.cod,r.codProv].map(ncode);if(arr.some(c=>own.indexOf(ncode(c))>=0))err='otro código repite el principal';else if(codeClash(arr,r))err='otro código pertenece a otro artículo';else ch.cods=arr}
+   const ap=g('aplicacion');if(ap)ch.apl=ap.split('|').map(x=>x.trim()).filter(Boolean).join('\n');
+   if(err){bad.push(cd+' ('+err+')');return}plan.push({r,ch})});
+  if(!plan.length){merr('Ninguna fila se puede aplicar. Problemas: '+bad.slice(0,6).join(', '));return false}
+  if(!confirm('Se actualizarán '+plan.length+' fichas técnicas'+(bad.length?' · no se aplican '+bad.length+' filas: '+bad.slice(0,5).join(', '):'')+'. ¿Aplicar?'))return false;
+  let cambios=0;plan.forEach(p=>{cambios+=applyTech(p.r,p.ch,'Importación de catálogo WEGA (CSV)',true)});
+  audit('Fichas técnicas importadas',plan.length+' artículos · '+cambios+' campos');save();closeModal();renderView();toast(plan.length+' fichas actualizadas · '+cambios+' campos cambiados'+(bad.length?' · '+bad.length+' sin aplicar':''),bad.length>0);return false}})};
 function snapPrecios(){DB.undoPrecios=DB.repuestos.map(r=>({id:r.id,pc:r.pc,gan:r.gan,pv:r.pv,pAnt:r.pAnt,fAct:r.fAct}))}
 ACT.repmasivo=()=>{modal({title:'Modificación masiva de precios',ok:'Aplicar',body:'<div class="g2"><div class="f"><label for="mp_a">Alcance</label><select id="mp_a" data-chg="mpcalc"><option value="all">Todos los artículos activos</option><option value="rub">Un rubro</option><option value="prov">Un proveedor</option><option value="marca">Una marca</option></select></div><div class="f"><label for="mp_v">Valor del alcance</label><select id="mp_v" data-chg="mpcalc"></select></div><div class="f"><label for="mp_p">Porcentaje (+ aumenta, − baja)</label><input id="mp_p" inputmode="decimal" placeholder="Ej.: 12,5" data-chg="mpcalc"></div><div class="f"><label for="mp_b">Se aplica sobre</label><select id="mp_b"><option value="compra">Precio de compra (recalcula venta con el % de ganancia)</option><option value="venta">Precio de venta directo</option></select></div></div><div id="mp_r" class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f"></div>',calc:()=>CHG.mpcalc({id:'mp_a'}),
  onOk:()=>{const p=num(val('mp_p'));if(!val('mp_p').trim()||p===0){merr('Ingresá un porcentaje distinto de cero.');return false}if(p<=-90||p>500){merr('Porcentaje fuera de rango (−90 % a 500 %).');return false}const l=mpSet();if(!l.length){merr('El alcance no tiene artículos.');return false}
@@ -682,7 +916,7 @@ ACT.repingpre=()=>{modal({title:'Ingresar precios de compra (lista del proveedor
   L.forEach(x=>{const p=x.split(/[;\t]/);const r=DB.repuestos.find(y=>y.cod===(p[0]||'').trim());const pr=num(p[1]);if(!r||!(pr>0))bad.push(x);else ok.push([r,pr])});
   if(!ok.length){merr('Ninguna línea coincide con un código existente.');return false}snapPrecios();ok.forEach(([r,pr])=>{r.pAnt=r.pv;r.fAct=TODAY();r.pc=r2(pr);r.pv=r2(pr*(1+r.gan/100))});audit('Ingreso de precios',ok.length+' artículos');save();closeModal();renderView();toast(ok.length+' precios actualizados'+(bad.length?' · '+bad.length+' líneas sin coincidencia':''),bad.length>0);return false}})};
 ACT.replist=()=>{const l=repFiltered().filter(r=>r.activo);printHTML('<div class="hdr"><img src="'+LOGO+'" alt=""><div><h1 style="margin:0">Listado de artículos</h1>'+h(DB.cfg.nombre)+' · '+fdate(TODAY())+'</div></div><table><thead><tr><th>Código</th><th>Descripción</th><th>Marca</th><th>Rubro</th><th>Rosca</th><th>Junta</th><th>P. venta</th><th>Stock</th></tr></thead><tbody>'+l.map(r=>'<tr><td>'+h(r.cod)+'</td><td>'+h(r.desc)+'</td><td>'+h(r.marca)+'</td><td>'+h(r.rubro)+'</td><td>'+h(r.rosca)+'</td><td>'+h(r.junta)+'</td><td>'+fmt(r.pv)+'</td><td>'+r.qty+'</td></tr>').join('')+'</tbody></table><p class="sm">'+vbLine()+'</p>')};
-ACT.repcsv=()=>{csvDown('repuestos_'+TODAY()+'.csv',[['Código','Cód. proveedor','Descripción','Marca','Rubro','Proveedor','P. compra','% ganancia','P. venta','IVA','Stock','Alarma','Reposición','Rosca','Junta','Aplicación']].concat(repFiltered().map(r=>[r.cod,r.codProv,r.desc,r.marca,r.rubro,(provOf(r.provId)||{}).n,r.pc,r2(r.gan),r.pv,r.iva,r.qty,r.alarma,r.repos,r.rosca,r.junta,r.apl.replace(/\n/g,' / ')])))};
+ACT.repcsv=()=>{csvDown('repuestos_'+TODAY()+'.csv',[['Código','Cód. proveedor','Otros códigos','Descripción','Marca','Rubro','Proveedor','P. compra','% ganancia','P. venta','IVA','Stock','Alarma','Reposición','Rosca','Junta','Aplicación']].concat(repFiltered().map(r=>[r.cod,r.codProv,(r.cods||[]).join(' | '),r.desc,r.marca,r.rubro,(provOf(r.provId)||{}).n,r.pc,r2(r.gan),r.pv,r.iva,r.qty,r.alarma,r.repos,r.rosca,r.junta,r.apl.replace(/\n/g,' / ')])))};
 ACT.repfalt=()=>{const l=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).sort((a,b)=>(provOf(a.provId).n).localeCompare(provOf(b.provId).n));if(!l.length){toast('No hay faltantes.');return}csvDown('faltantes_'+TODAY()+'.csv',[['Proveedor','Código','Descripción','Marca','Stock','Reposición','A pedir']].concat(l.map(r=>[(provOf(r.provId)||{}).n,r.cod,r.desc,r.marca,r.qty,r.repos,Math.max(0,r.repos-r.qty)])))};
 document.addEventListener('keydown',e=>{if(!ME||VIEW!=='repuestos'||!$('#modal').hidden||!isBoss())return;if(e.key==='F1'){e.preventDefault();ACT.repedit({id:''})}else if(e.key==='F2'&&UI.repSel){e.preventDefault();ACT.repedit({id:UI.repSel})}else if(e.key==='F3'&&UI.repSel){e.preventDefault();ACT.repdel()}});
 </script>
@@ -720,7 +954,7 @@ ACT.ingnew=d=>{UI.ing={mode:'ing',provId:d.id,ocId:'',ref:'',forma:'cc',cajaId:'
 function ingOpen(){modal({title:'Ingreso de mercadería',wide:true,ok:'Confirmar ingreso',body:ingBody(),noFocus:true,
  onOk:()=>{try{const I=UI.ing;lineCheck();if(I.ref.trim().length<3)throw new Error('Cargá el N° de remito o factura.');const tot=ingTotal();
   if(I.forma==='ef'){if(!DB.turno.abierto)throw new Error('Abrí el turno de caja para pagar en efectivo.');if(cajaEfectivo(I.cajaId)<tot-0.004)throw new Error('La caja no tiene efectivo suficiente ('+fmt(cajaEfectivo(I.cajaId))+').')}
-  I.lines.forEach(l=>{const r=repOf(l.repId);r.qty+=l.qty;if(Math.abs(r.pc-l.costo)>0.004){r.pAnt=r.pv;r.pc=r2(l.costo);r.pv=r2(r.pc*(1+r.gan/100));r.fAct=TODAY()}});
+  I.lines.forEach(l=>{const r=repOf(l.repId);stockMove(r,l.qty,'Ingreso de mercadería',I.ref.trim()+' · '+provOf(I.provId).n);if(Math.abs(r.pc-l.costo)>0.004){r.pAnt=r.pv;r.pc=r2(l.costo);r.pv=r2(r.pc*(1+r.gan/100));r.fAct=TODAY()}});
   const lg=ledgerAdd(I.provId,'Compra',tot,I.ref.trim());
   if(I.forma==='ef'){cajaMov(I.cajaId,'egreso','f4',tot,'Compra contado · '+provOf(I.provId).n+' · '+I.ref.trim());ledgerAdd(I.provId,'Pago',tot,'Contado · '+I.ref.trim(),[{cajaId:I.cajaId,monto:tot}])}
   if(I.ocId){const oc=DB.ocs.find(x=>x.id===I.ocId);if(oc)oc.estado='Recibida'}
@@ -820,7 +1054,7 @@ ACT.repocsv=()=>{const [a,b]=repRange();csvDown('ordenes_'+TODAY()+'.csv',[['OT'
 
 /* ===== Configuración ===== */
 V.config=()=>{const c=DB.cfg;return '<div class="bar"><h2>Configuración</h2></div><div class="card"><h3>Datos del taller</h3><div class="g3"><div class="f"><label for="cf_n">Nombre</label><input id="cf_n" value="'+h(c.nombre)+'"></div><div class="f"><label for="cf_d">Dirección</label><input id="cf_d" value="'+h(c.dir)+'"></div><div class="f"><label for="cf_t">Teléfono / WhatsApp</label><input id="cf_t" value="'+h(c.tel)+'"></div><div class="f"><label for="cf_m">Correo</label><input id="cf_m" value="'+h(c.mail)+'"></div><div class="f"><label for="cf_f">Facebook</label><input id="cf_f" value="'+h(c.fb)+'"></div><div class="f"><label for="cf_i">Instagram</label><input id="cf_i" value="'+h(c.ig)+'"></div></div><button class="btn p" data-act="cfsave">Guardar datos</button></div>'+
- '<div class="card"><h3>Opciones (banderas)</h3><label style="font-weight:500;color:var(--tx)"><input type="checkbox" style="width:auto;min-height:0" '+(c.traspasoSinRubro?'checked':'')+' data-chg="cfflag" data-f="traspasoSinRubro"> Permitir traspasos entre cajas sin elegir rubro (usa el concepto interno oculto “Traspaso interno”). Apagada por defecto.</label><p class="sm mut">El rubro financiero sigue siendo obligatorio en ingresos y egresos de caja.</p></div>'+
+ '<div class="card"><h3>Opciones (banderas)</h3><label style="font-weight:500;color:var(--tx)"><input type="checkbox" style="width:auto;min-height:0" '+(c.traspasoSinRubro?'checked':'')+' data-chg="cfflag" data-f="traspasoSinRubro"> Permitir traspasos entre cajas sin elegir rubro (usa el concepto interno oculto “Traspaso interno”). Apagada por defecto.</label><p class="sm mut">El rubro financiero sigue siendo obligatorio en ingresos y egresos de caja.</p><label style="font-weight:500;color:var(--tx);margin-top:8px"><input type="checkbox" style="width:auto;min-height:0" '+(c.recepCobra?'checked':'')+' data-chg="cfflag" data-f="recepCobra"> Permitir que Recepción cobre y entregue vehículos (por defecto lo hacen sólo el dueño y el jefe de taller).</label></div>'+
  '<div class="card"><h3>Catálogo de mano de obra</h3><div class="tw"><table class="itbl"><thead><tr><th>Servicio</th><th class="n">Precio neto</th></tr></thead><tbody>'+DB.servicios.map(s=>'<tr><td>'+h(s.n)+'</td><td><input style="max-width:140px;margin-left:auto;display:block;text-align:right" inputmode="decimal" data-chg="cfserv" data-id="'+s.id+'" value="'+s.pu+'" aria-label="Precio '+h(s.n)+'"></td></tr>').join('')+'</tbody></table></div></div>'+
  '<div class="card"><h3>Respaldo y demo</h3><div class="row"><button class="btn" data-act="cfexp">Exportar respaldo (JSON)</button><label class="btn" style="margin:0">Importar respaldo<input type="file" accept=".json,application/json" id="cf_imp" hidden data-chg="cfimp"></label><button class="btn d" data-act="cfreset">Restablecer datos de demo</button></div></div>'+
  '<div class="card"><h3>Auditoría (últimos movimientos)</h3><div class="tw" style="max-height:300px"><table><thead><tr><th>Cuándo</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead><tbody>'+DB.audit.slice(0,60).map(a=>'<tr><td>'+ftime(a.t)+'</td><td>'+h(a.u)+'</td><td>'+h(a.a)+'</td><td>'+h(a.d)+'</td></tr>').join('')+'</tbody></table></div></div>'};
@@ -828,13 +1062,14 @@ ACT.cfsave=()=>{const c=DB.cfg;if(val('cf_n').trim().length<3){toast('Cargá el 
 CHG.cfflag=t=>{DB.cfg[t.dataset.f]=t.checked;audit('Bandera',t.dataset.f+' = '+t.checked);save()};
 CHG.cfserv=t=>{const s=DB.servicios.find(x=>x.id===t.dataset.id);const v=num(t.value);if(v>=0){s.pu=v;save()}};
 ACT.cfexp=()=>{const b=new Blob([JSON.stringify(DB,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='respaldo_taller_'+TODAY()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)};
-CHG.cfimp=t=>{const f=t.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!o||o.ver!==1||!Array.isArray(o.ots)||!Array.isArray(o.repuestos))throw 0;confirmBox('Se reemplazan todos los datos actuales por los del respaldo. ¿Continuar?',()=>{DB=o;save();ME=userOf(ME.id)||DB.users[0];renderShell();toast('Respaldo importado')},'Importar')}catch(e){toast('El archivo no es un respaldo válido.',1)}};rd.readAsText(f)};
+CHG.cfimp=t=>{const f=t.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!o||o.ver!==2||!Array.isArray(o.ots)||!Array.isArray(o.repuestos))throw 0;confirmBox('Se reemplazan todos los datos actuales por los del respaldo. ¿Continuar?',()=>{DB=o;save();ME=userOf(ME.id)||DB.users[0];renderShell();toast('Respaldo importado')},'Importar')}catch(e){toast('El archivo no es un respaldo válido.',1)}};rd.readAsText(f)};
 ACT.cfreset=()=>confirmBox('Se borran los cambios y vuelven los datos de ejemplo. ¿Continuar?',()=>{resetDemo();ME=DB.users[0];renderShell();toast('Datos de demo restablecidos')},'Restablecer');
 
 /* ===== Eventos globales ===== */
 document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.disabled)return;const f=ACT[a.dataset.act];if(!f)return;f(a.dataset,a,e)});
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.chg&&CHG[t.dataset.chg])CHG[t.dataset.chg](t,e)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&MODAL)closeModal();if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.cell,.kc')){e.preventDefault();e.target.click()}});
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.chgc&&CHGC[t.dataset.chgc])CHGC[t.dataset.chgc](t,e)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const l=$('#lb');if(l){l.remove();return}}if(e.key==='Escape'&&MODAL)closeModal();if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.cell,.kc')){e.preventDefault();e.target.click()}});
 ACT.mclose=()=>closeModal();
 ACT.mok=()=>{if(!MODAL||!MODAL.onOk)return;merr('');try{const r=MODAL.onOk();if(r===true)closeModal()}catch(e){merr(e.message||'Error inesperado.')}};
 (function init(){try{const id=sessionStorage.getItem(SS);if(id)ME=userOf(id)||null}catch(e){}if(ME)renderShell();else renderLogin()})();
