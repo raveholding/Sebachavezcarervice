@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SebaChavez Car Service · Sistema VB (demo)</title>
+<title>SebaChavez Car Service · Sistema VB</title>
 <meta name="theme-color" content="#2b2f36">
 <style>
 :root{--rojo:#e53935;--azul:#1e6fd0;--grafito:#3a3d43;--noche:#23262b;--bg:#f2f4f7;--card:#fff;--bd:#dfe3e8;--tx:#1d2127;--mut:#667085;--ok:#1f9d55;--warn:#d98b0a;--bad:#d32f2f;--r:10px}
@@ -42,6 +42,7 @@ label{display:block;font-size:.82rem;font-weight:600;color:var(--mut);margin:0 0
 .ucard{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--bd);background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;min-height:52px}
 .ucard:hover{border-color:var(--azul);background:#f5f9ff}
 .av{width:36px;height:36px;border-radius:50%;background:var(--grafito);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.pbanner{background:#7a5400;color:#fff;text-align:center;font-size:.82rem;padding:5px 8px;position:sticky;top:0;z-index:30}.pbanner a{color:#ffe7a8}
 .demoflag{background:#fff6e0;border:1px solid #f1d38a;color:#7a5400;border-radius:8px;padding:8px 10px;font-size:.84rem;margin:10px 0}
 /* VB banner */
 .vb{background:linear-gradient(120deg,#1b1d21,#2c2f35);color:#fff;border-radius:12px;padding:14px;margin-top:14px}
@@ -160,8 +161,10 @@ const LOGO="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFB
 </script>
 <script>
 'use strict';
-/* ===== Sistema VB · taller mecánico · DEMO (datos locales en el navegador) ===== */
-const LS='sbcs_vb26_demo_v2', SS='sbcs_vb26_user';
+/* ===== Sistema VB · taller mecánico (datos locales en el navegador) ===== */
+const MODO=/practica/i.test(location.hash)?'practica':'real';
+const LS=MODO==='practica'?'sbcs_vb26_practica_v2':'sbcs_vb26_real_v1', SS='sbcs_vb26_user_'+MODO;
+window.addEventListener('hashchange',()=>location.reload());
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const h=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const r2=n=>Math.round((+n||0)*100)/100;
@@ -186,9 +189,9 @@ function cuitOk(c){const d=String(c||'').replace(/\D/g,'');return d.length===11&
 function cuitFmt(c){const d=String(c).replace(/\D/g,'');return d.slice(0,2)+'-'+d.slice(2,10)+'-'+d[10]}
 function mkCuit(pre,n){for(;;n++){const b=pre+String(n).padStart(8,'0');const dv=cuitDV(b);if(dv!==null)return cuitFmt(b+dv)}}
 
-/* ---------- Datos de ejemplo ---------- */
+/* ---------- Datos de práctica (modo práctica) ---------- */
 function seed(){
- const d={ver:2,seq:{ot:0,tu:0,oc:0,mov:0,tc:1},
+ const d={ver:2,modo:'practica',seq:{ot:0,tu:0,oc:0,mov:0,tc:1},
  cfg:{nombre:'SebaChavez Car Service',dir:'Jujuy 251 - Salta',tel:'3875971922',mail:'schavezcarservice@gmail.com',fb:'sebachavezcarservice',ig:'sebachavez_carservice',vhora:18000,rubrosOblig:true,traspasoSinRubro:false,recepCobra:false},
  users:[
   {id:'u1',n:'Seba Chavez',rol:'dueno',esp:'Dueño · gestión',com:0},
@@ -265,7 +268,7 @@ function seed(){
  const RX=n=>d.repuestos.find(x=>x.id===n);
  [['r11','r12'],['r14','r15']].forEach(p=>{const a=RX(p[0]),b=RX(p[1]);a.eq.push({m:b.marca,c:b.cod});b.eq.push({m:a.marca,c:a.cod})});
  RX('r8').cods.push('WO140');
- d.repuestos.forEach(r=>d.kardex.push({id:'k'+r.id,t:Date.now()-864e5*30,repId:r.id,tipo:'Saldo inicial de la demo',delta:r.qty,saldo:r.qty,ref:'',u:'sistema'}));
+ d.repuestos.forEach(r=>d.kardex.push({id:'k'+r.id,t:Date.now()-864e5*30,repId:r.id,tipo:'Saldo inicial (práctica)',delta:r.qty,saldo:r.qty,ref:'',u:'sistema'}));
 
  /* clientes y vehículos */
  const C=[['Carlos Aramayo','20-12345678-?','3874001122',true,150000],['Valeria Cruz','','3874556677',false,0],['Transportes Lerma SRL','','3874888999',true,400000],['Hugo Mamaní','','3875112233',false,0],['Julieta Ferreyra','','3874990011',false,0],['Gastón Pérez','','3875334455',false,0]];
@@ -334,11 +337,25 @@ function seed(){
  return d}
 
 /* ---------- estado ---------- */
+/* ---------- Datos reales: arranca vacío, sólo con el catálogo base ---------- */
+function seedReal(){const p=seed();
+ return {ver:2,modo:'real',seq:{ot:0,tu:0,oc:0,mov:0,tc:1},cfg:Object.assign({},p.cfg,{lastBackup:0,setupOk:false}),
+ users:[{id:'u1',n:'',rol:'dueno',esp:'Dueño · gestión',com:0}],
+ rubrosRep:p.rubrosRep,marcas:p.marcas,rubrosFin:p.rubrosFin,
+ servicios:p.servicios.map(s=>({id:s.id,n:s.n,pu:0,h:s.h})),
+ provs:[],repuestos:[],clientes:[],vehs:[],ots:[],turnos:[],ocs:[],ledger:[],cajas:p.cajas,
+ turno:{abierto:false,id:'T1',fecha:'',apert:{},por:''},movs:[],hist:[],audit:[],kardex:[],
+ equip:p.equip.map(e=>({id:e.id,cat:e.cat,n:e.n,est:'sinrel',cant:e.cant,prox:'',nota:''})),
+ extint:[],epp:p.epp.map(e=>({id:e.id,n:e.n,stock:0,min:0})),resid:[],habil:[],entregas:[]}}
+/* ---------- clave (PIN) ---------- */
+async function hashPin(pin,salt){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('sbcs|'+salt+'|'+pin));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let x=5381;const s='sbcs|'+salt+'|'+pin;for(let i=0;i<s.length;i++)x=((x*33)^s.charCodeAt(i))>>>0;return 'f'+x.toString(16)}}
+async function setPin(u,pin){u.salt=uid('s');u.pin=await hashPin(pin,u.salt)}
+const pinOk=p=>/^\d{4,8}$/.test(p);
 let DB=loadDB();
-function loadDB(){try{const j=localStorage.getItem(LS);if(j){const o=JSON.parse(j);if(o&&o.ver===2)return o}}catch(e){}return seed()}
+function loadDB(){try{const j=localStorage.getItem(LS);if(j){const o=JSON.parse(j);if(o&&o.ver===2&&(o.modo||'practica')===MODO)return o}}catch(e){}return MODO==='practica'?seed():seedReal()}
 let SAVEERR=false;
 function save(){try{localStorage.setItem(LS,JSON.stringify(DB));SAVEERR=false}catch(e){if(!SAVEERR){SAVEERR=true;setTimeout(()=>toast('No hay espacio en el navegador para guardar (¿demasiadas fotos?). Exportá un respaldo.',1),0)}}}
-function resetDemo(){try{localStorage.removeItem(LS)}catch(e){}DB=seed();save()}
+function resetDatos(){try{localStorage.removeItem(LS)}catch(e){}DB=MODO==='practica'?seed():seedReal();if(MODO==='real')DB.cfg.setupOk=false;save()}
 let ME=null,VIEW='dash',UI={otMode:'tablero',otEst:'',otQ:'',otMec:'',repQ:'',repRub:'',repSel:'',cliQ:'',turFecha:TODAY(),cajaTab:'mov',compTab:'prov',repTab:'',eqCat:'',segTab:'epp',repoPer:'mes'};
 function audit(a,d){DB.audit.unshift({t:Date.now(),u:ME?ME.n:'sistema',a,d:d||''});if(DB.audit.length>400)DB.audit.length=400}
 const ncode=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -397,35 +414,75 @@ const provDeuda=id=>r2(DB.ledger.filter(l=>l.provId===id).reduce((a,l)=>a+(l.tip
 const cajaEfectivo=cid=>{if(!DB.turno.abierto)return 0;let s=DB.turno.apert[cid]||0;DB.movs.filter(m=>m.turnoId===DB.turno.id&&m.cajaId===cid).forEach(m=>{s+=m.tipo==='ingreso'?m.monto:-m.monto});return r2(s)};
 
 function alertas(){const A=[];
- DB.extint.forEach(x=>{const d=daysTo(x.venc);if(d<=30)A.push({t:d<0?'bad':'warn',x:'Extintor “'+x.ubic+'” '+(d<0?'vencido':'vence en '+d+' días'),go:'seguridad'})});
- DB.habil.forEach(x=>{const d=daysTo(x.venc);if(d<=30)A.push({t:d<0?'bad':'warn',x:x.n+': '+(d<0?'vencido':'vence en '+d+' días'),go:'seguridad'})});
+ DB.extint.forEach(x=>{if(!x.venc)return;const d=daysTo(x.venc);if(d<=30)A.push({t:d<0?'bad':'warn',x:'Extintor “'+x.ubic+'” '+(d<0?'vencido':'vence en '+d+' días'),go:'seguridad'})});
+ DB.habil.forEach(x=>{if(!x.venc)return;const d=daysTo(x.venc);if(d<=30)A.push({t:d<0?'bad':'warn',x:x.n+': '+(d<0?'vencido':'vence en '+d+' días'),go:'seguridad'})});
  DB.equip.forEach(x=>{if(x.prox){const d=daysTo(x.prox);if(d<=30)A.push({t:d<0?'bad':'warn',x:'Calibración/service de “'+x.n+'” '+(d<0?'vencido':'en '+d+' días'),go:'equipo'})}});
  DB.epp.forEach(x=>{if(x.stock<x.min)A.push({t:'warn',x:'EPP bajo mínimo: '+x.n+' ('+x.stock+' de '+x.min+')',go:'seguridad'})});
  const rb=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).length;if(rb)A.push({t:'warn',x:rb+' repuestos en o bajo la cantidad de alarma',go:'repuestos'});
  const ac=resStock('Aceite usado');if(ac>=80)A.push({t:'warn',x:'Aceite usado acumulado: '+ac+' L (coordinar retiro con el gestor)',go:'seguridad'});
  DB.ots.filter(o=>o.estado==='Listo'&&daysTo(o.fecha)<=-2).forEach(o=>A.push({t:'warn',x:otNum(o)+' lista hace días sin entregar',go:'ot'}));
  DB.vehs.forEach(v=>{const d=daysTo(v.proxFecha);if(d<=14&&d>=-30)A.push({t:'ok',x:'Próximo service '+v.pat+' ('+(cliOf(v.cliId)||{}).n+'): '+fdate(v.proxFecha),go:'clientes'})});
+ if(MODO==='real'&&ME&&ME.rol==='dueno'){
+  const sp=DB.servicios.filter(s=>!s.pu).length;if(sp)A.push({t:'warn',x:sp+' servicios de mano de obra sin precio (Configuración)',go:'config'});
+  const dias=DB.cfg.lastBackup?Math.floor((Date.now()-DB.cfg.lastBackup)/864e5):null;
+  if((DB.ots.length||DB.repuestos.length||DB.clientes.length)&&(dias===null||dias>=7))A.push({t:'warn',x:dias===null?'Todavía no hiciste un respaldo de los datos (Configuración → Exportar respaldo)':'Hace '+dias+' días sin respaldo de los datos',go:'config'})}
  return A}
 function resStock(tipo){return DB.resid.filter(r=>r.tipo===tipo).reduce((a,r)=>a+r.cant,0)}
 
 /* ===== Ingreso ===== */
+let LOCK={n:0,until:0};
+const initials=n=>(n||'?').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+function loginHead(){return '<img class="logo" src="'+LOGO+'" alt="Logo SebaChavez Car Service"><h2 class="c">Sistema de gestión del taller</h2><p class="c mut sm" style="margin-top:-4px">'+h(DB.cfg.dir)+' · '+h(DB.cfg.tel)+'</p>'}
 function renderLogin(){
  $('#login').hidden=false;$('#app').hidden=true;
- $('#login').innerHTML='<div class="lbox"><img class="logo" src="'+LOGO+'" alt="Logo SebaChavez Car Service"><h2 class="c">Sistema de gestión del taller</h2>'+
- '<p class="c mut sm" style="margin-top:-4px">'+h(DB.cfg.dir)+' · '+h(DB.cfg.tel)+'</p>'+
- '<div class="demoflag"><b>DEMO.</b> Los datos (clientes, precios, stock) son <b>de ejemplo</b> y se guardan sólo en este navegador. Sin clave de acceso en la demo: elegí un perfil para ver los permisos de cada rol.</div>'+
- DB.users.filter(u=>u.rol!=='limpieza').map(u=>'<button class="ucard" data-act="login" data-id="'+u.id+'"><span class="av">'+h(u.n.split(' ').map(x=>x[0]).slice(0,2).join(''))+'</span><span><b>'+h(u.n)+'</b><br><span class="mut sm">'+h(ROL[u.rol])+' · '+h(u.esp)+'</span></span></button>').join('')+
+ if(MODO==='real'&&!DB.cfg.setupOk){renderSetup();return}
+ const pr=MODO==='practica';
+ $('#login').innerHTML='<div class="lbox">'+loginHead()+
+ (pr?'<div class="demoflag"><b>MODO PRÁCTICA.</b> Datos de ejemplo, guardados aparte; no tocan los datos reales del taller. Sin clave: elegí un perfil para ver los permisos de cada rol. <a href="#" data-act="modoreal">Ir al sistema real</a></div>':'<p class="c mut sm">Elegí tu nombre e ingresá tu clave.</p>')+
+ DB.users.filter(u=>u.rol!=='limpieza'&&u.activo!==false).map(u=>'<button class="ucard" data-act="login" data-id="'+u.id+'"><span class="av">'+h(initials(u.n))+'</span><span><b>'+h(u.n)+'</b><br><span class="mut sm">'+h(ROL[u.rol])+(u.esp?' · '+h(u.esp):'')+'</span></span></button>').join('')+
+ (pr?'':'<p class="c sm" style="margin-top:12px"><a href="#" data-act="olvide">Olvidé la clave del dueño</a> · <a href="#practica" data-act="modopractica">Modo práctica</a></p>')+
  vbBlock()+'</div>'}
-ACT.login=d=>{ME=userOf(d.id);try{sessionStorage.setItem(SS,ME.id)}catch(e){}audit('Ingreso','Perfil '+ROL[ME.rol]);save();renderShell()};
+function renderSetup(){
+ $('#login').innerHTML='<div class="lbox">'+loginHead()+'<div class="card"><h3>Primera vez: configurá al dueño</h3><p class="sm mut">Estos datos se guardan sólo en este navegador. La clave (4 a 8 números) se guarda cifrada, no en texto.</p>'+
+ '<div class="f"><label for="su_n">Nombre del dueño</label><input id="su_n" value="Seba Chavez" autocomplete="off"></div>'+
+ '<div class="g2"><div class="f"><label for="su_p">Clave (4 a 8 números)</label><input id="su_p" type="password" inputmode="numeric" autocomplete="new-password"></div><div class="f"><label for="su_q">Repetir clave</label><input id="su_q" type="password" inputmode="numeric" autocomplete="new-password"></div></div>'+
+ '<button class="btn p" data-act="setupok">Crear y entrar</button><p class="sm mut" style="margin-top:8px">¿Solo querés probar? <a href="#practica" data-act="modopractica">Entrá al modo práctica</a> con datos de ejemplo.</p></div>'+vbBlock()+'</div>'}
+ACT.modopractica=()=>{location.hash='#practica'};
+ACT.modoreal=()=>{history.replaceState(null,'',location.pathname+location.search);location.reload()};
+ACT.setupok=async()=>{const n=val('su_n').trim(),p=val('su_p'),q=val('su_q');
+ if(n.length<3){toast('Cargá el nombre del dueño.',1);return}
+ if(!pinOk(p)){toast('La clave debe tener de 4 a 8 números.',1);return}
+ if(p!==q){toast('Las claves no coinciden.',1);return}
+ const u=DB.users[0];u.n=n;await setPin(u,p);
+ const rc=String(Math.floor(Math.random()*1e8)).padStart(8,'0');const rs=uid('s');DB.cfg.rec=await hashPin(rc,rs);DB.cfg.recSalt=rs;
+ DB.cfg.setupOk=true;ME=u;try{sessionStorage.setItem(SS,ME.id)}catch(e){}audit('Alta del dueño',n);save();
+ modal({title:'Guardá tu código de recuperación',ok:'Ya lo anoté',hideOk:false,cancel:false,body:'<p>Si olvidás tu clave, este código permite crear una nueva. <b>Se muestra una sola vez.</b> Anotalo y guardalo aparte.</p><p style="font-size:1.6rem;letter-spacing:.2em;text-align:center"><b>'+rc+'</b></p>',onClose:()=>renderShell(),onOk:()=>true})};
+function pinPrompt(u){
+ $('#login').innerHTML='<div class="lbox">'+loginHead()+'<div class="card"><h3>'+h(u.n)+'</h3><div class="f"><label for="lg_p">Clave</label><input id="lg_p" type="password" inputmode="numeric" autocomplete="current-password" autofocus></div><div class="row"><button class="btn p" data-act="loginpin" data-id="'+u.id+'">Entrar</button><button class="btn" data-act="logout0">Volver</button></div></div>'+vbBlock()+'</div>';
+ setTimeout(()=>{const e=$('#lg_p');if(e)e.focus()},30)}
+ACT.logout0=()=>renderLogin();
+ACT.login=d=>{const u=userOf(d.id);if(MODO==='practica'||!u.pin){if(MODO==='real'){toast('Esta persona todavía no tiene clave. Pedile al dueño que la cargue en Personal.',1);return}ME=u;try{sessionStorage.setItem(SS,ME.id)}catch(e){}audit('Ingreso','Perfil '+ROL[ME.rol]);save();renderShell();return}pinPrompt(u)};
+ACT.loginpin=async d=>{const u=userOf(d.id);const now=Date.now();
+ if(LOCK.until>now){toast('Demasiados intentos. Esperá '+Math.ceil((LOCK.until-now)/1000)+' s.',1);return}
+ const hh=await hashPin(val('lg_p'),u.salt);
+ if(hh!==u.pin){LOCK.n++;audit('Ingreso fallido',u.n);if(LOCK.n>=5){LOCK.until=now+60000;LOCK.n=0}save();toast('Clave incorrecta.',1);return}
+ LOCK.n=0;ME=u;try{sessionStorage.setItem(SS,ME.id)}catch(e){}audit('Ingreso',ROL[ME.rol]);save();renderShell()};
+ACT.olvide=()=>modal({title:'Recuperar la clave del dueño',ok:'Cambiar clave',body:'<p class="sm mut">Ingresá el código de recuperación de 8 números que te mostró el sistema al crear al dueño.</p><div class="f"><label for="rc_c">Código de recuperación</label><input id="rc_c" inputmode="numeric" autocomplete="off"></div><div class="g2"><div class="f"><label for="rc_p">Nueva clave (4 a 8 números)</label><input id="rc_p" type="password" inputmode="numeric"></div><div class="f"><label for="rc_q">Repetir</label><input id="rc_q" type="password" inputmode="numeric"></div></div>',
+ onOk:async()=>{const p=val('rc_p');if(!pinOk(p)){merr('La clave debe tener de 4 a 8 números.');return false}if(p!==val('rc_q')){merr('Las claves no coinciden.');return false}
+  const hh=await hashPin(val('rc_c').trim(),DB.cfg.recSalt);if(!DB.cfg.rec||hh!==DB.cfg.rec){audit('Recuperación fallida');save();merr('Código incorrecto.');return false}
+  const u=DB.users.find(x=>x.rol==='dueno');await setPin(u,p);audit('Clave del dueño restablecida con código');save();toast('Clave cambiada. Ya podés ingresar.');return true}});
+ACT.mipin=()=>modal({title:'Cambiar mi clave',ok:'Guardar',body:'<div class="f"><label for="mp_a">Clave actual</label><input id="mp_a" type="password" inputmode="numeric"></div><div class="g2"><div class="f"><label for="mp_n">Nueva clave (4 a 8 números)</label><input id="mp_n" type="password" inputmode="numeric"></div><div class="f"><label for="mp_r">Repetir</label><input id="mp_r" type="password" inputmode="numeric"></div></div>',
+ onOk:async()=>{if(await hashPin(val('mp_a'),ME.salt)!==ME.pin){merr('La clave actual no es correcta.');return false}const p=val('mp_n');if(!pinOk(p)){merr('La clave debe tener de 4 a 8 números.');return false}if(p!==val('mp_r')){merr('Las claves no coinciden.');return false}await setPin(ME,p);audit('Cambió su clave');save();toast('Clave cambiada');return true}});
 ACT.logout=()=>{audit('Salida');MODAL=null;$('#modal').hidden=true;$('#modal').innerHTML='';const lb=$('#lb');if(lb)lb.remove();try{sessionStorage.removeItem(SS)}catch(e){}ME=null;save();renderLogin()};
 ACT.menu=()=>$('#side').classList.toggle('open');
 
 function renderShell(){
  $('#login').hidden=true;$('#app').hidden=false;
+ let pb=$('#pbanner');if(MODO==='practica'){if(!pb){pb=document.createElement('div');pb.id='pbanner';pb.className='pbanner';$('#app').parentNode.insertBefore(pb,$('#app'))}pb.innerHTML='MODO PRÁCTICA · datos de ejemplo, no son los del taller · <a href="#" data-act="modoreal">Ir al sistema real</a>'}
  const na=DB.ots.filter(o=>o.estado!=='Entregado').length,al=alertas().filter(a=>a.t!=='ok').length;
  $('#side').innerHTML='<div class="brand"><img src="'+LOGO+'" alt="SebaChavez Car Service"></div><nav aria-label="Principal">'+
  NAV.filter(n=>n[0]==='config'?(ME.rol==='dueno'):can(n[0])).map(n=>'<button data-act="go" data-v="'+n[0]+'" id="nav_'+n[0]+'"><span aria-hidden="true">'+n[1]+'</span>'+h(n[2])+(n[0]==='ot'&&na?'<span class="badge2">'+na+'</span>':'')+(n[0]==='seguridad'&&al?'<span class="badge2">'+al+'</span>':'')+'</button>').join('')+'</nav>'+
- '<div class="who"><b>'+h(ME.n)+'</b><br><span class="mut">'+h(ROL[ME.rol])+'</span><br><button class="btn s" style="margin-top:6px;background:#2f333a;color:#fff;border-color:#444" data-act="logout">Salir</button></div>'+
+ '<div class="who"><b>'+h(ME.n)+'</b><br><span class="mut">'+h(ROL[ME.rol])+'</span><br><button class="btn s" style="margin-top:6px;background:#2f333a;color:#fff;border-color:#444" data-act="logout">Salir</button>'+(MODO==='real'?' <button class="btn s" style="margin-top:6px;background:#2f333a;color:#fff;border-color:#444" data-act="mipin">Mi clave</button>':'')+'</div>'+
  '<div class="vbs">'+vbLine()+'<br><a href="https://wa.me/'+VBTEL+'?text='+encodeURIComponent(VBMSG)+'" target="_blank" rel="noopener">WhatsApp</a> · <a href="tel:+'+VBTEL+'">Llamar</a> · <a href="mailto:vincularbusiness@gmail.com">Correo</a></div>';
  go(VIEW)}
 function go(v){if(!ME)return;if(!can(v)||(v==='config'&&ME.rol!=='dueno'))v='dash';VIEW=v;$$('#side nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
@@ -649,7 +706,7 @@ ACT.otdel=d=>{const o=otOf(d.id),i=o&&o.items[+d.i];if(!i||!canBudget()||o.estad
 function imgCompress(file,max,q){return new Promise((res,rej)=>{const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',q))};im.onerror=rej;im.src=rd.result};rd.onerror=rej;rd.readAsDataURL(file)})}
 CHG.otfoto=t=>{const o=otOf(t.dataset.id);const files=[...(t.files||[])];t.value='';if(!o||o.estado==='Entregado'||!files.length)return;
  if(!(isBoss()||(ME.rol==='mecanico'&&otVisible(o)))){toast('No podés cargar fotos en esta orden.',1);return}
- if(o.fotos.length+files.length>6){toast('Máximo 6 fotos por orden en la demo.',1);return}
+ if(o.fotos.length+files.length>6){toast('Máximo 6 fotos por orden.',1);return}
  files.forEach(f=>{if(!/^image\//.test(f.type)){toast('“'+f.name+'” no es una imagen.',1);return}
   imgCompress(f,1280,.68).then(data=>{if(o.fotos.length>=6)return;o.fotos.push({id:uid('f'),n:f.name.slice(0,40),data,t:Date.now(),u:ME.n});audit('Foto de diagnóstico',otNum(o)+' · '+f.name.slice(0,30));otRefresh(o)}).catch(()=>toast('No se pudo leer la imagen.',1))})};
 ACT.fotover=d=>{const o=otOf(d.id),f=o&&o.fotos.find(x=>x.id===d.f);if(!f)return;const old=$('#lb');if(old)old.remove();const lb=document.createElement('div');lb.id='lb';lb.setAttribute('role','dialog');lb.setAttribute('aria-label','Foto ampliada');lb.innerHTML='<img src="'+f.data+'" alt="Foto ampliada del diagnóstico">';lb.addEventListener('click',()=>lb.remove());document.body.appendChild(lb)};
@@ -809,7 +866,7 @@ function repDetHTML(r){
  '<label style="margin-top:8px">Aplicación (vehículos compatibles)</label><div style="white-space:pre-line">'+h(r.apl||'—')+'</div></div>'}
 V.repuestos=()=>{const l=repFiltered(),pc=canCost(),pp=canPrice(),sel=repOf(UI.repSel),bajo=DB.repuestos.filter(r=>r.activo&&r.qty<=r.alarma).length;
  const stockVal=DB.repuestos.filter(r=>r.activo).reduce((a,r)=>a+r.qty*r.pc,0),sinv=DB.repuestos.filter(r=>r.activo&&!r.fVerif).length;
- return '<div class="bar"><h2>Repuestos e inventario</h2>'+(isBoss()?'<button class="btn p" data-act="repedit" data-id="">Nuevo (F1)</button><button class="btn" data-act="repedit" data-id="'+h(UI.repSel)+'"'+(sel?'':' disabled')+'>Modificar (F2)</button><button class="btn" data-act="repdel"'+(sel?'':' disabled')+'>Borrar (F3)</button>':'')+'<span class="sp"></span><span class="mut sm">'+l.length+' artículos · '+bajo+' en alarma'+(pc?' · stock a costo '+fmt(stockVal):'')+'</span></div>'+
+ return '<div class="bar"><h2>Repuestos e inventario</h2>'+(isBoss()?'<button class="btn p" data-act="repedit" data-id="">Nuevo (F1)</button><button class="btn" data-act="repedit" data-id="'+h(UI.repSel)+'"'+(sel?'':' disabled')+'>Modificar (F2)</button><button class="btn" data-act="repdel"'+(sel?'':' disabled')+'>Borrar (F3)</button><button class="btn" data-act="repimp">Importar (CSV)</button>':'')+'<span class="sp"></span><span class="mut sm">'+l.length+' artículos · '+bajo+' en alarma'+(pc?' · stock a costo '+fmt(stockVal):'')+'</span></div>'+
  '<div class="bar"><input id="rq" style="max-width:320px" placeholder="Cualquier código, descripción, marca, rosca, aplicación (ej.: astra)" value="'+h(UI.repQ)+'" data-chg="repq" aria-label="Buscar repuesto"><select id="rrub" data-chg="reprub" style="max-width:220px" aria-label="Rubro">'+opts(DB.rubrosRep,UI.repRub,x=>[x,x],'Todos los rubros')+'</select><select id="rprov" data-chg="repprov" style="max-width:240px" aria-label="Proveedor">'+opts(DB.provs,UI.repProv,p=>[p.id,p.n],'Todos los proveedores')+'</select>'+(isBoss()?'<label style="margin:0;font-weight:500"><input type="checkbox" style="width:auto;min-height:0" '+(UI.repInact?'checked':'')+' data-chg="repinact"> ver dados de baja</label>':'')+'<label style="margin:0;font-weight:500"><input type="checkbox" style="width:auto;min-height:0" '+(UI.repSinVer?'checked':'')+' data-chg="repsinver"> sin verificar con catálogo ('+sinv+')</label></div>'+
  '<div class="tw" style="max-height:48vh"><table><thead><tr><th>Código</th><th>Descripción</th><th>Rubro</th><th>Marca</th><th>Proveedor</th>'+(pc?'<th class="n">P. compra</th><th class="n">% gan.</th>':'')+(pp?'<th class="n">P. venta</th>':'')+'<th class="n">Stock</th><th class="n">Alarma</th></tr></thead><tbody>'+
  l.map(r=>'<tr class="clk'+(r.id===UI.repSel?' sel':'')+(r.activo&&r.qty<=r.alarma?' low':'')+(r.activo?'':' off')+'" data-act="repsel" data-id="'+r.id+'"><td>'+h(r.cod)+((r.cods||[]).length?' <span class="pill" title="Otros códigos: '+h((r.cods).join(', '))+'">+'+r.cods.length+'</span>':'')+'</td><td><b>'+h(r.desc)+'</b></td><td>'+h(r.rubro)+'</td><td>'+h(r.marca)+'</td><td>'+h((provOf(r.provId)||{}).n)+'</td>'+(pc?'<td class="n">'+fmt(r.pc)+'</td><td class="n">'+r2(r.gan)+'%</td>':'')+(pp?'<td class="n"><b>'+fmt(r.pv)+'</b></td>':'')+'<td class="n">'+r.qty+'</td><td class="n">'+r.alarma+'</td></tr>').join('')+(l.length?'':'<tr><td colspan="10" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>'+
@@ -879,6 +936,35 @@ ACT.reptraza=d=>{const r=repOf(d.id||UI.repSel);if(!r)return;
 
 /* ---- fichas técnicas: exportar / importar CSV ---- */
 const FCOLS=['codigo','descripcion','largo','ancho','alto','diam_ext','diam_int','rosca','junta','valvula','picos','observaciones','equivalencias','oem','otros_codigos','aplicacion'];
+
+/* ===== Importar artículos (alta masiva por CSV) ===== */
+const ICOLS=['codigo','cod_proveedor','otros_codigos','descripcion','marca','rubro','proveedor','costo','ganancia','stock','alarma','reposicion'];
+ACT.repimpl=()=>csvDown('plantilla_articulos.csv',[ICOLS,['WO130','','WO130B','Filtro de aceite','WEGA','FILTRO DE ACEITE','Nombre del proveedor','2500','50','10','3','6']]);
+ACT.repimp=()=>{if(!isBoss())return;modal({title:'Importar artículos (CSV)',wide:true,ok:'Revisar e importar',body:
+ '<p class="sm mut">Cargá el listado de repuestos de una vez. Columnas: <code>'+ICOLS.join(';')+'</code>. Obligatorias: <b>codigo, descripcion, rubro, proveedor</b>. <code>otros_codigos</code> separados por <code>|</code>. Si el rubro, la marca o el proveedor no existen se crean. Los artículos cuyo código ya existe se omiten (para modificarlos usá la ficha). El stock inicial queda registrado en la trazabilidad.</p>'+
+ '<div class="row"><label class="btn s filebtn">📁 Cargar archivo CSV<input type="file" accept=".csv,text/csv,text/plain" hidden id="fi_file" data-chg="fifile"></label><button class="btn s" data-act="repimpl" type="button">⬇ Descargar plantilla</button></div><textarea id="fi_t" style="min-height:150px;margin-top:8px" aria-label="Contenido del CSV"></textarea>',
+ onOk:()=>{const rows=parseCSV(val('fi_t'));if(rows.length<2){merr('Pegá el encabezado y al menos una fila.');return false}
+  const hd=rows[0].map(x=>norm(x).replace(/[^a-z_]/g,''));const ix=k=>hd.indexOf(k);
+  for(const k of ['codigo','descripcion','rubro','proveedor'])if(ix(k)<0){merr('Falta la columna “'+k+'”.');return false}
+  const plan=[],bad=[],seen={};
+  rows.slice(1).forEach((rw,n)=>{const g=k=>ix(k)<0?'':String(rw[ix(k)]==null?'':rw[ix(k)]).trim();const L='fila '+(n+2);
+   const cod=g('codigo'),desc=g('descripcion'),rub=g('rubro').toUpperCase(),pv=g('proveedor');
+   if(!cod||!desc||!rub||!pv){bad.push(L+': faltan datos obligatorios');return}
+   const cods=g('otros_codigos').split('|').map(x=>x.trim()).filter(Boolean),cp=g('cod_proveedor');
+   const all=[cod,cp].concat(cods).filter(Boolean);
+   if(codeClash(all,null)){bad.push(L+': el código ya existe ('+cod+')');return}
+   for(const c of all){const k=ncode(c);if(seen[k]){bad.push(L+': código repetido en el archivo ('+c+')');return}}
+   const nums={};for(const k of ['costo','ganancia','stock','alarma','reposicion']){const v=g(k).replace(',','.');if(v!==''&&!(isFinite(v)&&+v>=0)){bad.push(L+': “'+k+'” no es un número válido');return}nums[k]=v===''?null:+v}
+   all.forEach(c=>seen[ncode(c)]=1);plan.push({cod,cp,cods,desc,marca:g('marca').toUpperCase(),rub,pv,nums})});
+  if(bad.length){merr('No se importó nada. Corregí estas filas: '+bad.slice(0,8).join(' · ')+(bad.length>8?' …(+'+(bad.length-8)+')':''));return false}
+  if(!plan.length){merr('No hay filas para importar.');return false}
+  if(plan.length>1500){merr('Máximo 1500 artículos por carga.');return false}
+  plan.forEach(p=>{let pr=DB.provs.find(x=>norm(x.n)===norm(p.pv));if(!pr){pr={id:uid('p'),n:p.pv,cuit:'',tel:'',mail:'',activo:true};DB.provs.push(pr)}
+   if(DB.rubrosRep.indexOf(p.rub)<0)DB.rubrosRep.push(p.rub);if(p.marca&&DB.marcas.indexOf(p.marca)<0)DB.marcas.push(p.marca);
+   const pc=p.nums.costo||0,gan=p.nums.ganancia==null?50:p.nums.ganancia,q=p.nums.stock||0;
+   const r={id:uid('r'),cod:p.cod,codProv:p.cp,desc:p.desc,marca:p.marca,rubro:p.rub,provId:pr.id,pc,gan,pv:r2(pc*(1+gan/100)),qty:0,alarma:p.nums.alarma==null?2:p.nums.alarma,repos:p.nums.reposicion||0,venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:'',junta:'',apl:'',cods:p.cods,oem:'',eq:[],largo:'',ancho:'',alto:'',dext:'',dint:'',valv:'',picos:'',obs:'',fuente:'',fVerif:'',hist:[],activo:true};
+   DB.repuestos.push(r);if(q>0)stockMove(r,q,'Saldo inicial (importación)','CSV')});
+  audit('Importación de artículos',plan.length+' artículos');save();renderView();toast(plan.length+' artículos importados');return true}})};
 ACT.repfexp=()=>csvDown('fichas_tecnicas_'+TODAY()+'.csv',[FCOLS].concat(DB.repuestos.filter(r=>r.activo).map(r=>[r.cod,r.desc,r.largo,r.ancho,r.alto,r.dext,r.dint,r.rosca,r.junta,r.valv,r.picos,r.obs,(r.eq||[]).map(e=>e.m+':'+e.c).join('|'),r.oem,(r.cods||[]).join('|'),String(r.apl||'').split('\n').join('|')])));
 function parseCSV(t){t=String(t).replace(/^﻿/,'');const first=t.split(/\r?\n/)[0]||'';const sep=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?';':',';const rows=[];let row=[],cur='',q=false;
  for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}else if(ch==='"')q=true;else if(ch===sep){row.push(cur);cur=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;row.push(cur);cur='';if(row.some(x=>x.trim()!==''))rows.push(row);row=[]}else cur+=ch}
@@ -1004,21 +1090,21 @@ ACT.cajacierre=()=>{modal({title:'Arqueo y cierre del turno',ok:'Cerrar turno',w
 CHG.arcalc=t=>{const id=t.id.slice(3);const esp=cajaEfectivo(id),e=document.getElementById('ard_'+id);if(t.value.trim()===''){e.textContent='—';return}const d=r2(num(t.value)-esp);e.innerHTML='<b style="color:'+(Math.abs(d)>0.004?'var(--bad)':'var(--ok)')+'">'+fmt(d)+'</b>'};
 
 /* ===== Equipamiento ===== */
-V.equipo=()=>{const cats=[...new Set(DB.equip.map(e=>e.cat))];const l=DB.equip.filter(e=>!UI.eqCat||e.cat===UI.eqCat);const ok=DB.equip.filter(e=>e.est==='ok').length,pct=Math.round(ok/DB.equip.length*100);const ed=isBoss();
+V.equipo=()=>{const cats=[...new Set(DB.equip.map(e=>e.cat))];const l=DB.equip.filter(e=>!UI.eqCat||e.cat===UI.eqCat);const ok=DB.equip.filter(e=>e.est==='ok').length,pct=DB.equip.length?Math.round(ok/DB.equip.length*100):0;const ed=isBoss();
  return '<div class="bar"><h2>Equipamiento y habilitación del taller</h2><span class="sp"></span>'+(ed?'<button class="btn s" data-act="eqcsv">Lista de faltantes (Excel)</button>':'')+'</div>'+
- '<div class="card"><div class="row"><b>Taller listo: '+pct+' %</b><span class="mut sm">'+ok+' de '+DB.equip.length+' ítems disponibles · '+DB.equip.filter(e=>e.est==='falta').length+' faltan · '+DB.equip.filter(e=>e.est==='mant').length+' en mantenimiento</span></div><div class="pbar" style="margin-top:6px" role="progressbar" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+pct+'%"></i></div></div>'+
+ '<div class="card"><div class="row"><b>Taller listo: '+pct+' %</b><span class="mut sm">'+ok+' de '+DB.equip.length+' ítems disponibles · '+DB.equip.filter(e=>e.est==='falta').length+' faltan · '+DB.equip.filter(e=>e.est==='mant').length+' en mantenimiento'+(DB.equip.some(e=>e.est==='sinrel')?' · '+DB.equip.filter(e=>e.est==='sinrel').length+' sin relevar':'')+'</span></div><div class="pbar" style="margin-top:6px" role="progressbar" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+pct+'%"></i></div></div>'+
  '<div class="chips" style="margin-bottom:10px"><button class="chip'+(!UI.eqCat?' on':'')+'" data-act="eqcat" data-c="">Todo</button>'+cats.map(c=>'<button class="chip'+(UI.eqCat===c?' on':'')+'" data-act="eqcat" data-c="'+h(c)+'">'+h(c)+'</button>').join('')+'</div>'+
- '<div class="tw"><table class="itbl"><thead><tr><th>Ítem</th><th>Estado</th><th>Cant.</th><th>Próx. calibración / service</th><th>Nota</th></tr></thead><tbody>'+l.map(e=>'<tr><td><span class="mut sm">'+h(e.cat)+'</span><br>'+h(e.n)+'</td><td><select data-chg="eqf" data-id="'+e.id+'" data-f="est" aria-label="Estado"'+(ed?'':' disabled')+'><option value="ok"'+(e.est==='ok'?' selected':'')+'>Disponible</option><option value="falta"'+(e.est==='falta'?' selected':'')+'>Falta</option><option value="mant"'+(e.est==='mant'?' selected':'')+'>En mantenimiento</option></select></td><td><input style="width:70px" data-chg="eqf" data-id="'+e.id+'" data-f="cant" value="'+e.cant+'" inputmode="numeric"'+(ed?'':' disabled')+' aria-label="Cantidad"></td><td><input type="date" data-chg="eqf" data-id="'+e.id+'" data-f="prox" value="'+h(e.prox)+'"'+(ed?'':' disabled')+' aria-label="Próxima calibración">'+(e.prox&&daysTo(e.prox)<=30?' <span class="badge '+(daysTo(e.prox)<0?'bad':'warn')+'">'+(daysTo(e.prox)<0?'vencido':'en '+daysTo(e.prox)+' d')+'</span>':'')+'</td><td><input data-chg="eqf" data-id="'+e.id+'" data-f="nota" value="'+h(e.nota)+'"'+(ed?'':' disabled')+' aria-label="Nota"></td></tr>').join('')+'</tbody></table></div>'};
+ '<div class="tw"><table class="itbl"><thead><tr><th>Ítem</th><th>Estado</th><th>Cant.</th><th>Próx. calibración / service</th><th>Nota</th></tr></thead><tbody>'+l.map(e=>'<tr><td><span class="mut sm">'+h(e.cat)+'</span><br>'+h(e.n)+'</td><td><select data-chg="eqf" data-id="'+e.id+'" data-f="est" aria-label="Estado"'+(ed?'':' disabled')+'><option value="ok"'+(e.est==='ok'?' selected':'')+'>Disponible</option><option value="falta"'+(e.est==='falta'?' selected':'')+'>Falta</option><option value="mant"'+(e.est==='mant'?' selected':'')+'>En mantenimiento</option><option value="sinrel"'+(e.est==='sinrel'?' selected':'')+'>Sin relevar</option></select></td><td><input style="width:70px" data-chg="eqf" data-id="'+e.id+'" data-f="cant" value="'+e.cant+'" inputmode="numeric"'+(ed?'':' disabled')+' aria-label="Cantidad"></td><td><input type="date" data-chg="eqf" data-id="'+e.id+'" data-f="prox" value="'+h(e.prox)+'"'+(ed?'':' disabled')+' aria-label="Próxima calibración">'+(e.prox&&daysTo(e.prox)<=30?' <span class="badge '+(daysTo(e.prox)<0?'bad':'warn')+'">'+(daysTo(e.prox)<0?'vencido':'en '+daysTo(e.prox)+' d')+'</span>':'')+'</td><td><input data-chg="eqf" data-id="'+e.id+'" data-f="nota" value="'+h(e.nota)+'"'+(ed?'':' disabled')+' aria-label="Nota"></td></tr>').join('')+'</tbody></table></div>'};
 ACT.eqcat=d=>{UI.eqCat=d.c;renderView()};
 CHG.eqf=t=>{const e=DB.equip.find(x=>x.id===t.dataset.id);if(!e||!isBoss())return;const f=t.dataset.f;e[f]=f==='cant'?(parseInt(t.value)||0):t.value;audit('Equipamiento',e.n+' · '+f+' = '+t.value);save();if(f==='est')renderView()};
-ACT.eqcsv=()=>csvDown('equipamiento_faltante.csv',[['Categoría','Ítem','Estado','Cantidad requerida']].concat(DB.equip.filter(e=>e.est!=='ok').map(e=>[e.cat,e.n,e.est==='falta'?'Falta':'En mantenimiento',e.cant])));
+ACT.eqcsv=()=>csvDown('equipamiento_faltante.csv',[['Categoría','Ítem','Estado','Cantidad requerida']].concat(DB.equip.filter(e=>e.est!=='ok').map(e=>[e.cat,e.n,e.est==='falta'?'Falta':e.est==='sinrel'?'Sin relevar':'En mantenimiento',e.cant])));
 
 /* ===== Seguridad y medio ambiente ===== */
 V.seguridad=()=>{const t=UI.segTab;let b='';const ed=isBoss()||ME.rol==='mecanico';
  if(t==='epp')b='<div class="tw"><table><thead><tr><th>Elemento de protección personal</th><th class="n">Stock</th><th class="n">Mínimo</th><th></th></tr></thead><tbody>'+DB.epp.map(e=>'<tr><td>'+h(e.n)+(e.stock<e.min?' <span class="badge warn">bajo mínimo</span>':'')+'</td><td class="n">'+e.stock+'</td><td class="n">'+e.min+'</td><td><div class="row"><button class="btn s" data-act="eppent" data-id="'+e.id+'">Entregar a personal</button>'+(isBoss()?'<button class="btn s" data-act="eppadd" data-id="'+e.id+'">+ Ingreso</button>':'')+'</div></td></tr>').join('')+'</tbody></table></div><h3 style="margin-top:12px">Entregas registradas</h3>'+(DB.entregas.length?'<div class="tw"><table><tbody>'+DB.entregas.slice(0,15).map(x=>'<tr><td>'+fdate(x.fecha)+'</td><td>'+h(x.pers)+'</td><td>'+h(x.n)+' × '+x.cant+'</td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Sin entregas.</p>');
  else if(t==='ext')b='<div class="tw"><table><thead><tr><th>Ubicación</th><th>Tipo</th><th>Vencimiento de carga</th><th></th></tr></thead><tbody>'+DB.extint.map(x=>{const d=daysTo(x.venc);return '<tr><td>'+h(x.ubic)+'</td><td>'+h(x.tipo)+'</td><td>'+fdate(x.venc)+' <span class="badge '+(d<0?'bad':d<=30?'warn':'ok')+'">'+(d<0?'vencido':d<=30?'en '+d+' d':'vigente')+'</span></td><td>'+(isBoss()?'<button class="btn s" data-act="extrec" data-id="'+x.id+'">Registrar recarga</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div><p class="sm mut">Plazos de recarga y señalética exigida: [VERIFICAR] con el prestador habilitado y la normativa vigente.</p>'+(isBoss()?'<button class="btn s" data-act="extnew">➕ Agregar extintor</button>':'');
  else if(t==='res'){const tipos=['Aceite usado','Baterías','Filtros usados','Líquido refrigerante','Sólidos contaminados'];b='<div class="g4" style="margin-bottom:10px">'+tipos.map(x=>'<div class="kpi" style="cursor:default"><div class="v">'+resStock(x)+' <span class="sm">'+((DB.resid.find(r=>r.tipo===x)||{unidad:x==='Baterías'||x==='Filtros usados'?'u':x==='Sólidos contaminados'?'kg':'L'}).unidad)+'</span></div><div class="l">'+x+' acumulado</div></div>').join('')+'</div>'+(isBoss()?'<div class="row" style="margin-bottom:8px"><button class="btn s" data-act="resgen">➕ Registrar generación</button><button class="btn s p" data-act="resret">🚛 Registrar retiro del gestor</button></div>':'')+'<div class="tw"><table><thead><tr><th>Fecha</th><th>Tipo</th><th class="n">Cantidad</th><th>Referencia</th></tr></thead><tbody>'+DB.resid.slice().sort((a,b)=>a.fecha<b.fecha?1:-1).slice(0,30).map(r=>'<tr><td>'+fdate(r.fecha)+'</td><td>'+h(r.tipo)+'</td><td class="n" style="color:'+(r.cant<0?'var(--ok)':'inherit')+'">'+(r.cant>0?'+':'')+r.cant+' '+r.unidad+'</td><td>'+h(r.ref)+'</td></tr>').join('')+'</tbody></table></div><p class="sm mut">La generación se carga sola al entregar una OT con aceite, filtros o baterías. Requisitos de gestión de residuos peligrosos: [VERIFICAR] con la autoridad ambiental.</p>'}
- else b='<div class="tw"><table><thead><tr><th>Habilitación / seguro</th><th>Ente</th><th>Vencimiento</th><th></th></tr></thead><tbody>'+DB.habil.map(x=>{const d=daysTo(x.venc);return '<tr><td>'+h(x.n)+'</td><td>'+h(x.ent)+'</td><td>'+fdate(x.venc)+' <span class="badge '+(d<0?'bad':d<=30?'warn':'ok')+'">'+(d<0?'vencida':d<=30?'en '+d+' d':'vigente')+'</span></td><td>'+(isBoss()?'<button class="btn s" data-act="habren" data-id="'+x.id+'">Renovar</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div><p class="sm mut">Requisitos y plazos: [VERIFICAR] con el municipio, la ART y la aseguradora. Los datos cargados son de ejemplo.</p>'+(isBoss()?'<button class="btn s" data-act="habnew">➕ Agregar</button>':'');
+ else b='<div class="tw"><table><thead><tr><th>Habilitación / seguro</th><th>Ente</th><th>Vencimiento</th><th></th></tr></thead><tbody>'+DB.habil.map(x=>{const d=daysTo(x.venc);return '<tr><td>'+h(x.n)+'</td><td>'+h(x.ent)+'</td><td>'+fdate(x.venc)+(x.venc?' <span class="badge '+(d<0?'bad':d<=30?'warn':'ok')+'">'+(d<0?'vencida':d<=30?'en '+d+' d':'vigente')+'</span>':'')+'</td><td>'+(isBoss()?'<button class="btn s" data-act="habren" data-id="'+x.id+'">Renovar</button>':'')+'</td></tr>'}).join('')+'</tbody></table></div><p class="sm mut">Requisitos y plazos: [VERIFICAR] con el municipio, la ART y la aseguradora. '+(MODO==='practica'?'Los datos cargados son de ejemplo.':'Cargá las habilitaciones y seguros reales del taller.')+'</p>'+(isBoss()?'<button class="btn s" data-act="habnew">➕ Agregar</button>':'');
  return '<div class="bar"><h2>Seguridad y medio ambiente</h2></div><div class="chips" style="margin-bottom:10px">'+[['epp','EPP'],['ext','Extintores'],['res','Residuos peligrosos'],['hab','Habilitaciones y seguros']].map(x=>'<button class="chip'+(t===x[0]?' on':'')+'" data-act="segtab" data-t="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+b};
 ACT.segtab=d=>{UI.segTab=d.t;renderView()};
 ACT.eppent=d=>{const e=DB.epp.find(x=>x.id===d.id);modal({title:'Entregar: '+e.n,ok:'Registrar entrega',body:'<div class="g2"><div class="f"><label for="ee_p">Personal</label><select id="ee_p">'+opts(DB.users.filter(u=>u.rol!=='dueno'),'',u=>[u.n,u.n],'— elegir —')+'</select></div><div class="f"><label for="ee_c">Cantidad</label><input id="ee_c" type="number" min="1" value="1"></div></div><p class="mut sm">Stock disponible: '+e.stock+'</p>',onOk:()=>{const c=parseInt(val('ee_c'));if(!val('ee_p')){merr('Elegí a quién se entrega.');return false}if(!(c>0)||c>e.stock){merr('Cantidad inválida o mayor al stock.');return false}e.stock-=c;DB.entregas.unshift({fecha:TODAY(),pers:val('ee_p'),n:e.n,cant:c});audit('Entrega de EPP',e.n+' × '+c+' a '+val('ee_p'));save();renderView();return true}})};
@@ -1034,9 +1120,9 @@ ACT.habnew=()=>{modal({title:'Nueva habilitación o seguro',ok:'Agregar',body:'<
 
 /* ===== Personal ===== */
 V.personal=()=>{const ini=TODAY().slice(0,8)+'01';return '<div class="bar"><h2>Personal</h2><span class="sp"></span>'+(ME.rol==='dueno'?'<button class="btn p" data-act="peredit" data-id="">➕ Agregar persona</button>':'')+'</div><div class="tw"><table><thead><tr><th>Nombre</th><th>Rol</th><th>Especialidad</th><th class="n">% comisión MO</th><th class="n">OT activas</th><th class="n">OT entregadas (mes)</th><th class="n">Comisión estimada (mes)</th></tr></thead><tbody>'+DB.users.map(u=>{const a=DB.ots.filter(o=>o.mecId===u.id&&o.estado!=='Entregado').length,e=DB.ots.filter(o=>o.mecId===u.id&&o.estado==='Entregado'&&o.entregada>=ini);const mo=e.reduce((s,o)=>s+otTotal(o).mo,0);return '<tr'+(ME.rol==='dueno'?' class="clk" data-act="peredit" data-id="'+u.id+'"':'')+'><td><b>'+h(u.n)+'</b></td><td>'+ROL[u.rol]+'</td><td>'+h(u.esp)+'</td><td class="n">'+u.com+'%</td><td class="n">'+a+'</td><td class="n">'+e.length+'</td><td class="n">'+(u.com?fmt(mo*u.com/100):'—')+'</td></tr>'}).join('')+'</tbody></table></div><p class="sm mut">La comisión estimada se calcula sobre la mano de obra neta de las OT entregadas en el mes.</p>'};
-ACT.peredit=d=>{const u=d.id?userOf(d.id):{n:'',rol:'mecanico',esp:'',com:0};modal({title:d.id?'Editar persona':'Nueva persona',ok:'Guardar',body:'<div class="g2"><div class="f"><label for="pe_n">Nombre</label><input id="pe_n" value="'+h(u.n)+'"></div><div class="f"><label for="pe_r">Rol</label><select id="pe_r">'+opts(Object.keys(ROL),u.rol,k=>[k,ROL[k]])+'</select></div><div class="f"><label for="pe_e">Especialidad / puesto</label><input id="pe_e" value="'+h(u.esp)+'"></div><div class="f"><label for="pe_c">% comisión sobre mano de obra</label><input id="pe_c" inputmode="decimal" value="'+u.com+'"></div></div>',
- onOk:()=>{const c=num(val('pe_c'));if(val('pe_n').trim().length<3){merr('Cargá el nombre.');return false}if(c<0||c>50){merr('La comisión debe estar entre 0 y 50 %.');return false}if(d.id&&u.rol==='dueno'&&val('pe_r')!=='dueno'&&DB.users.filter(x=>x.rol==='dueno').length<2){merr('Debe haber al menos un dueño.');return false}
-  const x=d.id?u:{id:uid('u')};Object.assign(x,{n:val('pe_n').trim(),rol:val('pe_r'),esp:val('pe_e').trim(),com:c});if(!d.id)DB.users.push(x);audit('Personal '+(d.id?'editado':'nuevo'),x.n);save();renderView();return true}})};
+ACT.peredit=d=>{const u=d.id?userOf(d.id):{n:'',rol:'mecanico',esp:'',com:0};modal({title:d.id?'Editar persona':'Nueva persona',ok:'Guardar',body:'<div class="g2"><div class="f"><label for="pe_n">Nombre</label><input id="pe_n" value="'+h(u.n)+'"></div><div class="f"><label for="pe_r">Rol</label><select id="pe_r">'+opts(Object.keys(ROL),u.rol,k=>[k,ROL[k]])+'</select></div><div class="f"><label for="pe_e">Especialidad / puesto</label><input id="pe_e" value="'+h(u.esp)+'"></div><div class="f"><label for="pe_c">% comisión sobre mano de obra</label><input id="pe_c" inputmode="decimal" value="'+u.com+'"></div>'+(MODO==='real'?'<div class="f"><label for="pe_pin">'+(u.pin?'Nueva clave (vacío = no cambiar)':'Clave inicial (4 a 8 números)')+'</label><input id="pe_pin" type="password" inputmode="numeric" autocomplete="new-password"></div>':'')+'</div>',
+ onOk:async()=>{const c=num(val('pe_c'));const npin=val('pe_pin');if(MODO==='real'){if(npin&&!pinOk(npin)){merr('La clave debe tener de 4 a 8 números.');return false}if(!u.pin&&!npin&&val('pe_r')!=='limpieza'){merr('Cargá una clave inicial para que pueda ingresar.');return false}}if(val('pe_n').trim().length<3){merr('Cargá el nombre.');return false}if(c<0||c>50){merr('La comisión debe estar entre 0 y 50 %.');return false}if(d.id&&u.rol==='dueno'&&val('pe_r')!=='dueno'&&DB.users.filter(x=>x.rol==='dueno').length<2){merr('Debe haber al menos un dueño.');return false}
+  const x=d.id?u:{id:uid('u')};Object.assign(x,{n:val('pe_n').trim(),rol:val('pe_r'),esp:val('pe_e').trim(),com:c});if(!d.id)DB.users.push(x);if(npin)await setPin(x,npin);audit('Personal '+(d.id?'editado':'nuevo'),x.n);save();renderView();return true}})};
 
 /* ===== Reportes ===== */
 function repRange(){const t=TODAY();return UI.repoPer==='hoy'?[t,t]:UI.repoPer==='sem'?[addDays(-6),t]:UI.repoPer==='mes'?[t.slice(0,8)+'01',t]:['0000-00-00','9999-99-99']}
@@ -1055,23 +1141,26 @@ ACT.repocsv=()=>{const [a,b]=repRange();csvDown('ordenes_'+TODAY()+'.csv',[['OT'
 /* ===== Configuración ===== */
 V.config=()=>{const c=DB.cfg;return '<div class="bar"><h2>Configuración</h2></div><div class="card"><h3>Datos del taller</h3><div class="g3"><div class="f"><label for="cf_n">Nombre</label><input id="cf_n" value="'+h(c.nombre)+'"></div><div class="f"><label for="cf_d">Dirección</label><input id="cf_d" value="'+h(c.dir)+'"></div><div class="f"><label for="cf_t">Teléfono / WhatsApp</label><input id="cf_t" value="'+h(c.tel)+'"></div><div class="f"><label for="cf_m">Correo</label><input id="cf_m" value="'+h(c.mail)+'"></div><div class="f"><label for="cf_f">Facebook</label><input id="cf_f" value="'+h(c.fb)+'"></div><div class="f"><label for="cf_i">Instagram</label><input id="cf_i" value="'+h(c.ig)+'"></div></div><button class="btn p" data-act="cfsave">Guardar datos</button></div>'+
  '<div class="card"><h3>Opciones (banderas)</h3><label style="font-weight:500;color:var(--tx)"><input type="checkbox" style="width:auto;min-height:0" '+(c.traspasoSinRubro?'checked':'')+' data-chg="cfflag" data-f="traspasoSinRubro"> Permitir traspasos entre cajas sin elegir rubro (usa el concepto interno oculto “Traspaso interno”). Apagada por defecto.</label><p class="sm mut">El rubro financiero sigue siendo obligatorio en ingresos y egresos de caja.</p><label style="font-weight:500;color:var(--tx);margin-top:8px"><input type="checkbox" style="width:auto;min-height:0" '+(c.recepCobra?'checked':'')+' data-chg="cfflag" data-f="recepCobra"> Permitir que Recepción cobre y entregue vehículos (por defecto lo hacen sólo el dueño y el jefe de taller).</label></div>'+
- '<div class="card"><h3>Catálogo de mano de obra</h3><div class="tw"><table class="itbl"><thead><tr><th>Servicio</th><th class="n">Precio neto</th></tr></thead><tbody>'+DB.servicios.map(s=>'<tr><td>'+h(s.n)+'</td><td><input style="max-width:140px;margin-left:auto;display:block;text-align:right" inputmode="decimal" data-chg="cfserv" data-id="'+s.id+'" value="'+s.pu+'" aria-label="Precio '+h(s.n)+'"></td></tr>').join('')+'</tbody></table></div></div>'+
- '<div class="card"><h3>Respaldo y demo</h3><div class="row"><button class="btn" data-act="cfexp">Exportar respaldo (JSON)</button><label class="btn" style="margin:0">Importar respaldo<input type="file" accept=".json,application/json" id="cf_imp" hidden data-chg="cfimp"></label><button class="btn d" data-act="cfreset">Restablecer datos de demo</button></div></div>'+
+ '<div class="card"><h3>Catálogo de mano de obra</h3><p class="sm mut">Cargá el precio neto de cada servicio. También podés agregar o quitar servicios.</p><div class="tw"><table class="itbl"><thead><tr><th>Servicio</th><th class="n">Precio neto</th><th></th></tr></thead><tbody>'+DB.servicios.map(s=>'<tr><td>'+h(s.n)+'</td><td><input style="max-width:140px;margin-left:auto;display:block;text-align:right" inputmode="decimal" data-chg="cfserv" data-id="'+s.id+'" value="'+s.pu+'" aria-label="Precio '+h(s.n)+'"></td><td><button class="btn s d" data-act="servdel" data-id="'+s.id+'" aria-label="Quitar '+h(s.n)+'">✕</button></td></tr>').join('')+'</tbody></table></div><div class="row" style="margin-top:8px"><div class="f" style="flex:1"><label for="sv_n">Nuevo servicio</label><input id="sv_n"></div><div class="f"><label for="sv_p">Precio neto</label><input id="sv_p" inputmode="decimal" style="max-width:130px"></div><button class="btn p" data-act="servadd">Agregar</button></div></div>'+
+ '<div class="card"><h3>Respaldo y datos</h3><p class="sm mut">Los datos viven sólo en este navegador y este equipo. Exportá un respaldo seguido (el sistema avisa a los 7 días)'+(DB.cfg.lastBackup?'. Último respaldo: <b>'+ftime(DB.cfg.lastBackup)+'</b>':'')+'.</p><div class="row"><button class="btn" data-act="cfexp">Exportar respaldo (JSON)</button><label class="btn" style="margin:0">Importar respaldo<input type="file" accept=".json,application/json" id="cf_imp" hidden data-chg="cfimp"></label><button class="btn d" data-act="cfreset">'+(MODO==='practica'?'Restablecer datos de práctica':'Borrar todos los datos')+'</button></div></div>'+
  '<div class="card"><h3>Auditoría (últimos movimientos)</h3><div class="tw" style="max-height:300px"><table><thead><tr><th>Cuándo</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead><tbody>'+DB.audit.slice(0,60).map(a=>'<tr><td>'+ftime(a.t)+'</td><td>'+h(a.u)+'</td><td>'+h(a.a)+'</td><td>'+h(a.d)+'</td></tr>').join('')+'</tbody></table></div></div>'};
 ACT.cfsave=()=>{const c=DB.cfg;if(val('cf_n').trim().length<3){toast('Cargá el nombre.',1);return}Object.assign(c,{nombre:val('cf_n').trim(),dir:val('cf_d').trim(),tel:val('cf_t').trim(),mail:val('cf_m').trim(),fb:val('cf_f').trim(),ig:val('cf_i').trim()});audit('Datos del taller editados');save();toast('Datos guardados')};
 CHG.cfflag=t=>{DB.cfg[t.dataset.f]=t.checked;audit('Bandera',t.dataset.f+' = '+t.checked);save()};
 CHG.cfserv=t=>{const s=DB.servicios.find(x=>x.id===t.dataset.id);const v=num(t.value);if(v>=0){s.pu=v;save()}};
-ACT.cfexp=()=>{const b=new Blob([JSON.stringify(DB,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='respaldo_taller_'+TODAY()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)};
-CHG.cfimp=t=>{const f=t.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!o||o.ver!==2||!Array.isArray(o.ots)||!Array.isArray(o.repuestos))throw 0;confirmBox('Se reemplazan todos los datos actuales por los del respaldo. ¿Continuar?',()=>{DB=o;save();ME=userOf(ME.id)||DB.users[0];renderShell();toast('Respaldo importado')},'Importar')}catch(e){toast('El archivo no es un respaldo válido.',1)}};rd.readAsText(f)};
-ACT.cfreset=()=>confirmBox('Se borran los cambios y vuelven los datos de ejemplo. ¿Continuar?',()=>{resetDemo();ME=DB.users[0];renderShell();toast('Datos de demo restablecidos')},'Restablecer');
+ACT.servadd=()=>{const n=val('sv_n').trim(),p=num(val('sv_p'));if(n.length<3){toast('Cargá el nombre del servicio.',1);return}if(p<0){toast('Precio inválido.',1);return}DB.servicios.push({id:uid('s'),n,pu:p||0,h:1});audit('Servicio nuevo',n);save();renderView()};
+ACT.servdel=d=>{const s=DB.servicios.find(x=>x.id===d.id);if(!s)return;confirmBox('¿Quitar “'+s.n+'” del catálogo? Las órdenes ya cargadas no se modifican.',()=>{DB.servicios=DB.servicios.filter(x=>x.id!==d.id);audit('Servicio quitado',s.n);save();renderView()},'Quitar')};
+ACT.cfexp=()=>{DB.cfg.lastBackup=Date.now();save();const b=new Blob([JSON.stringify(DB,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='respaldo_taller_'+MODO+'_'+TODAY()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)};
+CHG.cfimp=t=>{const f=t.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!o||o.ver!==2||(o.modo||'practica')!==MODO||!Array.isArray(o.ots)||!Array.isArray(o.repuestos))throw 0;confirmBox('Se reemplazan todos los datos actuales por los del respaldo. ¿Continuar?',()=>{DB=o;save();ME=userOf(ME.id)||DB.users[0];renderShell();toast('Respaldo importado')},'Importar')}catch(e){toast('El archivo no es un respaldo válido de este modo ('+(MODO==='practica'?'práctica':'real')+').',1)}};rd.readAsText(f)};
+ACT.cfreset=()=>{if(MODO==='practica'){confirmBox('Se borran los cambios y vuelven los datos de ejemplo. ¿Continuar?',()=>{resetDatos();ME=DB.users[0];renderShell();toast('Datos de práctica restablecidos')},'Restablecer');return}
+ modal({title:'Borrar todos los datos',ok:'Borrar todo',body:'<p><b>Se borran todos los datos reales de este navegador</b> (órdenes, clientes, stock, caja, personal y claves). Si no tenés un respaldo, no se pueden recuperar.</p><div class="f"><label for="bd_t">Escribí BORRAR para confirmar</label><input id="bd_t" autocomplete="off"></div>',onOk:()=>{if(val('bd_t').trim()!=='BORRAR'){merr('Escribí BORRAR para confirmar.');return false}resetDatos();ME=null;try{sessionStorage.removeItem(SS)}catch(e){}$('#modal').hidden=true;renderLogin();return true}})};
 
 /* ===== Eventos globales ===== */
-document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.disabled)return;const f=ACT[a.dataset.act];if(!f)return;f(a.dataset,a,e)});
+document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.disabled)return;const f=ACT[a.dataset.act];if(!f)return;if(a.tagName==='A')e.preventDefault();f(a.dataset,a,e)});
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.chg&&CHG[t.dataset.chg])CHG[t.dataset.chg](t,e)});
 document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.chgc&&CHGC[t.dataset.chgc])CHGC[t.dataset.chgc](t,e)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const l=$('#lb');if(l){l.remove();return}}if(e.key==='Escape'&&MODAL)closeModal();if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.cell,.kc')){e.preventDefault();e.target.click()}});
 ACT.mclose=()=>closeModal();
-ACT.mok=()=>{if(!MODAL||!MODAL.onOk)return;merr('');try{const r=MODAL.onOk();if(r===true)closeModal()}catch(e){merr(e.message||'Error inesperado.')}};
+ACT.mok=()=>{if(!MODAL||!MODAL.onOk)return;merr('');try{const r=MODAL.onOk();if(r&&typeof r.then==='function'){r.then(x=>{if(x===true)closeModal()}).catch(e=>merr(e.message||'Error inesperado.'))}else if(r===true)closeModal()}catch(e){merr(e.message||'Error inesperado.')}};
 (function init(){try{const id=sessionStorage.getItem(SS);if(id)ME=userOf(id)||null}catch(e){}if(ME)renderShell();else renderLogin()})();
 </script>
 </body>

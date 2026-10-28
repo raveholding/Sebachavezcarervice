@@ -1,7 +1,7 @@
-# SebaChavez Car Service · Sistema VB (demo)
+# SebaChavez Car Service · Sistema VB
 
-Demo funcional del sistema de gestión para taller mecánico de servicio integral.
-Archivo único: `index.html` (abre en cualquier navegador, sin internet; los datos se guardan en el navegador).
+Sistema de gestión para taller mecánico de servicio integral.
+Archivo único: `index.html` (abre en cualquier navegador, sin internet; los datos se guardan en el navegador de la PC o celular donde se use).
 
 **Taller:** Jujuy 251 - Salta · WhatsApp 3875971922 · schavezcarservice@gmail.com · Facebook sebachavezcarservice · Instagram sebachavez_carservice
 
@@ -19,10 +19,19 @@ Archivo único: `index.html` (abre en cualquier navegador, sin internet; los dat
 - **Inventario:** campo para **otros códigos** del mismo producto (buscan y escanean igual), **dimensiones y equivalencias** con los mismos campos de la ficha de wega.com.ar (largo, ancho, alto, diámetros, rosca, junta, válvula, picos, observaciones, equivalencias, OEM), enlace a la ficha del catálogo, fecha de verificación e importación/exportación por CSV.
 - **Trazabilidad:** por artículo, cambios de ficha (quién, cuándo, antes/después y fuente), movimientos de stock (OT, ingresos, ajustes) y en qué OT/vehículo se usó. Si falta stock, el sistema sugiere los equivalentes disponibles (declarados o con misma rosca y junta).
 
-## Límites de la demo
-- Datos de ejemplo. Las dimensiones/rosca/junta/aplicaciones cargadas, salvo las del WO130 (de la pantalla del taller), son de ejemplo y están marcadas “sin verificar”: confirmar contra el catálogo antes de recomendar un reemplazo.
-- WEGA no publica API ni descarga de filtros que permita conectar el catálogo automáticamente **[VERIFICAR con WEGA]**; por eso se resuelve con enlace a la ficha + importación CSV. El patrón del enlace a cada ficha se comprobó con un ejemplo.
-- Sin facturación electrónica, pagos reales, nube ni multiusuario. Textos legales y plazos normativos marcados `[VERIFICAR]`.
-- Los respaldos de la versión anterior de la demo no son compatibles (cambió el formato de datos).
+## Versión para probar (v3: sin datos de ejemplo)
+- **Arranca vacío.** La primera vez pide crear al dueño con una **clave de 4 a 8 números** (se guarda cifrada) y muestra **una sola vez** un código de recuperación de 8 números.
+- **Ingreso con clave por persona.** El dueño da de alta al personal en *Personal* con su clave inicial; cada uno puede cambiarla en *Mi clave*. Tras 5 intentos fallidos hay una espera de 60 s. Los permisos por rol son los de la v2.
+- **Carga inicial:** *Configuración* → precios de mano de obra (los servicios base arrancan en $ 0; se pueden agregar y quitar); *Repuestos* → **Importar (CSV)** con plantilla descargable (alta masiva todo o nada, stock inicial en la trazabilidad); *Equipamiento* arranca “sin relevar”; *Seguridad* sin fechas; *Caja* con el turno cerrado hasta abrirlo.
+- **Respaldo:** *Configuración → Exportar respaldo (JSON)*. El panel avisa si pasan 7 días sin respaldo. *Importar respaldo* sólo acepta respaldos del mismo modo.
+- **Modo práctica** (para capacitar sin tocar datos reales): abrir `index.html#practica`. Usa datos de ejemplo, sin clave y con una franja de aviso; se guarda aparte del sistema real.
+- *Borrar todos los datos* exige escribir BORRAR.
+
+## Límites (no afirmar más que esto)
+- **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
+- **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
+- Las dimensiones/rosca/junta cargadas en el modo práctica son de ejemplo y están marcadas “sin verificar”. WEGA no publica API ni descarga de filtros **[VERIFICAR con WEGA]**; se resuelve con enlace a la ficha + importación CSV.
+- Sin facturación electrónica ni pagos reales. Textos legales y plazos normativos marcados `[VERIFICAR]`.
+- Los respaldos de la versión demo anterior no son compatibles.
 
 Desarrollado por **VINCULAR BUSINESS** · (387) 4484132 · vincularbusiness@gmail.com · “Tu idea, en buenas manos.”
