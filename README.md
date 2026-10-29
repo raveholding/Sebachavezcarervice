@@ -27,6 +27,10 @@ Archivo único: `index.html` (abre en cualquier navegador, sin internet; los dat
 - **Modo práctica** (para capacitar sin tocar datos reales): abrir `index.html#practica`. Usa datos de ejemplo, sin clave y con una franja de aviso; se guarda aparte del sistema real.
 - *Borrar todos los datos* exige escribir BORRAR.
 
+## Descuento e IVA (v3.1)
+- **IVA opcional siempre:** cada orden tiene la casilla *Aplicar IVA* (dueño y jefe), también en el cobro; las órdenes nuevas se crean con IVA salvo que se desactive en Configuración. Sin IVA se refleja en totales, impresión, WhatsApp y reportes.
+- **Descuento al cobrar:** en *Cobrar y entregar* se puede descontar **en % o en $** sobre la **mano de obra** (no sobre repuestos; tope: 100 % o el valor de la mano de obra). El IVA se calcula sobre la mano de obra ya descontada y la comisión del mecánico también. Si se cancela el cobro, se revierte; al cobrar queda en la auditoría.
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
