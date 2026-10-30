@@ -29,7 +29,7 @@ Archivo único: `index.html` (abre en cualquier navegador, sin internet; los dat
 
 ## Descuento e IVA (v3.1)
 - **IVA opcional siempre:** cada orden tiene la casilla *Aplicar IVA* (dueño y jefe), también en el cobro; las órdenes nuevas se crean con IVA salvo que se desactive en Configuración. Sin IVA se refleja en totales, impresión, WhatsApp y reportes.
-- **Descuento al cobrar:** en *Cobrar y entregar* se puede descontar **en % o en $** sobre la **mano de obra** (no sobre repuestos; tope: 100 % o el valor de la mano de obra). El IVA se calcula sobre la mano de obra ya descontada y la comisión del mecánico también. Si se cancela el cobro, se revierte; al cobrar queda en la auditoría.
+- **Descuento al cobrar (opcional):** en *Cobrar y entregar* el dueño o el jefe puede ofrecer un descuento **en % o en $** sobre el **total de la venta** (repuestos + mano de obra + IVA), antes de cerrar el cobro. Tope: 100 % o el total. Se prorratea entre neto, IVA, repuestos y mano de obra, por lo que los reportes y la comisión del mecánico quedan consistentes. Si se cancela el cobro, se revierte; al cobrar queda en la auditoría y se muestra en pantalla, impresión y WhatsApp.
 
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
