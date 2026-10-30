@@ -31,6 +31,12 @@ Archivo único: `index.html` (abre en cualquier navegador, sin internet; los dat
 - **IVA opcional siempre:** cada orden tiene la casilla *Aplicar IVA* (dueño y jefe), también en el cobro; las órdenes nuevas se crean con IVA salvo que se desactive en Configuración. Sin IVA se refleja en totales, impresión, WhatsApp y reportes.
 - **Descuento al cobrar (opcional):** en *Cobrar y entregar* el dueño o el jefe puede ofrecer un descuento **en % o en $** sobre el **total de la venta** (repuestos + mano de obra + IVA), antes de cerrar el cobro. Tope: 100 % o el total. Se prorratea entre neto, IVA, repuestos y mano de obra, por lo que los reportes y la comisión del mecánico quedan consistentes. Si se cancela el cobro, se revierte; al cobrar queda en la auditoría y se muestra en pantalla, impresión y WhatsApp.
 
+## Correcciones v3.2
+- **Mecánico sin precios en ningún lado:** se auditó cada pantalla, ficha de repuesto, trazabilidad y órdenes; ve solo artículos y stock. Además se bloquearon por código las acciones con precios (Excel, listados con precio, ajuste de precios) y se limpia el aviso en pantalla al salir.
+- **Roles:** el dueño asigna el rol de cada persona desde *Personal* (lista desplegable) y puede activar/desactivar accesos; no puede cambiarse su propio rol ni dejar el sistema sin un dueño activo. Todo queda en la auditoría.
+- **Venta de mostrador** (módulo nuevo, dueño/jefe/recepción): repuestos del inventario o **productos nuevos** fuera del inventario, **precio editable** y **descuento (% o $) por renglón**, IVA opcional, cobro en efectivo (entra a caja), transferencia o tarjeta; descuenta stock y deja trazabilidad.
+- **Órdenes de trabajo:** precio editable también en repuestos, **descuento por renglón en cualquier producto o servicio**, producto nuevo, y además el descuento general sobre el total al cobrar.
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
