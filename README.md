@@ -48,10 +48,39 @@ Archivo único: `index.html` (abre en cualquier navegador, sin internet; los dat
 - **Alta completa del cliente** desde cualquier lugar donde se cree (ficha de clientes, nueva OT, turno nuevo y venta de mostrador): nombre o razón social, teléfono, correo, domicilio, localidad, provincia, cuenta corriente y límite, condición frente a ARCA y CUIT/DNI. Para Responsable Inscripto, Monotributo y Exento se exige el domicilio fiscal; el correo se valida.
 - Es un dato de registro: el sistema **no emite facturas** ni consulta el padrón de ARCA.
 
+## Sistema VB completo (v4): menú digital, Club, garantías, RR. HH. y tareas
+Mismos módulos que la demo [tallermecnicoSVBdemo](https://raveholding.github.io/tallermecnicoSVBdemo/), con los datos del taller:
+- **Menú digital público** en `index.html#menu` (con los datos reales; el de práctica es `#practica-menu`):
+  - **Tienda** con categorías, destacados, buscador, ficha de producto y botón **“Con instalación”**.
+  - **Servicios** por área con precio final, duración y garantía.
+  - **Carrito** que envía el pedido por WhatsApp.
+  - **Turnos online** con horarios libres reales.
+  - Alta al **Club** y consulta de la tarjeta.
+- **Menú digital y pedidos:**
+  - Bandeja de pedidos y turnos del menú. Un pedido se pasa a venta o turno, y la confirmación sale por WhatsApp.
+  - **Catálogo de servicios** con área, descripción, precio, duración, garantía y publicación.
+  - Productos publicados y destacados, y configuración del menú.
+- **Áreas de trabajo:** mecánica, electricidad, car audio, alarmas y accesorios. Las instalaciones suman el control eléctrico previo y van al box de instalaciones.
+- **Club y fidelización:**
+  - Puntos, niveles y premios. Los puntos se pueden usar como pago al cobrar la orden.
+  - Tarjeta del socio.
+  - Recordatorios por WhatsApp: service, cumpleaños, garantías y clientes inactivos.
+- **Garantías** automáticas al entregar o vender, con número de serie y reclamos.
+- **Personal y RR. HH.:**
+  - Legajos, asistencia (entrada y salida), vacaciones y licencias.
+  - **Organigrama** y sueldos estimados con adelantos.
+- **Tareas:** Mi día, tablero del equipo, tareas recurrentes y **responsabilidades por puesto**.
+- **Datos reales intactos:** al actualizar no se borra nada; los módulos nuevos arrancan vacíos con valores por defecto. El modo práctica carga datos de ejemplo nuevos.
+
+**Cómo se arma:**
+- `index.html` se genera con `sh tools/build.sh` a partir de `tools/base.html` (el núcleo del taller) más los módulos de `tools/`, que son los mismos que usa la demo.
+- Los cambios propios del taller se hacen en `tools/base.html`, y después se vuelve a correr el armado.
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
 - Las dimensiones/rosca/junta cargadas en el modo práctica son de ejemplo y están marcadas “sin verificar”. WEGA no publica API ni descarga de filtros **[VERIFICAR con WEGA]**; se resuelve con enlace a la ficha + importación CSV.
+- Lo que se pide desde el menú digital queda en el navegador donde se hizo y llega por WhatsApp; para que llegue a todos los equipos hace falta la nube. La asistencia es un registro interno y los sueldos, una estimación (la liquidación legal la hace el contador).
 - Sin facturación electrónica ni pagos reales. Textos legales y plazos normativos marcados `[VERIFICAR]`.
 - Los respaldos de la versión demo anterior no son compatibles.
 
