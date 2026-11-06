@@ -37,6 +37,16 @@ Archivo único: `index.html` (abre en cualquier navegador, sin internet; los dat
 - **Venta de mostrador** (módulo nuevo, dueño/jefe/recepción): repuestos del inventario o **productos nuevos** fuera del inventario, **precio editable** y **descuento (% o $) por renglón**, IVA opcional, cobro en efectivo (entra a caja), transferencia o tarjeta; descuenta stock y deja trazabilidad.
 - **Órdenes de trabajo:** precio editable también en repuestos, **descuento por renglón en cualquier producto o servicio**, producto nuevo, y además el descuento general sobre el total al cobrar.
 
+## Condición frente a ARCA (v3.3)
+- **Al elegir el cliente** en una **orden de trabajo** o en una **venta de mostrador** se elige su condición frente a ARCA: Consumidor Final, IVA Responsable Inscripto, Responsable Monotributo, Monotributista Social, IVA Sujeto Exento, IVA No Alcanzado, Sujeto No Categorizado o Cliente del Exterior. Se completa sola con la de la ficha del cliente y se puede cambiar en el momento.
+- **CUIT obligatorio y validado** (dígito verificador) para Responsable Inscripto, Monotributo, Monotributista Social y Exento; para Consumidor Final el CUIT/CUIL/DNI es opcional.
+- Lo elegido **se guarda en la ficha del cliente** y **queda registrado en la OT o en la venta** (aunque después cambie la ficha). Los cambios quedan en la auditoría.
+- **OT:** se ve en la cabecera (botón *Cambiar* para el dueño, jefe y recepción, mientras no esté entregada), en la impresión de la OT y del presupuesto y en el CSV de órdenes. El mecánico no la ve.
+- **Ventas de mostrador:** se puede elegir un cliente, crear uno nuevo o dejar “Consumidor final (sin identificar)”. Cualquier condición distinta de Consumidor Final exige identificar al cliente. La lista de ventas muestra cliente y condición.
+- **Compras:** en la ficha del proveedor, en el *Ingreso de mercadería* y en la *Orden de compra* se elige la condición del proveedor (sin Consumidor Final; incluye Proveedor del Exterior). Queda en la OC y en el libro del proveedor.
+- Clientes y proveedores cargados antes de esta versión arrancan como Consumidor Final y Responsable Inscripto, respectivamente.
+- Es un dato de registro: el sistema **no emite facturas** ni consulta el padrón de ARCA.
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
