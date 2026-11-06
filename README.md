@@ -45,6 +45,7 @@ Archivo único: `index.html` (abre en cualquier navegador, sin internet; los dat
 - **Ventas de mostrador:** se puede elegir un cliente, crear uno nuevo o dejar “Consumidor final (sin identificar)”. Cualquier condición distinta de Consumidor Final exige identificar al cliente. La lista de ventas muestra cliente y condición.
 - **Compras:** en la ficha del proveedor, en el *Ingreso de mercadería* y en la *Orden de compra* se elige la condición del proveedor (sin Consumidor Final; incluye Proveedor del Exterior). Queda en la OC y en el libro del proveedor.
 - Clientes y proveedores cargados antes de esta versión arrancan como Consumidor Final y Responsable Inscripto, respectivamente.
+- **Alta completa del cliente** desde cualquier lugar donde se cree (ficha de clientes, nueva OT, turno nuevo y venta de mostrador): nombre o razón social, teléfono, correo, domicilio, localidad, provincia, cuenta corriente y límite, condición frente a ARCA y CUIT/DNI. Para Responsable Inscripto, Monotributo y Exento se exige el domicilio fiscal; el correo se valida.
 - Es un dato de registro: el sistema **no emite facturas** ni consulta el padrón de ARCA.
 
 ## Límites (no afirmar más que esto)

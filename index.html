@@ -354,7 +354,7 @@ const pinOk=p=>/^\d{4,8}$/.test(p);
 let DB=loadDB();
 function loadDB(){try{const j=localStorage.getItem(LS);if(j){const o=JSON.parse(j);if(o&&o.ver===2&&(o.modo||'practica')===MODO)return migrar(o)}}catch(e){}return migrar(MODO==='practica'?seed():seedReal())}
 /* completa campos agregados en versiones nuevas (condición frente a ARCA) */
-function migrar(o){if(!o.ventas)o.ventas=[];if(!o.seq.vt)o.seq.vt=0;(o.clientes||[]).forEach(c=>{if(!c.cond)c.cond='CF';if(c.doc==null)c.doc=''});(o.provs||[]).forEach(p=>{if(!p.cond)p.cond='RI'});return o}
+function migrar(o){if(!o.ventas)o.ventas=[];if(!o.seq.vt)o.seq.vt=0;(o.clientes||[]).forEach(c=>{if(!c.cond)c.cond='CF';['doc','mail','dom','loc','prov'].forEach(k=>{if(c[k]==null)c[k]=''})});(o.provs||[]).forEach(p=>{if(!p.cond)p.cond='RI'});return o}
 let SAVEERR=false;
 function save(){try{localStorage.setItem(LS,JSON.stringify(DB));SAVEERR=false}catch(e){if(!SAVEERR){SAVEERR=true;setTimeout(()=>toast('No hay espacio en el navegador para guardar (¿demasiadas fotos?). Exportá un respaldo.',1),0)}}}
 function resetDatos(){try{localStorage.removeItem(LS)}catch(e){}DB=MODO==='practica'?seed():seedReal();if(MODO==='real')DB.cfg.setupOk=false;save()}
@@ -381,6 +381,18 @@ const readArca=(px,quien)=>arcaCheck(val(px+'_ac'),val(px+'_ad'),quien);
 const arcaLine=a=>a?arcaTxt(a.cond)+(a.doc?' · '+(arcaCuit(a.cond)||String(a.doc).length===13?'CUIT ':'Doc. ')+a.doc:''):'';
 /* guarda la condición en la ficha del cliente si cambió */
 function arcaToCli(c,a){if(!c||!a)return;if((c.cond||'CF')!==a.cond||(c.doc||'')!==a.doc){const antes=arcaLine({cond:c.cond||'CF',doc:c.doc||''});c.cond=a.cond;c.doc=a.doc;audit('Condición ARCA del cliente',c.n+': '+antes+' → '+arcaLine(a))}}
+/* ---------- datos completos del cliente (alta rápida y ficha) ---------- */
+function cliDatosHTML(px,c,live,withCC){c=c||{};const at=f=>' id="'+px+'_c_'+f+'"'+(live?' data-chg="cdat" data-px="'+px+'" data-f="'+f+'"':'');
+ const fi=(f,l,x)=>'<div class="f"><label for="'+px+'_c_'+f+'">'+l+'</label><input'+at(f)+' value="'+h(c[f]==null?'':c[f])+'"'+(x||'')+'></div>';
+ return '<div class="g3">'+fi('n','Nombre y apellido / razón social')+fi('tel','Teléfono (WhatsApp)',' inputmode="tel" placeholder="3875123456"')+fi('mail','Correo',' type="email" placeholder="nombre@correo.com"')+
+  fi('dom','Domicilio (calle y número)',' placeholder="Av. Belgrano 1234"')+fi('loc','Localidad',' placeholder="Salta"')+fi('prov','Provincia')+
+  (withCC?'<div class="f"><label for="'+px+'_c_cc">Cuenta corriente</label><select'+at('cc')+'><option value="0"'+(c.cc&&c.cc!=='0'?'':' selected')+'>No habilitada</option><option value="1"'+(c.cc&&c.cc!=='0'?' selected':'')+'>Habilitada</option></select></div>'+fi('lim','Límite de cuenta corriente ($)',' inputmode="decimal"'):'')+'</div>'}
+function readCliDatos(px,cond){const g=f=>val(px+'_c_'+f).trim();const n=g('n');if(n.length<3)throw new Error('Cargá el nombre o la razón social del cliente.');
+ const tel=g('tel').replace(/\D/g,'');if(tel&&tel.length<8)throw new Error('El teléfono del cliente parece incompleto.');
+ const mail=g('mail');if(mail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail))throw new Error('El correo del cliente no parece válido.');
+ const dom=g('dom');if(cond&&arcaCuit(cond)&&dom.length<4)throw new Error('Para “'+arcaTxt(cond)+'” cargá el domicilio fiscal del cliente.');
+ const o={n,tel,mail,dom,loc:g('loc'),prov:g('prov')};if(document.getElementById(px+'_c_cc')){o.cc=val(px+'_c_cc')==='1';o.lim=r2(num(val(px+'_c_lim')));if(!(o.lim>=0))throw new Error('El límite de cuenta corriente no puede ser negativo.')}return o}
+const cliDom=c=>[c.dom,c.loc,c.prov].filter(Boolean).join(', ');
 const vehOf=id=>DB.vehs.find(v=>v.id===id);
 const repOf=id=>DB.repuestos.find(r=>r.id===id);
 const provOf=id=>DB.provs.find(p=>p.id===id);
@@ -532,9 +544,9 @@ V.dash=()=>{
 /* ===== Selector de cliente + vehículo ===== */
 function pickerHTML(cid,vid,arca){return '<div class="g2"><div class="f"><label for="pk_cli">Cliente</label><select id="pk_cli" data-chg="pkcli">'+opts(DB.clientes,cid,c=>[c.id,c.n],'— elegir —')+'<option value="__new">➕ Nuevo cliente…</option></select></div>'+
  '<div class="f"><label for="pk_veh">Vehículo</label><select id="pk_veh" data-chg="pkveh"></select></div></div>'+
- '<div id="pk_newc" class="g2" hidden><div class="f"><label for="pk_cn">Nombre y apellido / razón social</label><input id="pk_cn"></div><div class="f"><label for="pk_ct">Teléfono (WhatsApp)</label><input id="pk_ct" inputmode="tel" placeholder="3875123456"></div></div>'+
- '<div id="pk_newv" class="g4" hidden><div class="f"><label for="pk_vp">Patente</label><input id="pk_vp" placeholder="AB123CD" maxlength="8"></div><div class="f"><label for="pk_vm">Marca</label><input id="pk_vm"></div><div class="f"><label for="pk_vo">Modelo / motor</label><input id="pk_vo"></div><div class="f"><label for="pk_va">Año</label><input id="pk_va" inputmode="numeric" maxlength="4"></div></div>'+
- (arca?'<div class="card" style="background:#f8fafc;padding:10px 12px;margin-bottom:10px"><h3 style="margin-bottom:6px">Datos fiscales del cliente</h3>'+arcaHTML('pk',(cliOf(cid)||{}).cond,(cliOf(cid)||{}).doc)+'<div class="sm mut">Se guarda en la ficha del cliente y queda registrada en la orden.</div></div>':'')}
+ '<div id="pk_newc" class="card" style="background:#f8fafc;padding:10px 12px;margin-bottom:10px" hidden><h3 style="margin-bottom:6px">Datos del cliente nuevo</h3>'+cliDatosHTML('pk',{prov:'Salta',lim:0},false,true)+'</div>'+
+ (arca?'<div class="card" style="background:#f8fafc;padding:10px 12px;margin-bottom:10px"><h3 style="margin-bottom:6px">Datos fiscales del cliente</h3>'+arcaHTML('pk',(cliOf(cid)||{}).cond,(cliOf(cid)||{}).doc)+'<div class="sm mut">Se guarda en la ficha del cliente y queda registrada en la orden.</div></div>':'')+
+ '<div id="pk_newv" class="g4" hidden><div class="f"><label for="pk_vp">Patente</label><input id="pk_vp" placeholder="AB123CD" maxlength="8"></div><div class="f"><label for="pk_vm">Marca</label><input id="pk_vm"></div><div class="f"><label for="pk_vo">Modelo / motor</label><input id="pk_vo"></div><div class="f"><label for="pk_va">Año</label><input id="pk_va" inputmode="numeric" maxlength="4"></div></div>'}
 function pkFill(vid){const c=val('pk_cli'),sel=$('#pk_veh');if(!sel)return;const vs=DB.vehs.filter(v=>v.cliId===c);
  sel.innerHTML=(c&&c!=='__new'?'<option value="">— elegir —</option>'+vs.map(v=>'<option value="'+v.id+'"'+(v.id===vid?' selected':'')+'>'+h(v.pat+' · '+v.marca+' '+v.mod)+'</option>').join(''):'')+'<option value="__new">➕ Nuevo vehículo…</option>';
  if(c==='__new'||!c)sel.value='__new';
@@ -545,8 +557,8 @@ function readPicker(){
  let cid=val('pk_cli'),vid=val('pk_veh');
  if(!cid)throw new Error('Elegí un cliente o creá uno nuevo.');
  const ar=$('#pk_ac')?readArca('pk','del cliente'):null;
- if(cid==='__new'){const n=val('pk_cn').trim();if(n.length<3)throw new Error('Cargá el nombre del cliente nuevo.');const t=val('pk_ct').replace(/\D/g,'');if(t&&t.length<8)throw new Error('El teléfono parece incompleto.');
-  cid=uid('c');DB.clientes.push({id:cid,n:n,doc:ar?ar.doc:'',cond:ar?ar.cond:'CF',tel:t,mail:'',cc:false,lim:0,saldo:0});audit('Cliente nuevo',n+(ar?' · '+arcaLine(ar):''));vid='__new'}
+ if(cid==='__new'){const cd=readCliDatos('pk',ar&&ar.cond);
+  cid=uid('c');DB.clientes.push(Object.assign({id:cid,doc:ar?ar.doc:'',cond:ar?ar.cond:'CF',cc:false,lim:0,saldo:0},cd));audit('Cliente nuevo',cd.n+(ar?' · '+arcaLine(ar):''));vid='__new'}
  if(!vid)throw new Error('Elegí un vehículo o creá uno nuevo.');
  if(vid==='__new'){const p=val('pk_vp').toUpperCase().replace(/[\s-]/g,'');if(!/^([A-Z]{2}\d{3}[A-Z]{2}|[A-Z]{3}\d{3})$/.test(p))throw new Error('Patente inválida (formatos AB123CD o ABC123).');
   const ex=DB.vehs.find(v=>v.pat===p);if(ex)vid=ex.id;else{if(!val('pk_vm').trim()||!val('pk_vo').trim())throw new Error('Cargá marca y modelo del vehículo.');const a=parseInt(val('pk_va'))||0;if(a&&(a<1960||a>new Date().getFullYear()+1))throw new Error('Año inválido.');
@@ -811,7 +823,7 @@ ACT.otprint=d=>{const o=otOf(d.id);if(!o||!otVisible(o))return;const v=vehOf(o.v
  const th=price?'<th>Detalle</th><th>Cant.</th><th>P. unit.</th><th>IVA</th><th>Importe</th>':'<th>Detalle</th><th>Cant.</th>';
  const rows=items.map(i=>'<tr><td>'+h(i.desc)+(i.extra?' <i>(adicional)</i>':'')+'</td><td>'+i.qty+'</td>'+(price?'<td>'+fmt(i.pu)+((+i.dv>0)?' <i>(−'+(i.dt==='$'?fmt(i.dv):i.dv+' %')+')</i>':'')+'</td><td>'+(o.sinIva?'—':i.iva+'%')+'</td><td>'+fmt(lnNet(i))+'</td>':'')+'</tr>').join('');
  printHTML('<div class="hdr"><img src="'+LOGO+'" alt=""><div><h1 style="margin:0">'+h(DB.cfg.nombre)+'</h1>'+h(DB.cfg.dir)+' · Tel./WhatsApp '+h(DB.cfg.tel)+'<br>'+h(DB.cfg.mail)+' · Facebook: '+h(DB.cfg.fb)+' · Instagram: @'+h(DB.cfg.ig)+'</div></div>'+
- '<h2>'+(pres?'PRESUPUESTO':'ORDEN DE TRABAJO')+' · '+otNum(o)+'</h2><p>Fecha: '+fdate(o.fecha)+' · Cliente: <b>'+h(c.n)+'</b> '+(mech?'':h(c.tel)+'<br>Condición frente a ARCA: <b>'+h(arcaLine(otArca(o)))+'</b>')+'<br>Vehículo: <b>'+h(v.marca+' '+v.mod)+'</b> · Patente <b>'+h(v.pat)+'</b> · '+h(o.km)+' km · Mecánico: '+h((userOf(o.mecId)||{n:'—'}).n)+'</p><p>Motivo: '+h(o.motivo)+'</p>'+
+ '<h2>'+(pres?'PRESUPUESTO':'ORDEN DE TRABAJO')+' · '+otNum(o)+'</h2><p>Fecha: '+fdate(o.fecha)+' · Cliente: <b>'+h(c.n)+'</b> '+(mech?'':h(c.tel)+(cliDom(c)?' · '+h(cliDom(c)):'')+'<br>Condición frente a ARCA: <b>'+h(arcaLine(otArca(o)))+'</b>')+'<br>Vehículo: <b>'+h(v.marca+' '+v.mod)+'</b> · Patente <b>'+h(v.pat)+'</b> · '+h(o.km)+' km · Mecánico: '+h((userOf(o.mecId)||{n:'—'}).n)+'</p><p>Motivo: '+h(o.motivo)+'</p>'+
  (pres?'':'<p>Diagnóstico: '+h(o.obs||'—')+'</p>')+
  (items.length?'<table><thead><tr>'+th+'</tr></thead><tbody>'+rows+'</tbody></table>':'<p class="sm">Sin trabajos ni repuestos autorizados todavía.</p>')+
  (price&&items.length?'<p style="text-align:right">'+(t.desc>0?'Subtotal '+fmt(t.bruto)+' · Descuento '+(o.desc.t==='%'?o.desc.v+' % ':'')+'−'+fmt(t.desc)+' · ':'')+'Neto '+fmt(t.neto)+' · '+(o.sinIva?'Sin IVA':'IVA '+fmt(t.iva))+' · <b>Total '+fmt(t.total)+'</b>'+(t.pagado?' · Pagado '+fmt(t.pagado)+' · Saldo '+fmt(Math.max(0,t.saldo)):'')+'</p>':'')+
@@ -832,7 +844,7 @@ V.turnos=()=>{
 ACT.tuday=d=>{UI.turFecha=+d.n===0?TODAY():addDays(+d.n,UI.turFecha);renderView()};
 CHG.tufecha=t=>{if(t.value){UI.turFecha=t.value;renderView()}};
 ACT.tunew=d=>{const hr=+d.h||9,rc=+d.r||0;
- modal({title:'Nuevo turno · '+fdate(UI.turFecha),ok:'Agendar',wide:true,body:pickerHTML('','')+
+ modal({title:'Nuevo turno · '+fdate(UI.turFecha),ok:'Agendar',wide:true,body:pickerHTML('','',true)+
  '<div class="g4"><div class="f"><label for="tu_f">Fecha</label><input type="date" id="tu_f" value="'+UI.turFecha+'"></div><div class="f"><label for="tu_h">Hora</label><select id="tu_h">'+opts(HORAS,hr,x=>[x,String(x).padStart(2,'0')+':00'])+'</select></div><div class="f"><label for="tu_d">Duración (h)</label><select id="tu_d">'+opts([1,2,3,4,5,6],1)+'</select></div><div class="f"><label for="tu_r">Puesto</label><select id="tu_r">'+opts(RECURSOS.map((r,i)=>[i,r]),rc,x=>x)+'</select></div></div>'+
  '<div class="f"><label for="tu_s">Servicio solicitado</label><input id="tu_s" placeholder="Ej.: service, alineación, frenos…"></div>',calc:()=>pkFill(''),
  onOk:()=>{try{const f=val('tu_f');if(!f)throw new Error('Elegí la fecha.');if(f<TODAY()&&!confirm('La fecha es anterior a hoy. ¿Continuar?'))return false;const hr2=+val('tu_h'),du=+val('tu_d'),rc2=+val('tu_r');const s=val('tu_s').trim();if(s.length<3)throw new Error('Indicá el servicio solicitado.');
@@ -849,21 +861,19 @@ ACT.tuedit=d=>{const t=DB.turnos.find(x=>x.id===d.id);
  onOk:()=>{const cf=tuConflict(val('te_f'),+val('te_h'),+val('te_d'),+val('te_r'),t.id);if(cf){merr(cf);return false}t.fecha=val('te_f');t.hora=+val('te_h');t.dur=+val('te_d');t.rec=+val('te_r');audit('Turno reprogramado',t.id);save();UI.turFecha=t.fecha;renderView();return true}})};
 
 /* ===== Clientes y vehículos ===== */
-V.clientes=()=>{const q=norm(UI.cliQ);const l=DB.clientes.filter(c=>!q||norm(c.n+' '+c.tel+' '+(c.doc||'')+' '+DB.vehs.filter(v=>v.cliId===c.id).map(v=>v.pat+' '+v.marca+' '+v.mod).join(' ')).includes(q));
+V.clientes=()=>{const q=norm(UI.cliQ);const l=DB.clientes.filter(c=>!q||norm(c.n+' '+c.tel+' '+(c.doc||'')+' '+cliDom(c)+' '+DB.vehs.filter(v=>v.cliId===c.id).map(v=>v.pat+' '+v.marca+' '+v.mod).join(' ')).includes(q));
  return '<div class="bar"><h2>Clientes y vehículos</h2><input id="cq" style="max-width:280px" placeholder="Buscar nombre, teléfono, patente…" value="'+h(UI.cliQ)+'" data-chg="cliq" aria-label="Buscar cliente"><span class="sp"></span><button class="btn p" data-act="clinew">➕ Nuevo cliente</button></div>'+
  '<div class="tw"><table><thead><tr><th>Cliente</th><th>Condición ARCA</th><th>Teléfono</th><th>Vehículos</th><th>OT</th><th class="n">Saldo cta. cte.</th></tr></thead><tbody>'+l.map(c=>{const vs=DB.vehs.filter(v=>v.cliId===c.id);return '<tr class="clk" data-act="cliopen" data-id="'+c.id+'"><td><b>'+h(c.n)+'</b>'+(c.cc?' <span class="badge ok">Cta. cte.</span>':'')+'</td><td class="sm">'+h(arcaTxt(c.cond||'CF'))+(c.doc?'<br><span class="mut">'+h(c.doc)+'</span>':'')+'</td><td>'+h(c.tel)+'</td><td>'+vs.map(v=>'<span class="pill">'+h(v.pat)+'</span> '+h(v.marca+' '+v.mod)).join('<br>')+'</td><td>'+DB.ots.filter(o=>o.cliId===c.id).length+'</td><td class="n">'+(c.saldo>0?'<b style="color:var(--bad)">'+fmt(c.saldo)+'</b>':'—')+'</td></tr>'}).join('')+(l.length?'':'<tr><td colspan="6" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>'};
 CHG.cliq=t=>{UI.cliQ=t.value;const p=t.selectionStart;renderView();const n=$('#cq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(e){}}};
 ACT.clinew=()=>ACT.cliopen({id:''});
-ACT.cliopen=d=>{const c=d.id?cliOf(d.id):{id:'',n:'',tel:'',mail:'',doc:'',cond:'CF',cc:false,lim:0,saldo:0};const vs=c.id?DB.vehs.filter(v=>v.cliId===c.id):[];const ots=c.id?DB.ots.filter(o=>o.cliId===c.id).sort((a,b)=>b.num-a.num):[];
- modal({title:c.id?c.n:'Nuevo cliente',wide:true,ok:'Guardar cliente',body:'<div class="g3"><div class="f"><label for="cl_n">Nombre y apellido / razón social</label><input id="cl_n" value="'+h(c.n)+'"></div><div class="f"><label for="cl_t">Teléfono (WhatsApp)</label><input id="cl_t" inputmode="tel" value="'+h(c.tel)+'"></div><div class="f"><label for="cl_m">Correo</label><input id="cl_m" type="email" value="'+h(c.mail)+'"></div></div>'+arcaHTML('cl',c.cond,c.doc)+'<div class="g3">'+
- '<div class="f"><label for="cl_cc">Cuenta corriente</label><select id="cl_cc"><option value="0"'+(c.cc?'':' selected')+'>No habilitada</option><option value="1"'+(c.cc?' selected':'')+'>Habilitada</option></select></div><div class="f"><label for="cl_l">Límite de cuenta corriente ($)</label><input id="cl_l" inputmode="decimal" value="'+(c.lim||0)+'"></div><div class="f"><label>Saldo actual</label><div class="b" style="padding:8px 0;color:'+(c.saldo>0?'var(--bad)':'inherit')+'">'+fmt(c.saldo)+'</div></div></div>'+
+ACT.cliopen=d=>{const c=d.id?cliOf(d.id):{id:'',n:'',tel:'',mail:'',dom:'',loc:'',prov:'Salta',doc:'',cond:'CF',cc:false,lim:0,saldo:0};const vs=c.id?DB.vehs.filter(v=>v.cliId===c.id):[];const ots=c.id?DB.ots.filter(o=>o.cliId===c.id).sort((a,b)=>b.num-a.num):[];
+ modal({title:c.id?c.n:'Nuevo cliente',wide:true,ok:'Guardar cliente',body:cliDatosHTML('cl',Object.assign({},c,{lim:c.lim||0}),false,true)+arcaHTML('cl',c.cond,c.doc)+'<div class="row" style="margin-bottom:10px"><span class="mut sm">Saldo de cuenta corriente:</span> <b style="color:'+(c.saldo>0?'var(--bad)':'inherit')+'">'+fmt(c.saldo)+'</b></div>'+
  (c.id?'<div class="row" style="margin-bottom:10px">'+(c.saldo>0?'<button class="btn p s" data-act="clicobro" data-id="'+c.id+'">💵 Cobrar deuda</button>':'')+'<button class="btn s" data-act="vehnew" data-id="'+c.id+'">➕ Agregar vehículo</button>'+(c.tel?'<a class="btn s" target="_blank" rel="noopener" href="'+h(wa(c.tel,'Hola '+c.n+', te escribimos de '+DB.cfg.nombre+'.'))+'">💬 WhatsApp</a>':'')+'</div>'+
  '<h3>Vehículos y próximo service</h3>'+(vs.length?'<div class="tw"><table class="itbl"><thead><tr><th>Patente</th><th>Vehículo</th><th class="n">Km actual</th><th>Próx. service (km)</th><th>Próx. service (fecha)</th></tr></thead><tbody>'+vs.map(v=>'<tr><td><b>'+h(v.pat)+'</b></td><td>'+h(v.marca+' '+v.mod+(v.anio?' '+v.anio:''))+'</td><td class="n">'+h(v.km)+'</td><td><input data-vk="'+v.id+'" inputmode="numeric" value="'+h(v.proxKm||'')+'"></td><td><input type="date" data-vf="'+v.id+'" value="'+h(v.proxFecha||'')+'"></td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Sin vehículos cargados.</p>')+
  '<h3 style="margin-top:12px">Historial de órdenes</h3>'+(ots.length?'<div class="tw"><table><thead><tr><th>OT</th><th>Fecha</th><th>Vehículo</th><th>Motivo</th><th>Estado</th><th class="n">Total</th></tr></thead><tbody>'+ots.map(o=>'<tr class="clk" data-act="otopen" data-id="'+o.id+'"><td>'+otNum(o)+'</td><td>'+fdate(o.fecha)+'</td><td>'+h((vehOf(o.vehId)||{}).pat)+'</td><td>'+h(o.motivo)+'</td><td><span class="badge b-'+o.estado+'">'+o.estado+'</span></td><td class="n">'+fmt(otTotal(o).total)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="mut">Sin órdenes.</p>'):''),
- onOk:()=>{const n=val('cl_n').trim();if(n.length<3){merr('Cargá el nombre del cliente.');return false}const t=val('cl_t').replace(/\D/g,'');if(t&&t.length<8){merr('El teléfono parece incompleto.');return false}const lim=num(val('cl_l'));if(lim<0){merr('El límite no puede ser negativo.');return false}
-  const cc=val('cl_cc')==='1';if(!cc&&c.saldo>0){merr('No se puede deshabilitar la cuenta corriente con deuda pendiente.');return false}
-  let ar;try{ar=readArca('cl')}catch(e){merr(e.message);return false}
-  const x=c.id?c:{id:uid('c'),doc:'',cond:'CF',saldo:0};if(c.id)arcaToCli(x,ar);else{x.cond=ar.cond;x.doc=ar.doc}Object.assign(x,{n,tel:t,mail:val('cl_m').trim(),cc,lim});if(!c.id)DB.clientes.push(x);
+ onOk:()=>{let ar,cd;try{ar=readArca('cl');cd=readCliDatos('cl',ar.cond)}catch(e){merr(e.message);return false}const n=cd.n;
+  if(!cd.cc&&c.saldo>0){merr('No se puede deshabilitar la cuenta corriente con deuda pendiente.');return false}
+  const x=c.id?c:{id:uid('c'),doc:'',cond:'CF',saldo:0};if(c.id)arcaToCli(x,ar);else{x.cond=ar.cond;x.doc=ar.doc}Object.assign(x,cd);if(!c.id)DB.clientes.push(x);
   $$('[data-vk]').forEach(i=>{const v=vehOf(i.dataset.vk);if(v)v.proxKm=parseInt(i.value)||0});$$('[data-vf]').forEach(i=>{const v=vehOf(i.dataset.vf);if(v)v.proxFecha=i.value||''});
   audit(c.id?'Cliente editado':'Cliente nuevo',n);save();renderView();return true}})};
 ACT.vehnew=d=>{modal({title:'Nuevo vehículo',ok:'Agregar',body:'<div class="g2"><div class="f"><label for="nv_p">Patente</label><input id="nv_p" placeholder="AB123CD" maxlength="8"></div><div class="f"><label for="nv_a">Año</label><input id="nv_a" inputmode="numeric" maxlength="4"></div><div class="f"><label for="nv_m">Marca</label><input id="nv_m"></div><div class="f"><label for="nv_o">Modelo / motor</label><input id="nv_o"></div><div class="f"><label for="nv_k">Km actual</label><input id="nv_k" inputmode="numeric"></div></div>',
@@ -1215,13 +1225,13 @@ ACT.cfreset=()=>{if(MODO==='practica'){confirmBox('Se borran los cambios y vuelv
 
 
 /* ===== Ventas de mostrador (repuestos y productos, precios editables, descuento por renglón) ===== */
-UI.vt=UI.vt||{lines:[],sinIva:false,medio:'Efectivo',cli:'',cond:'CF',doc:'',nn:'',nt:''};
+UI.vt=UI.vt||{lines:[],sinIva:false,medio:'Efectivo',cli:'',cond:'CF',doc:'',nc:{prov:'Salta',lim:0}};
 /* cliente de la venta y su condición frente a ARCA */
 function vtCliHTML(){const vt=UI.vt;return '<div class="card" style="background:#f8fafc;padding:10px 12px;margin-bottom:10px"><div class="g2"><div class="f"><label for="vt_cli">Cliente</label><select id="vt_cli" data-chg="vtcli">'+opts(DB.clientes.slice().sort((a,b)=>a.n.localeCompare(b.n)),vt.cli,c=>[c.id,c.n+(c.doc?' · '+c.doc:'')],'Consumidor final (sin identificar)')+'<option value="__new"'+(vt.cli==='__new'?' selected':'')+'>➕ Nuevo cliente…</option></select></div><div></div></div>'+
- (vt.cli==='__new'?'<div class="g2"><div class="f"><label for="vt_nn">Nombre y apellido / razón social</label><input id="vt_nn" data-chg="vtnc" data-f="nn" value="'+h(vt.nn)+'"></div><div class="f"><label for="vt_nt">Teléfono (WhatsApp)</label><input id="vt_nt" data-chg="vtnc" data-f="nt" inputmode="tel" value="'+h(vt.nt)+'"></div></div>':'')+
+ (vt.cli==='__new'?'<h3 style="margin:4px 0 6px">Datos del cliente nuevo</h3>'+cliDatosHTML('vt',vt.nc,true,true):'')+
  arcaHTML('vt',vt.cond,vt.doc)+'</div>'}
 CHG.vtcli=t=>{const v=UI.vt;v.cli=t.value;const c=cliOf(t.value);v.cond=c?(c.cond||'CF'):'CF';v.doc=c?(c.doc||''):'';renderView()};
-CHG.vtnc=t=>{UI.vt[t.dataset.f]=t.value};
+CHG.cdat=t=>{if(t.dataset.px==='vt'&&UI.vt){UI.vt.nc=UI.vt.nc||{};UI.vt.nc[t.dataset.f]=t.value}};
 function vtTot(){return otTotal({items:UI.vt.lines,sinIva:UI.vt.sinIva,pagos:[],desc:null})}
 function vtTotsHTML(){const t=vtTot();return (t.lineDesc>0?'<span class="sm">Descuentos: −'+fmt(t.lineDesc)+'</span><br>':'')+'Neto '+fmt(t.neto)+' · '+(UI.vt.sinIva?'<b>Sin IVA</b>':'IVA '+fmt(t.iva))+'<br><b style="font-size:1.3rem">Total '+fmt(t.total)+'</b>'}
 function vtRows(){const at=(ix,f)=>' data-chg="vtline" data-i="'+ix+'" data-f="'+f+'"';
@@ -1259,15 +1269,15 @@ ACT.vtcobrar=()=>{const L=UI.vt.lines;if(!L.length)return;
   const medio=UI.vt.medio;let caja='';if(medio==='Efectivo'){if(!DB.turno.abierto)throw new Error('Abrí el turno de caja para cobrar en efectivo.');caja=val('vt_caja');if(!caja)throw new Error('Elegí la caja.')}
   const V0=UI.vt;if(!V0.cli&&(V0.cond||'CF')!=='CF')throw new Error('Para “'+arcaTxt(V0.cond)+'” elegí el cliente o cargalo como nuevo (hace falta la razón social).');
   const ar=arcaCheck(V0.cond,V0.doc,'del cliente');let cli=V0.cli&&V0.cli!=='__new'?cliOf(V0.cli):null;
-  if(V0.cli==='__new'){const n=String(V0.nn||'').trim(),tl=String(V0.nt||'').replace(/\D/g,'');if(n.length<3)throw new Error('Cargá el nombre del cliente nuevo.');if(tl&&tl.length<8)throw new Error('El teléfono parece incompleto.');
-   cli={id:uid('c'),n,doc:ar.doc,cond:ar.cond,tel:tl,mail:'',cc:false,lim:0,saldo:0};DB.clientes.push(cli);audit('Cliente nuevo',n+' · '+arcaLine(ar))}
+  if(V0.cli==='__new'){const cd=readCliDatos('vt',ar.cond);
+   cli=Object.assign({id:uid('c'),doc:ar.doc,cond:ar.cond,cc:false,lim:0,saldo:0},cd);DB.clientes.push(cli);audit('Cliente nuevo',cd.n+' · '+arcaLine(ar))}
   else if(cli)arcaToCli(cli,ar);
   DB.seq.vt++;const num0=DB.seq.vt,ref='VT-'+String(num0).padStart(4,'0');
   for(const id in need)stockMove(repOf(id),-need[id],'Venta de mostrador',ref);
   if(medio==='Efectivo')cajaMov(caja,'ingreso','f2',t.total,ref);
   DB.ventas.unshift({id:uid('vt'),num:num0,fecha:TODAY(),t:Date.now(),u:ME.n,cliId:cli?cli.id:'',cliN:cli?cli.n:'Consumidor final',arca:ar,lines:L.map(l=>Object.assign({},l)),sinIva:UI.vt.sinIva,medio,cajaId:caja,total:t.total,neto:t.neto,iva:t.iva,lineDesc:t.lineDesc});
   audit('Venta de mostrador',ref+' · '+fmt(t.total)+' · '+medio+' · '+(cli?cli.n+' · ':'')+arcaLine(ar)+(t.lineDesc>0?' · descuentos '+fmt(t.lineDesc):''));
-  Object.assign(UI.vt,{lines:[],cli:'',cond:'CF',doc:'',nn:'',nt:''});save();renderView();toast('Venta '+ref+' cobrada: '+fmt(t.total))}catch(e){toast(e.message,1)}};
+  Object.assign(UI.vt,{lines:[],cli:'',cond:'CF',doc:'',nc:{prov:'Salta',lim:0}});save();renderView();toast('Venta '+ref+' cobrada: '+fmt(t.total))}catch(e){toast(e.message,1)}};
 
 /* ===== Eventos globales ===== */
 const PRICEACT=new Set(['repcsv','repfalt','repmasivo','reprevert','repingpre','repimp','repocsv']);
