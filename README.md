@@ -37,10 +37,72 @@ Archivo único: `index.html` (abre en cualquier navegador, sin internet; los dat
 - **Venta de mostrador** (módulo nuevo, dueño/jefe/recepción): repuestos del inventario o **productos nuevos** fuera del inventario, **precio editable** y **descuento (% o $) por renglón**, IVA opcional, cobro en efectivo (entra a caja), transferencia o tarjeta; descuenta stock y deja trazabilidad.
 - **Órdenes de trabajo:** precio editable también en repuestos, **descuento por renglón en cualquier producto o servicio**, producto nuevo, y además el descuento general sobre el total al cobrar.
 
+## Condición frente a ARCA (v3.3)
+- **Al elegir el cliente** en una **orden de trabajo** o en una **venta de mostrador** se elige su condición frente a ARCA: Consumidor Final, IVA Responsable Inscripto, Responsable Monotributo, Monotributista Social, IVA Sujeto Exento, IVA No Alcanzado, Sujeto No Categorizado o Cliente del Exterior. Se completa sola con la de la ficha del cliente y se puede cambiar en el momento.
+- **CUIT obligatorio y validado** (dígito verificador) para Responsable Inscripto, Monotributo, Monotributista Social y Exento; para Consumidor Final el CUIT/CUIL/DNI es opcional.
+- Lo elegido **se guarda en la ficha del cliente** y **queda registrado en la OT o en la venta** (aunque después cambie la ficha). Los cambios quedan en la auditoría.
+- **OT:** se ve en la cabecera (botón *Cambiar* para el dueño, jefe y recepción, mientras no esté entregada), en la impresión de la OT y del presupuesto y en el CSV de órdenes. El mecánico no la ve.
+- **Ventas de mostrador:** se puede elegir un cliente, crear uno nuevo o dejar “Consumidor final (sin identificar)”. Cualquier condición distinta de Consumidor Final exige identificar al cliente. La lista de ventas muestra cliente y condición.
+- **Compras:** en la ficha del proveedor, en el *Ingreso de mercadería* y en la *Orden de compra* se elige la condición del proveedor (sin Consumidor Final; incluye Proveedor del Exterior). Queda en la OC y en el libro del proveedor.
+- Clientes y proveedores cargados antes de esta versión arrancan como Consumidor Final y Responsable Inscripto, respectivamente.
+- **Alta completa del cliente** desde cualquier lugar donde se cree (ficha de clientes, nueva OT, turno nuevo y venta de mostrador): nombre o razón social, teléfono, correo, domicilio, localidad, provincia, cuenta corriente y límite, condición frente a ARCA y CUIT/DNI. Para Responsable Inscripto, Monotributo y Exento se exige el domicilio fiscal; el correo se valida.
+- Es un dato de registro: el sistema **no emite facturas** ni consulta el padrón de ARCA.
+
+## Sistema VB completo (v4): menú digital, Club, garantías, RR. HH. y tareas
+Mismos módulos que la demo [tallermecnicoSVBdemo](https://raveholding.github.io/tallermecnicoSVBdemo/), con los datos del taller:
+- **Menú digital público** en `index.html#menu` (con los datos reales; el de práctica es `#practica-menu`):
+  - **Tienda** con categorías, destacados, buscador, ficha de producto y botón **“Con instalación”**.
+  - **Servicios** por área con precio final, duración y garantía.
+  - **Carrito** que envía el pedido por WhatsApp.
+  - **Turnos online** con horarios libres reales.
+  - Alta al **Club** y consulta de la tarjeta.
+- **Menú digital y pedidos:**
+  - Bandeja de pedidos y turnos del menú. Un pedido se pasa a venta o turno, y la confirmación sale por WhatsApp.
+  - **Catálogo de servicios** con área, descripción, precio, duración, garantía y publicación.
+  - Productos publicados y destacados, y configuración del menú.
+- **Áreas de trabajo:** mecánica, electricidad, car audio, alarmas y accesorios. Las instalaciones suman el control eléctrico previo y van al box de instalaciones.
+- **Club y fidelización:**
+  - Puntos, niveles y premios. Los puntos se pueden usar como pago al cobrar la orden.
+  - Tarjeta del socio.
+  - Recordatorios por WhatsApp: service, cumpleaños, garantías y clientes inactivos.
+- **Garantías** automáticas al entregar o vender, con número de serie y reclamos.
+- **Personal y RR. HH.:**
+  - Legajos, asistencia (entrada y salida), vacaciones y licencias.
+  - **Organigrama** y sueldos estimados con adelantos.
+- **Tareas:** Mi día, tablero del equipo, tareas recurrentes y **responsabilidades por puesto**.
+- **Datos reales intactos:** al actualizar no se borra nada; los módulos nuevos arrancan vacíos con valores por defecto. El modo práctica carga datos de ejemplo nuevos.
+
+**Cómo se arma:**
+- `index.html` se genera con `sh tools/build.sh` a partir de `tools/base.html` (el núcleo del taller) más los módulos de `tools/`, que son los mismos que usa la demo.
+- Los cambios propios del taller se hacen en `tools/base.html`, y después se vuelve a correr el armado.
+
+## Diseño Sistema VB (esqueleto V27.2, sección 7)
+Capa de diseño común a los dos sistemas (`tools/vb_ux.js`). No quita funciones: reordena y agrega.
+- **Barra lateral por secciones plegables:** Operación del taller · Logística e inventario · Clientes y fidelidad · Equipo · Sistema. Arriba van los botones principales **Vender [F1]** y **Nueva orden [F2]**, y en la barra se ven los avisos (órdenes, stock bajo en amarillo, pedidos y tareas).
+- **Barra superior:** nombre del negocio, estado (modo, caja abierta o cerrada, de un día anterior en rojo), **buscador Ctrl + K**, **campana de avisos** con lista, **tema** (Automático → Claro → Oscuro), acceso al menú público y usuario con su rol.
+- **Buscador universal (Ctrl + K):**
+  - Busca por patente, cliente (nombre, teléfono o CUIT), N.º de OT, repuesto (código exacto, parcial o descripción) y pantallas.
+  - Tolera errores de tipeo: “arqeo” lleva a Caja.
+  - Un repuesto elegido se agrega a la venta. Sólo muestra lo que el rol puede abrir.
+- **Tema claro, oscuro y automático:** sólo cambia variables CSS, lo hace en < 5 ms y recuerda la elección en cada equipo. El menú público queda siempre en claro.
+- **Ayuda en contexto:** cada pantalla tiene una línea que dice para qué sirve y por dónde empezar.
+- **Panel “Hoy”** (dueño y jefe de taller):
+  - Cobrado hoy contra ayer, órdenes abiertas con presupuestos esperando, turnos y stock en alerta.
+  - Últimos cobros y tendencia de los últimos 7 días contra la semana anterior.
+  - Sin indicadores repetidos.
+- **Caja:** tablero del turno con estado (verde abierta, gris cerrada, rojo si es de un día anterior), **4 pasos del día** con el paso actual marcado y como atajo, ingresos y egresos, duración y ticket promedio.
+- **Módulos activables** (Configuración → Módulos): menú digital, Club, garantías, tareas y RR. HH. avanzado. Apagarlos sólo los oculta; los datos quedan.
+- **Créditos** completos: Celular (387) 4484132 · www.vincularbusiness.com.ar · correo, con botones WhatsApp · Llamar · Página web · Correo.
+- **Accesibilidad:**
+  - Contraste AA verificado por auditor automático: 0 textos por debajo de 4,5:1 en todas las pantallas de dueño, recepción y mecánico, en claro y en oscuro, más ventanas, ingreso y menú público.
+  - Controles de ≥ 44 px, sin desbordes de 320 a 1440 px y respeta “reducir movimiento”.
+- Pruebas en `tools/pruebas/` (ver LEEME).
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
 - Las dimensiones/rosca/junta cargadas en el modo práctica son de ejemplo y están marcadas “sin verificar”. WEGA no publica API ni descarga de filtros **[VERIFICAR con WEGA]**; se resuelve con enlace a la ficha + importación CSV.
+- Lo que se pide desde el menú digital queda en el navegador donde se hizo y llega por WhatsApp; para que llegue a todos los equipos hace falta la nube. La asistencia es un registro interno y los sueldos, una estimación (la liquidación legal la hace el contador).
 - Sin facturación electrónica ni pagos reales. Textos legales y plazos normativos marcados `[VERIFICAR]`.
 - Los respaldos de la versión demo anterior no son compatibles.
 
