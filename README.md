@@ -76,6 +76,28 @@ Mismos módulos que la demo [tallermecnicoSVBdemo](https://raveholding.github.io
 - `index.html` se genera con `sh tools/build.sh` a partir de `tools/base.html` (el núcleo del taller) más los módulos de `tools/`, que son los mismos que usa la demo.
 - Los cambios propios del taller se hacen en `tools/base.html`, y después se vuelve a correr el armado.
 
+## Diseño Sistema VB (esqueleto V27.2, sección 7)
+Capa de diseño común a los dos sistemas (`tools/vb_ux.js`). No quita funciones: reordena y agrega.
+- **Barra lateral por secciones plegables:** Operación del taller · Logística e inventario · Clientes y fidelidad · Equipo · Sistema. Arriba van los botones principales **Vender [F1]** y **Nueva orden [F2]**, y en la barra se ven los avisos (órdenes, stock bajo en amarillo, pedidos y tareas).
+- **Barra superior:** nombre del negocio, estado (modo, caja abierta o cerrada, de un día anterior en rojo), **buscador Ctrl + K**, **campana de avisos** con lista, **tema** (Automático → Claro → Oscuro), acceso al menú público y usuario con su rol.
+- **Buscador universal (Ctrl + K):**
+  - Busca por patente, cliente (nombre, teléfono o CUIT), N.º de OT, repuesto (código exacto, parcial o descripción) y pantallas.
+  - Tolera errores de tipeo: “arqeo” lleva a Caja.
+  - Un repuesto elegido se agrega a la venta. Sólo muestra lo que el rol puede abrir.
+- **Tema claro, oscuro y automático:** sólo cambia variables CSS, lo hace en < 5 ms y recuerda la elección en cada equipo. El menú público queda siempre en claro.
+- **Ayuda en contexto:** cada pantalla tiene una línea que dice para qué sirve y por dónde empezar.
+- **Panel “Hoy”** (dueño y jefe de taller):
+  - Cobrado hoy contra ayer, órdenes abiertas con presupuestos esperando, turnos y stock en alerta.
+  - Últimos cobros y tendencia de los últimos 7 días contra la semana anterior.
+  - Sin indicadores repetidos.
+- **Caja:** tablero del turno con estado (verde abierta, gris cerrada, rojo si es de un día anterior), **4 pasos del día** con el paso actual marcado y como atajo, ingresos y egresos, duración y ticket promedio.
+- **Módulos activables** (Configuración → Módulos): menú digital, Club, garantías, tareas y RR. HH. avanzado. Apagarlos sólo los oculta; los datos quedan.
+- **Créditos** completos: Celular (387) 4484132 · www.vincularbusiness.com.ar · correo, con botones WhatsApp · Llamar · Página web · Correo.
+- **Accesibilidad:**
+  - Contraste AA verificado por auditor automático: 0 textos por debajo de 4,5:1 en todas las pantallas de dueño, recepción y mecánico, en claro y en oscuro, más ventanas, ingreso y menú público.
+  - Controles de ≥ 44 px, sin desbordes de 320 a 1440 px y respeta “reducir movimiento”.
+- Pruebas en `tools/pruebas/` (ver LEEME).
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
