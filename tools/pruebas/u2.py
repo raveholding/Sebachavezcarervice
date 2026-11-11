@@ -11,8 +11,10 @@ async def main():
         tot=collections.Counter();ex={}
         for th in ['light','dark']:
             await pg.evaluate(f"localStorage.setItem('vb.theme','{th}');themeApply()")
-            for v in views:
-                await pg.evaluate(f"go('{v}')");await pg.wait_for_timeout(60)
+            vv=[(v,None) for v in views]+([('config',t) for t in await pg.evaluate("typeof cfTabs==='function'&&ME.rol==='dueno'?cfTabs().map(x=>x[0]):[]")])
+            for v,t in vv:
+                await pg.evaluate(f"UI.cfTab='{t}'" if t else "0");await pg.evaluate(f"go('{v}')");await pg.wait_for_timeout(60)
+                if t:v='config/'+t
                 r=await pg.evaluate(JS)
                 for x in r:
                     k=(th,v,x['cls'][:40]);tot[k]+=1;ex.setdefault(k,x)

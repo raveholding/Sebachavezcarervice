@@ -9,3 +9,8 @@ Correr desde la raíz del repo:
 Ejemplos:
 - Demo: `file:///…/index.html` con "Martín Gómez" y `#menu`.
 - Seba: `file:///…/index.html#practica` con "Seba Chavez" y `#practica-menu`.
+
+- `python3 tools/pruebas/c1.py <url> "<usuario>"`: Configuración (guardado automático, buscador, interruptores, precios, porcentaje, módulos, móvil).
+- `python3 tools/pruebas/c2.py`: interruptores del menú y acceso oculto (doble clic, doble toque, apagado) en la demo.
+- `python3 tools/pruebas/c3.py <url>`: acceso oculto desde `#menu` y `#practica-menu` en Seba.
+- `u2.py` ahora también revisa el contraste de cada sección de Configuración.
