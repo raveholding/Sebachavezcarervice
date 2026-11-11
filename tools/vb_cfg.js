@@ -39,7 +39,7 @@ document.head.appendChild(st)})();
 
 UI.cfTab=UI.cfTab||'neg';UI.cfQ='';UI.cfMoQ=UI.cfMoQ||'';UI.cfMoF=UI.cfMoF||'';UI.cfAuQ=UI.cfAuQ||'';
 const cfMenuOn=()=>typeof webCfgHTML==='function'&&modOn('webp');
-const cfTabs=()=>[['neg','🏪','Datos del negocio'],['mod','🧩','Módulos'],['fun','🎛️','Funcionamiento'],['mo','🧰','Mano de obra']].concat(cfMenuOn()?[['menu','📱','Menú digital']]:[]).concat([['acc','🔐','Usuarios y accesos'],['dat','💾','Datos y respaldo'],['aud','🕑','Auditoría']]);
+const cfTabs=()=>[['neg','🏪','Datos del negocio'],['mod','🧩','Módulos'],['fun','🎛️','Funcionamiento'],['mo','🧰','Mano de obra']].concat(cfMenuOn()?[['menu','📱','Menú digital']]:[]).concat(typeof prCfg==='function'?[['imp','🖨️','Impresión y datos fiscales']]:[]).concat([['acc','🔐','Usuarios y accesos'],['dat','💾','Datos y respaldo'],['aud','🕑','Auditoría']]);
 const cfSinPrecio=()=>DB.servicios.filter(s=>!(s.pu>0)).length;
 const cfBkDias=()=>DB.cfg.lastBackup?Math.floor((Date.now()-DB.cfg.lastBackup)/864e5):null;
 function cfChecks(){const c=DB.cfg,M=c.menu||{};const L=[
@@ -49,6 +49,7 @@ function cfChecks(){const c=DB.cfg,M=c.menu||{};const L=[
  ['Correo o una red social',!!((c.mail||'').trim()||(c.ig||'').trim()||(c.fb||'').trim()),'neg','cf_m'],
  ['Precios de mano de obra',DB.servicios.length>0&&!cfSinPrecio(),'mo','cfmoq'],
  ['Respaldo de los últimos 7 días',cfBkDias()!==null&&cfBkDias()<=7,'dat','']];
+ if(typeof prFiscOk==='function')L.push(['Datos fiscales (CUIT y condición)',prFiscOk(),'imp','pf_cuit']);
  if(cfMenuOn())L.push(['Horario del menú digital',!!(M.horario||'').trim(),'menu','mc_h']);return L}
 /* índice del buscador: [texto, palabras clave, sección, campo] */
 const CFIDX=[['Nombre del negocio','razon social titulo marca','neg','cf_n'],['Dirección','domicilio calle ubicacion mapa','neg','cf_d'],['Teléfono / WhatsApp','celular telefono whatsapp contacto','neg','cf_t'],['Correo','mail email','neg','cf_m'],['Facebook','redes','neg','cf_f'],['Instagram','redes ig','neg','cf_i'],
@@ -56,13 +57,14 @@ const CFIDX=[['Nombre del negocio','razon social titulo marca','neg','cf_n'],['D
  ['Traspasos entre cajas sin rubro','caja traspaso rubro','fun','sw_traspasoSinRubro'],['IVA en órdenes nuevas','iva impuesto factura','fun','sw_ivaDef'],['Recepción cobra y entrega','recepcion cobrar entregar permisos','fun','sw_recepCobra'],
  ['Precios de mano de obra','servicios tarifas catalogo precio','mo','cfmoq'],['Aumentar precios por porcentaje','inflacion aumento ajuste masivo','mo','cfmopct'],['Agregar servicio','nuevo servicio','mo','sv_n'],
  ['Frase de bienvenida del menú','menu bienvenida saludo','menu','mc_b'],['Horario de atención','horarios menu','menu','mc_h'],['Mostrar precios en el menú','consultar precios','menu',''],['Acceso oculto desde el logo','doble clic logo panel ingresar secreto','menu','sw_accOculto'],
+ ['CUIT y condición frente a ARCA del negocio','fiscal cuit iibb ingresos brutos inicio actividades razon social monotributo responsable inscripto','imp','pf_cuit'],['Formato de impresión (A4 o ticket)','impresora ticket 80 58 termica papel','imp','pf_fmt'],['Texto al pie y condiciones de garantía','pie ticket garantia leyenda','imp','pf_pie'],
  ['Usuarios y claves','personal clave pin contraseña roles permisos','acc',''],['Mi clave','cambiar mi clave pin','acc',''],
  ['Respaldo','backup copia exportar importar restaurar excel','dat',''],['Borrar o restablecer datos','reset borrar','dat',''],['Auditoría','historial movimientos quien hizo','aud','cfauq']];
 
 V.config=()=>{if(ME.rol!=='dueno')return '<div class="card"><p>Sólo el dueño puede ver la configuración.</p></div>';
  const T=cfTabs();if(!T.some(t=>t[0]===UI.cfTab))UI.cfTab='neg';const ck=cfChecks(),ok=ck.filter(x=>x[1]).length,pc=Math.round(ok*100/ck.length);
- const cnt={neg:ck.filter(x=>x[2]==='neg'&&!x[1]).length,mo:cfSinPrecio(),dat:(cfBkDias()===null||cfBkDias()>7)?1:0};
- const body={neg:cfNeg,mod:cfMod,fun:cfFun,mo:cfMo,menu:cfMenu,acc:cfAcc,dat:cfDat,aud:cfAud}[UI.cfTab]();
+ const cnt={imp:ck.filter(x=>x[2]==='imp'&&!x[1]).length,neg:ck.filter(x=>x[2]==='neg'&&!x[1]).length,mo:cfSinPrecio(),dat:(cfBkDias()===null||cfBkDias()>7)?1:0};
+ const body={neg:cfNeg,mod:cfMod,fun:cfFun,mo:cfMo,menu:cfMenu,imp:cfImp,acc:cfAcc,dat:cfDat,aud:cfAud}[UI.cfTab]();
  return '<div class="cfhead"><h2>Configuración</h2><div class="cfsrch"><input id="cfq" type="search" placeholder="Buscar un ajuste… (ej.: IVA, horario, clave)" autocomplete="off" data-chg="cfq" aria-label="Buscar un ajuste" aria-controls="cfres"><div id="cfres" class="cfres" hidden></div></div></div>'+
  (pc<100?'<div class="card"><div class="cfprog"><b>Puesta en marcha: '+pc+' %</b><div class="cfbar" role="progressbar" aria-valuenow="'+pc+'" aria-valuemin="0" aria-valuemax="100" aria-label="Puesta en marcha"><i style="width:'+pc+'%"></i></div><span class="sm mut">'+ok+' de '+ck.length+' listos</span></div><div class="cfmiss"><span class="sm mut" style="align-self:center">Te falta:</span>'+ck.filter(x=>!x[1]).map(x=>'<button data-act="cfgo" data-t="'+x[2]+'" data-f="'+x[3]+'">＋ '+h(x[0])+'</button>').join('')+'</div></div>':'')+
  '<div class="cfx"><nav class="cfnav" aria-label="Secciones de configuración">'+T.map(t=>'<button data-act="cftab" data-t="'+t[0]+'" class="'+(UI.cfTab===t[0]?'on':'')+'"'+(UI.cfTab===t[0]?' aria-current="page"':'')+'><span aria-hidden="true">'+t[1]+'</span>'+h(t[2])+(cnt[t[0]]?'<span class="cnt" aria-label="'+cnt[t[0]]+' pendientes">'+cnt[t[0]]+'</span>':'')+'</button>').join('')+'</nav><div id="cfbody">'+body+'</div></div>'};
@@ -110,6 +112,19 @@ function cfMenu(){const on=DB.cfg.accOculto!==false;
  '<div class="row"><a class="btn" href="'+h(menuURL())+'" target="_blank" rel="noopener">📱 Abrir el menú digital</a><button class="btn" data-act="go" data-v="webp">Productos, pedidos y turnos →</button></div></div>'}
 CHG.cfacc=t=>{if(ME.rol!=='dueno')return;DB.cfg.accOculto=t.checked;audit('Acceso oculto desde el logo',t.checked?'activado':'apagado');save();cfFlash('acc')};
 
+function cfImp(){const P=prCfg(),F=DB.cfg.fisc;return '<div class="g2" style="align-items:start"><div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Datos fiscales del negocio</h3>'+cfOk('imp')+'</div><p class="sm mut">Salen en el encabezado de los comprobantes y sirven para sugerir la letra de la factura. Copialos tal cual figuran en ARCA.</p>'+
+ '<div class="f"><label for="pf_raz">Razón social (si es distinta del nombre)</label><input id="pf_raz" value="'+h(F.razon)+'" data-chg="cffis" data-f="razon"></div>'+
+ '<div class="f"><label for="pf_cond">Condición frente al IVA</label><select id="pf_cond" data-chg="cffis" data-f="cond">'+PR_EMI.map(x=>'<option value="'+x[0]+'"'+(F.cond===x[0]?' selected':'')+'>'+x[1]+'</option>').join('')+'</select></div>'+
+ '<div class="f"><label for="pf_cuit">CUIT</label><input id="pf_cuit" inputmode="numeric" value="'+h(F.cuit)+'" data-chg="cffis" data-f="cuit" placeholder="20-12345678-9"><div class="cferr" id="er_cuit"></div></div>'+
+ '<div class="g2"><div class="f"><label for="pf_iibb">Ingresos Brutos</label><input id="pf_iibb" value="'+h(F.iibb)+'" data-chg="cffis" data-f="iibb"></div><div class="f"><label for="pf_ini">Inicio de actividades</label><input id="pf_ini" type="date" value="'+h(F.inicio)+'" data-chg="cffis" data-f="inicio"></div></div></div>'+
+ '<div class="card"><h3>Impresión</h3><div class="f"><label id="pf_fmt">Formato de tickets y comprobantes</label><div class="chips">'+[['a4','📄 Hoja A4'],['80','🧾 Ticket 80 mm'],['58','🧾 Ticket 58 mm']].map(f=>'<button class="chip'+(P.fmt===f[0]?' on':'')+'" data-act="prfmt" data-v="'+f[0]+'">'+f[1]+'</button>').join('')+'</div><span class="sm mut">Las constancias, estados de cuenta, órdenes de compra y la agenda salen siempre en A4.</span></div>'+
+ '<div class="f"><label for="pf_pie">Texto al pie de tickets y comprobantes</label><input id="pf_pie" value="'+h(P.pie)+'" data-chg="cfprn" data-f="pie" maxlength="140"></div>'+
+ '<div class="f"><label for="pf_gar">Condiciones de garantía (constancia de entrega)</label><textarea id="pf_gar" rows="4" data-chg="cfprn" data-f="gar">'+h(P.gar)+'</textarea></div>'+
+ '<button class="btn" data-act="go" data-v="imprimir">🖨️ Ir a Impresiones →</button></div></div>'}
+let cfFT=null;CHG.cffis=t=>{if(ME.rol!=='dueno')return;prCfg();const f=t.dataset.f;let v=t.value.trim();
+ if(f==='cuit'){const e=$('#er_cuit');if(v&&!cuitOk(v)){if(e)e.textContent='CUIT inválido: son 11 números y el último es el dígito verificador.';t.setAttribute('aria-invalid','true');return}if(e)e.textContent='';t.removeAttribute('aria-invalid');if(v)v=cuitFmt(v)}
+ DB.cfg.fisc[f]=v;clearTimeout(cfFT);cfFT=setTimeout(()=>{audit('Datos fiscales del negocio',f);save();cfFlash('imp')},450)};
+let cfPT=null;CHG.cfprn=t=>{if(ME.rol!=='dueno')return;prCfg()[t.dataset.f]=t.value.trim();clearTimeout(cfPT);cfPT=setTimeout(()=>{save();cfFlash('imp')},450)};
 function cfAcc(){const S=[['personal','👷 Personal: usuarios y claves','Agregar personas, elegir su puesto (permisos) y darles o cambiarles la clave.'],['__mipin','🔑 Mi clave','Cambiar tu propia clave de ingreso.']].concat(modOn('tareas')?[['tareas','🗂️ Qué le toca a cada puesto','Responsabilidades por puesto, base del organigrama de tareas.']]:[]);
  return '<div class="card"><h3>Usuarios y accesos</h3><div class="cfsc">'+S.map(s=>'<button '+(s[0]==='__mipin'?'data-act="mipin"':'data-act="go" data-v="'+s[0]+'"')+'><b>'+s[1]+'</b><span>'+s[2]+'</span></button>').join('')+'</div>'+
  '<p class="sm mut" style="margin-top:12px">Si alguien de tu equipo olvida su clave, se la cambiás vos desde Personal. Si el dueño olvida la suya, en la pantalla de ingreso está “Olvidé la clave del dueño”, que usa el código de recuperación que anotaste al crear el sistema.</p></div>'}
