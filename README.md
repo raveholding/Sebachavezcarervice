@@ -127,6 +127,17 @@ Pantalla **Sistema → Datos y respaldo** (solo el dueño). Funciona sin interne
 - **Mano de obra**: búsqueda, filtro por área y "Sin precio", precio con IVA al lado, acepta "10.000" y **aumento o baja por porcentaje** a todos o a los filtrados (redondea a la decena; las órdenes cargadas no cambian).
 - **Acceso oculto al panel**: en el menú digital público, **doble clic (o doble toque en el celular) sobre el logo** abre el ingreso al sistema. No se ve ningún botón y sigue pidiendo usuario y clave. Se apaga en Configuración → Menú digital.
 
+## Impresiones (v7)
+
+Pantalla **Operación → Impresiones** (dueño, jefe de taller y recepción) y botones en cada lugar: "🖨 Más impresiones…" dentro de cada orden, 🖨 en cada venta y en cada orden de compra, y aviso para imprimir el ticket apenas se cobra una venta.
+
+- **Para el cliente**: presupuesto, orden de trabajo, comprobante interno (con la X y "Documento no válido como factura"), recibo de cada cobro con el importe en letras, constancia de entrega con garantías y próximo service, ticket de venta, estado de cuenta y etiqueta de próximo service (10 × 6 cm).
+- **Para el taller**: agenda del día (turnos, vehículos en el taller y tareas, con casillas), orden de compra, pedido de reposición por proveedor, lista de precios de mano de obra y cartel A4 con el QR del menú digital.
+- **Formato**: hoja A4, ticket de 80 mm o de 58 mm (impresoras térmicas). Para un PDF, "Guardar como PDF" en la ventana de impresión. Funciona sin internet.
+- **Factura**: el sistema **no emite facturas ni pide CAE**. Se emite en ARCA (web o facturador) y después se **registra a mano** el tipo, punto de venta, número y, si se quiere, el CAE, para que quede vinculada a la orden o a la venta y salga en los papeles. Sugiere la letra según la condición del negocio y del cliente [VERIFICAR con el contador].
+- **Configuración → Impresión y datos fiscales**: CUIT (con control del dígito verificador), condición frente al IVA, Ingresos Brutos, inicio de actividades, texto al pie y condiciones de garantía. Hasta que se completen, la puesta en marcha lo marca como pendiente.
+- El QR usa la biblioteca qrcode-generator 2.0.4 (Kazuhiko Arase, licencia MIT), incluida dentro del archivo.
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
