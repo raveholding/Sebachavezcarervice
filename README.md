@@ -98,6 +98,25 @@ Capa de diseño común a los dos sistemas (`tools/vb_ux.js`). No quita funciones
   - Controles de ≥ 44 px, sin desbordes de 320 a 1440 px y respeta “reducir movimiento”.
 - Pruebas en `tools/pruebas/` (ver LEEME).
 
+## Datos y respaldo (v5)
+
+Pantalla **Sistema → Datos y respaldo** (solo el dueño). Funciona sin internet y sin servicios externos.
+
+- **Respaldo completo**: archivo `.json` con todo el sistema, o `.vbk` **cifrado** con clave (AES-256-GCM, clave derivada con PBKDF2-SHA256). Si se pierde la clave del respaldo cifrado, no se puede abrir: anotarla en un lugar seguro.
+- **Restaurar**: valida el archivo y, antes de reemplazar, deja una copia automática del estado actual. El sistema real no acepta respaldos de práctica o de demostración.
+- **Copias automáticas en el equipo**: una por día y otra antes de cada restauración o importación; se guardan las últimas 10 en el navegador. No reemplazan al respaldo en un pendrive o en la nube.
+- **Exportar**: cada tabla (clientes, vehículos, órdenes, ventas, repuestos, stock, proveedores, compras, caja, turnos, servicios, garantías, Club, personal, asistencia, tareas, auditoría) en Excel, CSV o JSON, o un Excel completo con todas las hojas. El CSV usa `;` y viene protegido contra fórmulas peligrosas.
+- **Importar** desde Excel (.xlsx), CSV o JSON: clientes con vehículos, proveedores, servicios, actualización de precios por código y repuestos. Reconoce encabezados con distintos nombres, muestra una vista previa con las filas aceptadas y rechazadas (con el motivo) y recién después aplica. No lee el formato viejo .xls: guardarlo antes como .xlsx.
+
+## Sin internet (v5)
+
+- Después de abrirlo una vez con internet, el sistema **vuelve a abrir y trabaja sin conexión** (queda guardado en el equipo). Arriba aparece "● Sin internet" mientras no hay conexión.
+- **Instalar como app**: desde Datos y respaldo → Sin internet, o desde el menú del navegador ("Instalar" / "Agregar a pantalla de inicio").
+- **Almacenamiento permanente**: pedirlo en la misma pestaña, para que el navegador no borre los datos al quedarse sin espacio.
+- **Copia del programa**: botón para descargar el `.html`, que abre con doble clic en cualquier computadora aunque no haya internet.
+- Los datos viven **en ese navegador y ese equipo**: hacer un respaldo al menos una vez por semana y guardarlo fuera del equipo. Borrar los datos del navegador borra el sistema.
+- Lo que necesita internet: compartir por WhatsApp, abrir mapas y recibir las versiones nuevas (cuando hay una, aparece el aviso para actualizar).
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
