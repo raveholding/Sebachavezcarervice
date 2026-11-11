@@ -27,8 +27,8 @@ async def main():
         await pg.click('[data-act=uxbell]');await pg.wait_for_timeout(100);await pg.screenshot(path=f'/tmp/{P}_bell.png');print('avisos',await J("document.querySelectorAll('#uxbell button').length"))
         await pg.keyboard.press('Escape');await J("($('#uxbell')||{remove(){}}).remove()")
         await J("ACT.uxsec({s:'log'})");print('sección plegada',await J("$('#uxs_log').classList.contains('cl')"))
-        await J("go('config')");await pg.click('[data-chg=uxmod][data-k=club]');await pg.wait_for_timeout(100);print('club oculto',await J("!$('#nav_club')"));await J("go('club')");print('go club apagado ->',await J("VIEW"))
-        await J("go('config')");await pg.click('[data-chg=uxmod][data-k=club]');await pg.wait_for_timeout(100);print('club vuelve',await J("!!$('#nav_club')"))
+        await J("UI.cfTab='mod';go('config')");await pg.click('[data-chg=uxmod][data-k=club]');await pg.wait_for_timeout(100);print('club oculto',await J("!$('#nav_club')"));await J("go('club')");print('go club apagado ->',await J("VIEW"))
+        await J("UI.cfTab='mod';go('config')");await pg.click('[data-chg=uxmod][data-k=club]');await pg.wait_for_timeout(100);print('club vuelve',await J("!!$('#nav_club')"))
         t0=await J("performance.now()");await J("ACT.uxtheme()");t1=await J("performance.now()");print('tema ms',round(t1-t0,1))
         for w in [320,360,768,1024,1440]:
             await pg.set_viewport_size({'width':w,'height':820});await J("go('dash')");await pg.wait_for_timeout(80)
