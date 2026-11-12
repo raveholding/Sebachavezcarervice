@@ -138,6 +138,11 @@ Pantalla **Operación → Impresiones** (dueño, jefe de taller y recepción) y 
 - **Configuración → Impresión y datos fiscales**: CUIT (con control del dígito verificador), condición frente al IVA, Ingresos Brutos, inicio de actividades, texto al pie y condiciones de garantía. Hasta que se completen, la puesta en marcha lo marca como pendiente.
 - El QR usa la biblioteca qrcode-generator 2.0.4 (Kazuhiko Arase, licencia MIT), incluida dentro del archivo.
 
+## Ejemplos de ventas y compras, y demo limpia (v7.1)
+
+- Los datos de ejemplo suman 5 ventas de mostrador (consumidor final, monotributista y responsable inscripto, con distintos medios de pago), una de ellas con factura registrada, y 2 órdenes de compra pendientes. Así se pueden mostrar el ticket, el recibo, la orden de compra y el registro de factura sin cargar nada antes.
+- La versión de los datos de ejemplo pasó a `car5`: los datos de **práctica** guardados con la versión anterior se reemplazan solos por los nuevos. Los datos reales no se tocan.
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
