@@ -6,4 +6,5 @@ set -e
 D=$(dirname "$0")
 cp "$D/base.html" index.html
 python3 "$D/demo_patch.py" index.html --cliente
+python3 "$D/seba_final.py" index.html
 python3 "$D/pwa.py" . "SebaChavez Car Service" "SebaChavez" "$D/logo_cliente.jpg"
