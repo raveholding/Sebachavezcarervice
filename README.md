@@ -143,6 +143,13 @@ Pantalla **Operación → Impresiones** (dueño, jefe de taller y recepción) y 
 - Los datos de ejemplo suman 5 ventas de mostrador (consumidor final, monotributista y responsable inscripto, con distintos medios de pago), una de ellas con factura registrada, y 2 órdenes de compra pendientes. Así se pueden mostrar el ticket, el recibo, la orden de compra y el registro de factura sin cargar nada antes.
 - La versión de los datos de ejemplo pasó a `car5`: los datos de **práctica** guardados con la versión anterior se reemplazan solos por los nuevos. Los datos reales no se tocan.
 
+## Sistema final del cliente (v8)
+
+- **Sin referencias a la demo**: la pantalla de ingreso ya no ofrece el modo práctica ni los datos de ejemplo. El modo práctica sigue disponible para capacitar entrando a la dirección `#practica`. Los ajustes propios de este cliente están en `tools/seba_final.py` (no se aplican a la demo).
+- **Código 2 (EAN) / sub código**: columna "Código 2 (EAN)" en la lista de repuestos y campo siempre visible en la ficha. Todos los códigos sirven para buscar y escanear al vender.
+- **Importar artículos** (Repuestos → Importar, o Datos y respaldo → Importar): acepta Excel (.xlsx) o CSV. Reconoce la columna `otros_codigos` (o "EAN 2" / "Código 2") y `precio_venta` (opcional, sin IVA: si está, manda sobre la ganancia). Los artículos cuyo código ya existe o se repite en el archivo **se omiten y se listan**, y el resto se carga igual (antes se cancelaba toda la carga).
+- Pruebas: `tools/pruebas/s_imp.py` (importación con código 2, omitidos y recarga) y `tools/pruebas/f1.py` (busca textos de demo en el sistema real).
+
 ## Límites (no afirmar más que esto)
 - **Los datos viven sólo en el navegador y el equipo donde se usan.** No hay sincronización entre dispositivos ni copia en la nube; si se borran los datos del navegador o se cambia de equipo, sólo sirve el respaldo.
 - **La clave es un control de uso del sistema, no seguridad de servidor:** quien tenga acceso al equipo y sepa usar las herramientas del navegador puede leer o modificar los datos locales. Para varios equipos o seguridad real hace falta un servidor (por ejemplo, Supabase).
