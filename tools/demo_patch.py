@@ -71,7 +71,7 @@ rep(".tg{display:grid;grid-template-columns:60px repeat(4,minmax(150px,1fr));min
 # 7) acceso al menú desde el ingreso
 if not CLIENTE:
   rep("<a href=\"#\" data-act=\"modoreal\">Probar el sistema vacío (con claves)</a>",
-    "<a href=\"#\" data-act=\"modoreal\">Probar el sistema vacío (con claves)</a><br>📱 <a href=\"#menu\" target=\"_blank\" rel=\"noopener\">Ver el menú digital que ven los clientes</a>")
+    "<span style=\"display:flex;gap:8px;flex-wrap:wrap;margin-top:10px\"><a href=\"#\" class=\"btn s\" data-act=\"modoreal\" style=\"background:#fff;color:#1d2127\">🧹 Probar el sistema limpio, con mis datos</a><a href=\"#menu\" class=\"btn s\" target=\"_blank\" rel=\"noopener\" style=\"background:#fff;color:#1d2127\">📱 Ver el menú digital</a></span><span style=\"display:block;margin-top:6px\">O elegí un perfil de abajo para recorrerlo con datos de ejemplo.</span>")
 
 else:
   rep('<a href="#practica" data-act="modopractica">Modo práctica</a></p>', '<a href="#practica" data-act="modopractica">Modo práctica</a> · 📱 <a href="#menu" target="_blank" rel="noopener">Menú digital</a></p>')

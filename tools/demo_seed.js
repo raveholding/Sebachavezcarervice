@@ -5,7 +5,7 @@ const AREA_INST=['ele','aud','ala','acc'];
 const CLUBDEF={on:true,cada:1000,ptsx:1,valor:20,niveles:[{n:'Bronce',d:0,b:'Sumás puntos en cada service, instalación y compra'},{n:'Plata',d:400,b:'Lavado de motor sin cargo en cada service'},{n:'Oro',d:1200,b:'5 % menos en mano de obra y prioridad de turno'}],cumple:'10 % de descuento en mano de obra durante tu mes de cumpleaños',vence:12};
 const MENUDEF={bienvenida:'Mecánica, car audio, alarmas y accesorios en un solo lugar.',horario:'Lunes a viernes de 8:30 a 18 · Sábados de 9 a 13',precios:true,turnos:true,club:true};
 const PREMIOSDEF=[{id:'pr1',n:'Lavado de motor',pts:250,d:'Con desengrasante y secado'},{id:'pr2',n:'Revisión de alarma y controles',pts:300,d:'Chequeo, batería de controles y ajuste de sensores'},{id:'pr3',n:'Kit LED para patente',pts:400,d:'Par de lámparas LED instaladas'},{id:'pr4',n:'Alineación sin cargo',pts:900,d:'Alineación computarizada'}];
-const DEMOVER='car4';
+const DEMOVER='car5';
 const tel10=t=>String(t||'').replace(/\D/g,'').slice(-10);
 function extMigrar(o){if(o.modo==='practica'&&o.demoVer!==DEMOVER&&typeof seed==='function')return migrar(seed());
  o.cfg=o.cfg||{};o.seq=o.seq||{};
@@ -120,5 +120,23 @@ function extSeed(d){
  d.seq.ped=1;d.pedidos.push({id:'pw1',num:1,t:Date.now()-36e5*3,n:'Lautaro Sosa (ejemplo)',tel:'3875667788',veh:'Peugeot 208',entrega:'instalar',nota:'¿Tienen turno para el sábado?',estado:'Nuevo',items:[{k:'rep',id:rq('PAR-69-3V').id,qty:1,desc:rq('PAR-69-3V').desc,pu:r2(rq('PAR-69-3V').pv*1.21)},{k:'srv',id:'s14',qty:1,desc:'Instalación de parlantes (par)',pu:r2(18000*1.21)}]});
  d.seq.sol=2;d.solic.push({id:'sw1',num:1,t:Date.now()-36e5*5,fecha:addDays(1),hora:10,sid:'s18',n:'Micaela Torres (ejemplo)',tel:'3874112299',pat:'AD987ZX',veh:'Chevrolet Onix',nota:'Quiero alarma con bloqueo',estado:'Nueva'});
  d.solic.push({id:'sw2',num:2,t:Date.now()-36e5*20,fecha:addDays(2),hora:9,sid:'s1',n:'Raúl Cardozo (ejemplo)',tel:'3875443322',pat:'AB321CC',veh:'Fiat Cronos',nota:'',estado:'Nueva'});
+ demoMovSeed(d);
  rhSeed(d);
  return d}
+
+/* ventas de mostrador, órdenes de compra y una factura registrada de ejemplo (sólo datos de práctica / demo) */
+function demoMovSeed(d){const fk=b=>{for(let i=0;i<20;i++){const x=String(+b+i).padStart(10,'0'),v=cuitDV(x);if(v!==null)return x.slice(0,2)+'-'+x.slice(2)+'-'+v}return ''};
+ const day=n=>addDays(-n),ts=(n,h)=>new Date(day(n)+'T'+String(h).padStart(2,'0')+':15:00').getTime();
+ const R=d.repuestos.filter(r=>r.activo!==false&&r.qty>3&&r.pv>0);if(R.length<4)return;const pick=i=>R[i%R.length];
+ const lerma=d.clientes.find(c=>/Lerma/.test(c.n));if(lerma&&!lerma.doc){lerma.cond='RI';lerma.doc=fk('3071234560')}
+ const gas=d.clientes.find(c=>/Gast/.test(c.n));if(gas&&!gas.doc){gas.cond='MT';gas.doc=fk('2031456780')}
+ const V=[[6,10,null,[[0,2],[3,1]],'Efectivo'],[4,12,gas,[[1,1]],'Transferencia'],[3,17,lerma,[[2,4],[5,2]],'Transferencia'],[1,11,null,[[4,1],[6,2]],'Tarjeta de débito'],[1,16,d.clientes[0],[[7,1]],'Mercado Pago']];
+ d.ventas=d.ventas||[];V.forEach((x,i)=>{const L=x[3].map(([k,q])=>{const r=pick(k);r.qty=Math.max(0,r.qty-q);return {k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:q,pu:r.pv,pu0:r.pv,iva:r.iva||21,costo:r.pc||0,dt:'%',dv:0}});
+  const neto=r2(L.reduce((a,l)=>a+l.qty*l.pu,0)),iva=r2(L.reduce((a,l)=>a+l.qty*l.pu*l.iva/100,0));const c=x[2];d.seq.vt=(d.seq.vt||0)+1;
+  d.ventas.unshift({id:'vtd'+(i+1),num:d.seq.vt,fecha:day(x[0]),t:ts(x[0],x[1]),u:'Lucía Ramos',cliId:c?c.id:'',cliN:c?c.n:'Consumidor final',arca:c?{cond:c.cond||'CF',doc:c.doc||''}:{cond:'CF',doc:''},lines:L,sinIva:false,medio:x[4],cajaId:'C1',total:r2(neto+iva),neto,iva,lineDesc:0})});
+ const fv=d.ventas.find(v=>v.id==='vtd3');if(fv)fv.fact={tipo:'A',pv:3,num:1287,fecha:fv.fecha,cae:'',u:'Lucía Ramos'};
+ const low=d.repuestos.filter(r=>r.activo!==false&&r.provId);const byP={};low.forEach(r=>{(byP[r.provId]=byP[r.provId]||[]).push(r)});const P=Object.keys(byP).slice(0,2);
+ d.ocs=d.ocs||[];P.forEach((pid,i)=>{d.seq.oc=(d.seq.oc||0)+1;d.ocs.push({id:'ocd'+(i+1),num:d.seq.oc,provId:pid,arca:(d.provs.find(p=>p.id===pid)||{}).cond||'RI',fecha:day(2-i),lines:byP[pid].slice(0,3+i).map((r,j)=>({repId:r.id,qty:[4,2,6,3][j%4],costo:r.pc||0})),estado:'Pendiente',obs:i?'':'Entregar por la mañana.'})});
+ d.cfg.print={fmt:'a4',pie:'Gracias por elegirnos.',gar:'La garantía cubre defectos de los repuestos y de la mano de obra indicados, desde la fecha de entrega. No cubre mal uso, golpes, ni intervenciones de terceros. [VERIFICAR / completar por el taller]'};
+ if(!VB_CLIENTE)d.cfg.fisc={razon:'Tu Taller Car Center S.R.L. (ejemplo)',cond:'RI',cuit:fk('3070000000'),iibb:'Ejemplo 1234567',inicio:'2018-03-01'};
+ d.audit=d.audit||[];d.audit.unshift({t:ts(3,17),u:'Lucía Ramos',a:'Factura ARCA registrada',d:'VT-'+String((fv||{}).num||3).padStart(4,'0')+' · Factura A 00003-00001287 (ejemplo)'})}

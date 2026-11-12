@@ -16,3 +16,4 @@ Ejemplos:
 - `u2.py` ahora también revisa el contraste de cada sección de Configuración.
 - `python3 tools/pruebas/p1.py <url> "<usuario>" <prefijo>`: imprime todos los documentos en A4, 80 y 58 mm (genera PDF en /tmp/t), importe en letras y registro de factura.
 - `python3 tools/pruebas/p2.py <url> "<usuario>"`: botón de impresión dentro de la orden, orden de compra y datos fiscales.
+- `python3 tools/pruebas/e1.py`: ejemplos de ventas y compras, demo limpia (entrar, vaciar y volver a los ejemplos) en la demo.
