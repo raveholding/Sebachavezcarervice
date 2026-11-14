@@ -227,7 +227,7 @@ function datOffHTML(){const http=/^https?:/.test(location.protocol);
  '<li><b>O descargá el archivo</b> y abrilo con doble clic: funciona igual, sin internet. Importante: cada forma de abrirlo guarda sus propios datos, así que elegí una y usá siempre la misma (para pasar datos de una a otra, usá el respaldo).</li>'+
  '<li><b>Activá el almacenamiento permanente</b> para que el navegador no borre los datos si le falta espacio.</li>'+
  '<li><b>Descargá un respaldo cada semana</b> (el sistema avisa a los 7 días) y guardalo fuera de la computadora: pendrive, Drive o correo.</li></ol>'+
- '<div class="row" style="margin-top:10px">'+(http?'<button class="btn p" data-act="datdlhtml">⬇ Descargar el sistema (archivo .html)</button>':'')+'<button class="btn" data-act="datpersist">🔒 Activar almacenamiento permanente</button>'+(window.__vbInstall?'<button class="btn" data-act="datinstall">📲 Instalar como aplicación</button>':'')+'</div>'+
+ '<div class="row" style="margin-top:10px">'+(http?'<button class="btn p" data-act="datdlhtml">⬇ Descargar el sistema (archivo .html)</button>':'')+'<button class="btn" data-act="datpersist">🔒 Activar almacenamiento permanente</button>'+'<button class="btn" data-act="vbinstall">📲 Instalar como aplicación</button>'+'</div>'+
  '<p class="sm mut" style="margin:8px 0 0">Sin internet no funcionan sólo los enlaces externos: WhatsApp, mapas, Instagram y la página del desarrollador. Todo lo demás (órdenes, caja, stock, ventas, Club, personal, impresiones) sigue igual.</p></div></div>'}
 async function datOffDraw(){const el=$('#datoff');if(!el)return;let q={},p=false;try{if(navigator.storage){if(navigator.storage.estimate)q=await navigator.storage.estimate();if(navigator.storage.persisted)p=await navigator.storage.persisted()}}catch(e){}
  const ls=(localStorage.getItem(LS)||'').length*2,sw=!!(navigator.serviceWorker&&navigator.serviceWorker.controller),inst=matchMedia('(display-mode: standalone)').matches;const http=/^https?:/.test(location.protocol);
@@ -252,5 +252,25 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();window.__vb
 /* indicador de conexión en la barra superior */
 ['online','offline'].forEach(ev=>window.addEventListener(ev,()=>{try{if(ME)uxTop();toast(navigator.onLine?'Volvió internet':'Sin internet: el sistema sigue funcionando y guarda todo en este equipo')}catch(e){}}));
 if(typeof uxTop==='function'){const _uxTopD=uxTop;uxTop=function(){_uxTopD();const t=$('#uxtop');if(t&&!navigator.onLine&&!t.querySelector('.offc')){const s=document.createElement('span');s.className='chip2 c-warn offc';s.textContent='● Sin internet';const n=t.querySelector('.nm');if(n)n.after(s)}}}
+/* botón visible "Instalar aplicación": instala de verdad cuando el navegador lo permite; si no, muestra los pasos */
+(function(){
+ const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+ const st=document.createElement('style');st.textContent='#vbinst{position:fixed;right:14px;bottom:14px;z-index:40;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 18px;border:0;border-radius:999px;background:#1e6fd0;color:#fff;font:inherit;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.28);cursor:pointer}#vbinst:hover{background:#1859ab}#vbinst:focus-visible{outline:3px solid #fff;outline-offset:2px;box-shadow:0 0 0 5px #1e6fd0}#app:not([hidden]) ~ #vbinst{display:none}@media(max-width:900px){#vbinsttop .vbit{display:none}}@media print{#vbinst,#vbinsttop{display:none!important}}';document.head.appendChild(st);
+ function pill(){let b=document.getElementById('vbinst');if(standalone()){if(b)b.remove();return}
+  if(!b){b=document.createElement('button');b.id='vbinst';b.type='button';b.innerHTML='<span aria-hidden="true">📲</span> Instalar aplicación';b.onclick=()=>ACT.vbinstall();document.body.appendChild(b)}}
+ ACT.vbinstall=async()=>{const e=window.__vbInstall;
+  if(e){e.prompt();try{const r=await e.userChoice;if(r&&r.outcome==='accepted')toast('Instalando la aplicación…')}catch(x){}window.__vbInstall=null;return}
+  if(standalone()){toast('La aplicación ya está instalada en este equipo.');return}
+  const ua=navigator.userAgent||'',ios=/iphone|ipad|ipod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),and=/android/i.test(ua);
+  let pasos;
+  if(!/^https?:/.test(location.protocol))pasos='<p>Para instalarla, abrí el sistema desde su dirección web (no como archivo). Ahí aparece este mismo botón y se instala con un toque.</p>';
+  else if(ios)pasos='<ol style="margin:0 0 0 18px;padding:0"><li>Abrí esta página en <b>Safari</b>.</li><li>Tocá el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba).</li><li>Elegí <b>Agregar a pantalla de inicio</b> y confirmá con <b>Agregar</b>.</li></ol>';
+  else if(and)pasos='<ol style="margin:0 0 0 18px;padding:0"><li>Abrí esta página en <b>Chrome</b>.</li><li>Tocá el menú <b>⋮</b> (arriba a la derecha).</li><li>Elegí <b>Instalar aplicación</b> (o <b>Agregar a la pantalla principal</b>) y confirmá.</li></ol>';
+  else pasos='<ol style="margin:0 0 0 18px;padding:0"><li>En <b>Chrome</b> o <b>Edge</b>, buscá el ícono de instalar <b>⊕</b> al final de la barra de direcciones.</li><li>O abrí el menú <b>⋮</b> y elegí <b>Instalar…</b> / <b>Guardar y compartir → Instalar página como aplicación</b>.</li><li>Confirmá con <b>Instalar</b>.</li></ol>';
+  modal({title:'📲 Instalar la aplicación',ok:'Entendido',cancel:false,body:'<p>Se instala en el celular o en la computadora, abre en su propia ventana con el ícono del taller y sigue funcionando sin internet.</p>'+pasos+'<p class="sm mut" style="margin:10px 0 0">Si el botón no abre el aviso de instalación de tu navegador, es porque este navegador la instala desde su menú: seguí los pasos de arriba.</p>',onOk:()=>true})};
+ ACT.datinstall=ACT.vbinstall;
+ window.addEventListener('appinstalled',()=>{window.__vbInstall=null;pill();const t=document.getElementById('vbinsttop');if(t)t.remove();try{toast('Aplicación instalada')}catch(x){}});
+ if(typeof uxTop==='function'){const _uxTopI=uxTop;uxTop=function(){_uxTopI();const t=$('#uxtop');if(t&&!standalone()&&!t.querySelector('#vbinsttop')){const b=document.createElement('button');b.className='tb';b.id='vbinsttop';b.type='button';b.setAttribute('aria-label','Instalar aplicación');b.title='Instalar aplicación';b.innerHTML='📲<span class="vbit"> Instalar</span>';b.onclick=()=>ACT.vbinstall();const th=t.querySelector('[data-act="uxtheme"]');if(th)t.insertBefore(b,th);else t.appendChild(b)}}}
+ pill()})();
 /* el respaldo de Configuración lleva a la pantalla nueva */
 ACT.cfexp=()=>{UI.datTab='resp';go('datos')};

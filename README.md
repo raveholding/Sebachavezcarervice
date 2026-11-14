@@ -111,7 +111,7 @@ Pantalla **Sistema → Datos y respaldo** (solo el dueño). Funciona sin interne
 ## Sin internet (v5)
 
 - Después de abrirlo una vez con internet, el sistema **vuelve a abrir y trabaja sin conexión** (queda guardado en el equipo). Arriba aparece "● Sin internet" mientras no hay conexión.
-- **Instalar como app**: desde Datos y respaldo → Sin internet, o desde el menú del navegador ("Instalar" / "Agregar a pantalla de inicio").
+- **Instalar como app**: botón **📲 Instalar aplicación** visible en la pantalla de ingreso y en la barra superior (también en Datos y respaldo). Donde el navegador lo permite (Chrome, Edge, Android) abre el aviso de instalación; en iPhone/Safari y otros muestra los pasos para agregarla a la pantalla de inicio. Se oculta solo cuando la app ya está instalada. El código está en `tools/vb_datos.js`.
 - **Almacenamiento permanente**: pedirlo en la misma pestaña, para que el navegador no borre los datos al quedarse sin espacio.
 - **Copia del programa**: botón para descargar el `.html`, que abre con doble clic en cualquier computadora aunque no haya internet.
 - Los datos viven **en ese navegador y ese equipo**: hacer un respaldo al menos una vez por semana y guardarlo fuera del equipo. Borrar los datos del navegador borra el sistema.
